@@ -158,7 +158,7 @@ Les noms d'entités sont des exemples. Remplacez-les par les vôtres, dans les c
 - **Titres des cartes** : le titre affiché est écrit dans le HTML de la carte (champ `info` ou `head`) ; modifier `name:` ne suffit pas, cherchez le texte dans la carte et remplacez-le.
 
 ## Crédits
-- Damien Joulou
+- Damien Joulou-Bénardeau
 - Style inspiré des tableaux de bord de [TechEnClair](https://github.com/mirasandalucia/TechEnClair) (licence MIT).
 - Construit avec [button-card](https://github.com/custom-cards/button-card) et [card-mod](https://github.com/thomasloven/lovelace-card-mod) ; icônes [Material Design Icons](https://pictogrammers.com/library/mdi/).
 - Conçu avec l'aide de Claude (Anthropic).
