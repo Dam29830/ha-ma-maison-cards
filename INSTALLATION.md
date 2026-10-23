@@ -2,6 +2,8 @@
 
 Ce guide part de zéro. Comptez 20 à 30 minutes pour tout installer, moins si vous ne voulez que quelques cartes.
 
+> **Le plus simple : le tableau automatique, en trois clics.** Dans HACS, téléchargez **Ma Maison**, **button-card** et **card-mod** ; puis *Paramètres → Tableaux de bord → Ajouter un tableau de bord* → **Ma Maison**. Le tableau se construit avec vos appareils, sans rien copier ni remplacer : voir [le tableau automatique](README.md#le-tableau-automatique-recommandé). Ce guide reste utile pour le thème (étape 5), le package (étape 6) et l'installation à la main.
+
 **Sommaire**
 
 1. [Ce qu'il vous faut](#1-ce-quil-vous-faut)
@@ -36,9 +38,10 @@ Ce que contient le dépôt :
 | `dashboard/ma-maison.yaml` | le tableau de bord complet, toutes les cartes rangées en sections |
 | `configuration/themes/maison_nuit.yaml` | le thème sombre |
 | `configuration/packages/ma_maison.yaml` | les entrées, capteurs, automatisations et le script utilisés par certaines cartes |
-| `dist/ma-maison-agenda.js` | les cartes Agenda et Rappels (agendas et rappels de l'iPhone) |
+| `dist/ma-maison-agenda.js` | les cartes Agenda et Rappels et le tableau automatique (fichier installé par HACS) |
+| `src/`, `outils/` | le code de ce fichier et l'outil qui le construit (inutiles pour l'installation) |
 
-> Ajouter ce dépôt à HACS n'installe que les cartes Agenda et Rappels (étape 7). Le reste se copie à la main, comme décrit dans ce guide.
+> Ajouter ce dépôt à HACS donne le tableau automatique et les cartes Agenda et Rappels. Le thème et le package, eux, se copient à la main (étapes 5 et 6).
 
 ## 3. Installer button-card et card-mod (HACS)
 
@@ -109,7 +112,7 @@ Les cartes **Agenda** et **Rappels** affichent les agendas et les rappels de l'i
 
 1. **Relier iCloud** : *Paramètres → Appareils et services → Ajouter une intégration* → **Apple iCloud**. Saisissez votre identifiant Apple et votre mot de passe, puis le code à 6 chiffres qui s'affiche sur l'iPhone. Vos agendas et vos listes de rappels apparaissent comme entités `calendar.…` et `todo.…`.
 2. **Installer le fichier**, au choix (pas les deux) :
-   - **Avec HACS (le plus simple)** : *HACS → ⋮ (en haut à droite) → Dépôts personnalisés*. Dépôt : `https://github.com/Dam29830/ha-ma-maison-cards`, type : **Tableau de bord**, puis **Ajouter**. Ouvrez ensuite « Ma Maison — Agenda et Rappels » dans HACS et cliquez sur **Télécharger**. HACS déclare la ressource lui-même.
+   - **Avec HACS (le plus simple)** : *HACS → ⋮ (en haut à droite) → Dépôts personnalisés*. Dépôt : `https://github.com/Dam29830/ha-ma-maison-cards`, type : **Tableau de bord**, puis **Ajouter**. Ouvrez ensuite « Ma Maison » dans HACS et cliquez sur **Télécharger**. HACS déclare la ressource lui-même.
    - **À la main** : dans File editor, ouvrez `/config`, créez un dossier `www` s'il n'existe pas, puis dedans un fichier `ma-maison-agenda.js`. Collez-y le contenu de [`dist/ma-maison-agenda.js`](dist/ma-maison-agenda.js) et enregistrez. Déclarez ensuite la ressource : *Paramètres → Tableaux de bord → ⋮ (en haut à droite) → Ressources → Ajouter une ressource*. Adresse : `/local/ma-maison-agenda.js`, type : **Module JavaScript**.
 3. Rechargez la page (Ctrl + F5 sur PC, Cmd + Maj + R sur Mac). Dans l'application mobile, fermez-la complètement puis rouvrez-la.
 
@@ -166,7 +169,10 @@ Les cartes utilisent des noms d'entités d'exemple (`cover.salon_volet_tele`, `s
 | « Vérifier la configuration » signale une erreur | Le plus souvent : une clé `homeassistant:` ou `frontend:` présente deux fois dans `configuration.yaml`, ou une indentation décalée. Utilisez des espaces, jamais de tabulations. |
 | Les poubelles annoncent les mauvais jours | Réglez la première ligne du champ `head` de chaque carte : voir [Personnaliser](README.md#personnaliser). |
 | iPhone / iPad : un onglet de la barre du bas affiche une page vide | L'adresse du tableau n'est pas `ma-maison-iphone` (ou `ma-maison-ipad`). Corrigez-la dans *Paramètres → Tableaux de bord*, ou remplacez ce chemin dans le fichier collé. |
-| « Custom element doesn't exist: ma-maison-agenda » (ou `ma-maison-rappels`) | Le fichier n'est pas installé. Avec HACS : vérifiez que « Ma Maison — Agenda et Rappels » est téléchargé. À la main : le fichier doit être dans `/config/www/` et la ressource `/local/ma-maison-agenda.js` déclarée. Voir l'étape 7, puis rechargez la page. |
+| « Ma Maison » n'apparaît pas dans la liste des tableaux à ajouter | Le fichier n'est pas chargé : vérifiez que « Ma Maison » est téléchargé dans HACS (ou que la ressource `/local/ma-maison-agenda.js` est déclarée), puis rechargez la page. Dans l'application mobile, videz le cache du frontend depuis les réglages de l'application. |
+| Le tableau automatique affiche « Il manque button-card » | Installez button-card depuis HACS (étape 3), puis rechargez la page. |
+| Une carte manque dans le tableau automatique | Il n'a pas trouvé l'appareil, ou il est dans une autre pièce ou un autre étage que celui choisi. ✏️ ouvre les réglages du tableau : choisissez l'entité vous-même. |
+| « Custom element doesn't exist: ma-maison-agenda » (ou `ma-maison-rappels`) | Le fichier n'est pas installé. Avec HACS : vérifiez que « Ma Maison » est téléchargé. À la main : le fichier doit être dans `/config/www/` et la ressource `/local/ma-maison-agenda.js` déclarée. Voir l'étape 7, puis rechargez la page. |
 | Agenda ou Rappels : « iCloud déconnecté » | Apple redemande le code de double authentification. Le bouton **Ouvrir** de la carte mène à l'intégration Apple iCloud : reconnectez-la avec le code reçu sur l'iPhone. Si elle ne propose pas de le faire, supprimez-la puis ajoutez-la de nouveau (étape 7.1). |
 | Agenda ou Rappels : « Aucun agenda » / « Aucune liste » | L'intégration Apple iCloud n'est pas installée, ou vos agendas viennent d'ailleurs (Google, CalDAV…) : ajoutez `platform: all` sous `type:` dans la carte, ou listez vos entités avec `entities:`. |
 | Les valeurs du HomePod ne bougent pas | Vérifiez que votre raccourci Apple envoie bien vers `https://<votre-home-assistant>/api/webhook/<votre-identifiant>`, avec le même identifiant que dans le package. |

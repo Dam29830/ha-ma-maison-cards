@@ -2,7 +2,7 @@
 
 Un tableau de bord sombre et vivant pour Home Assistant : le ciel suit la vraie météo et la position du soleil, les volets bougent selon leur position réelle, le poêle flambe, le ballon chauffe, le robot se promène, les poubelles s'envolent les jours de grand vent et la cloche sonne quand un rappel de l'iPhone est en retard.
 
-> 🇬🇧 *A French Home Assistant dashboard made of animated `custom:button-card` cards (weather, shutters, pellet stove, water heater, robot vacuum, bins…). Copy a card's YAML, replace the example entity IDs, done. Two extra JavaScript cards show the iPhone's calendar and reminders (Apple iCloud integration).*
+> 🇬🇧 *A French Home Assistant dashboard made of animated `custom:button-card` cards (weather, shutters, pellet stove, water heater, robot vacuum, bins…). Install it from HACS and pick « Ma Maison » when adding a dashboard: it builds itself with your own devices, nothing to copy. You can still copy a single card's YAML and replace the example entity IDs. Two extra JavaScript cards show the iPhone's calendar and reminders (Apple iCloud integration).*
 
 <p align="center">
   <img src="images/animations.gif" alt="Cartes animées : météo, volets, poêle à granulés, robot aspirateur" width="100%">
@@ -15,13 +15,17 @@ Un tableau de bord sombre et vivant pour Home Assistant : le ciel suit la vraie 
 
 ## Démarrage rapide
 
-1. Installez **[button-card](https://github.com/custom-cards/button-card)** depuis HACS.
-2. Ouvrez une carte du dossier [`cartes/`](cartes), copiez-la (icône *Copy raw file*), puis dans votre tableau de bord : ✏️ → *Ajouter une carte* → *Manuel* → collez.
-3. Remplacez les entités d'exemple indiquées en tête du fichier par les vôtres.
+[![Ouvrir le dépôt dans HACS](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=Dam29830&repository=ha-ma-maison-cards&category=plugin)
 
-Les cartes **Agenda** et **Rappels** sont à part : un petit fichier JavaScript, à installer avec HACS ou à la main, et aucune entité à remplacer (voir [Agenda et rappels de l'iPhone](#4-agenda-et-rappels-de-liphone)).
+1. Dans **HACS**, téléchargez **Ma Maison** (bouton ci-dessus), puis **[button-card](https://github.com/custom-cards/button-card)** et **[card-mod](https://github.com/thomasloven/lovelace-card-mod)**.
+2. *Paramètres → Tableaux de bord → Ajouter un tableau de bord*, puis choisissez **Ma Maison** dans la liste.
+3. C'est tout : le tableau se construit avec **vos** appareils. Rien à copier, aucune entité à remplacer.
 
-Pour tout installer (thème, package, tableau complet), suivez le **[guide d'installation pas à pas](INSTALLATION.md)**, avec une section dépannage.
+Détails, réglages et limites : [le tableau automatique](#le-tableau-automatique-recommandé).
+
+Vous préférez une seule carte ? Ouvrez-la dans le dossier [`cartes/`](cartes), copiez-la (icône *Copy raw file*), puis dans votre tableau de bord : ✏️ → *Ajouter une carte* → *Manuel* → collez, et remplacez les entités d'exemple indiquées en tête du fichier.
+
+Pour le thème, le package et l'installation à la main, suivez le **[guide d'installation pas à pas](INSTALLATION.md)**, avec une section dépannage.
 
 Sur iPhone ou sur iPad, deux tableaux tout prêts vous attendent : [versions iPhone et iPad](#versions-iphone-et-ipad).
 
@@ -30,7 +34,7 @@ Sur iPhone ou sur iPad, deux tableaux tout prêts vous attendent : [versions iPh
 - [Aperçu du tableau complet](#aperçu-du-tableau-complet)
 - [Versions iPhone et iPad](#versions-iphone-et-ipad)
 - [Les cartes](#les-cartes)
-- [Installation](#installation) · [guide pas à pas](INSTALLATION.md)
+- [Installation](#installation) : [le tableau automatique](#le-tableau-automatique-recommandé) · [à la main](#installation-à-la-main) · [guide pas à pas](INSTALLATION.md)
 - [Entités à remplacer](#entités-à-remplacer)
 - [Personnaliser](#personnaliser)
 - [Crédits](#crédits)
@@ -65,7 +69,9 @@ L'onglet **Accueil** regroupe aussi l'agenda et les rappels de l'iPhone : sous l
 
 Deux réglages en plus par rapport au tableau complet : les boutons des cartes occupent toute la place prévue pour eux (plus faciles à toucher), et les petites cartes Température et Humidité remplissent leur case.
 
-**Installation** : créez un tableau de bord vide nommé « Ma Maison iPhone » (ou « Ma Maison iPad »). Home Assistant remplit son adresse d'après le titre : elle doit être `ma-maison-iphone` (ou `ma-maison-ipad`), car la barre d'onglets l'utilise. Ouvrez-le, puis ✏️ → ⋮ → *Éditeur de configuration brute* et collez le fichier. Avec une autre adresse, remplacez `/ma-maison-iphone/` (ou `/ma-maison-ipad/`) partout dans le fichier.
+**Avec le tableau automatique**, rien à faire : il prend la disposition iPhone, iPad ou ordinateur selon l'écran qui l'affiche, et la barre d'onglets suit l'adresse du tableau.
+
+**À la main** : créez un tableau de bord vide nommé « Ma Maison iPhone » (ou « Ma Maison iPad »). Home Assistant remplit son adresse d'après le titre : elle doit être `ma-maison-iphone` (ou `ma-maison-ipad`), car la barre d'onglets l'utilise. Ouvrez-le, puis ✏️ → ⋮ → *Éditeur de configuration brute* et collez le fichier. Avec une autre adresse, remplacez `/ma-maison-iphone/` (ou `/ma-maison-ipad/`) partout dans le fichier.
 
 ## Les cartes
 
@@ -99,11 +105,70 @@ Chaque fichier du dossier [`cartes/`](cartes) est une carte prête à coller. En
 
 ## Installation
 
+### Le tableau automatique (recommandé)
+
+[![Ouvrir le dépôt dans HACS](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=Dam29830&repository=ha-ma-maison-cards&category=plugin)
+
+1. **Télécharger** : le bouton ci-dessus ouvre le dépôt dans HACS (sinon *HACS → ⋮ → Dépôts personnalisés*, adresse `https://github.com/Dam29830/ha-ma-maison-cards`, type **Tableau de bord**). Cliquez sur **Télécharger**, puis faites de même pour **button-card** et **card-mod**.
+2. **Créer le tableau** : *Paramètres → Tableaux de bord → Ajouter un tableau de bord*, choisissez **Ma Maison** dans la liste, donnez-lui un nom, puis **Créer**.
+3. Ouvrez-le : c'est prêt.
+
+Sans HACS : copiez [`dist/ma-maison-agenda.js`](dist/ma-maison-agenda.js) dans `/config/www/` et déclarez la ressource `/local/ma-maison-agenda.js` (type **Module JavaScript**, voir l'[étape 4](#4-agenda-et-rappels-de-liphone)) ; la suite est identique.
+
+**Ce qu'il trouve tout seul**
+
+| Carte | Ce qu'il cherche |
+|---|---|
+| Présence | les deux premières personnes, la vôtre d'abord |
+| Météo | votre météo (Met.no) |
+| Volets | chaque volet roulant ; la façade dès deux volets (ses boutons pilotent tous les volets, ou votre groupe de volets s'il existe) |
+| Porte de garage | une porte de type « garage » |
+| Prises | les prises connectées rangées dans une pièce |
+| Radiateur | un interrupteur nommé « radiateur » qui mesure la puissance |
+| Poêle à granulés | un thermostat dont le nom évoque un poêle, et les capteurs du même appareil |
+| Eau chaude | un chauffe-eau Atlantic Cozytouch |
+| Températures et humidité | une carte par pièce : le capteur choisi dans les réglages de la pièce, sinon celui qui s'y trouve |
+| Robot aspirateur | votre aspirateur, et l'entité de sa station s'il en a deux |
+| Projecteur | un appareil Android TV Remote et son entité Google Cast |
+| Caméras | jusqu'à quatre caméras |
+| Linky | la statistique de [ha-linky](https://github.com/bokub/ha-linky) |
+| Agenda et rappels | les agendas et listes iCloud, sinon tous ceux de Home Assistant |
+| Prévisions, poubelles, facture, tarifs, granulés, HomePod | apparaissent dès que le [package](#3-le-package--entrées-capteurs-et-automatisations) est installé |
+
+Une carte sans appareil correspondant est simplement masquée. La disposition suit l'écran : ordinateur, iPhone ou iPad, avec la barre d'onglets en bas.
+
+**Régler** : ✏️ en haut à droite du tableau ouvre ses réglages dans un éditeur visuel (ou en YAML). Un champ laissé vide reste en détection automatique.
+
+| Réglage | À quoi il sert | Exemple |
+|---|---|---|
+| `etage` | n'afficher que les appareils d'un étage (ceux sans pièce restent) : pratique si Home Assistant gère deux maisons | `etage: ma_maison` |
+| `affichage` | imposer une disposition : `ordinateur`, `iphone` ou `ipad` (`auto` par défaut) | `affichage: ipad` |
+| `meteo`, `garage`, `radiateur`, `poele`, `chauffe_eau`, `robot`, `projecteur` | choisir l'entité ; `false` masque la carte | `poele: climate.mon_poele` |
+| `personnes`, `volets`, `prises`, `cameras` | choisir la liste | `prises: [switch.prise_tele]` |
+| `pieces` | pièces des cartes température et humidité | `pieces: [salon, chambre]` |
+| `poubelle_jaune`, `poubelle_bleue` | jours de collecte (`jours`, `semaines` : `toutes`, `paires` ou `impaires`, `heure`, `feries` : `report` ou `aucun`) | `poubelle_jaune: {jours: [mardi], semaines: impaires, heure: 7}` |
+| `masquer` | cartes à cacher : `robot`, `poubelles`, `eau_chaude`, `temperatures`, `electricite`, `cameras`, `agenda`… | `masquer: [robot]` |
+| `exclure` | entités à ignorer dans la détection | `exclure: [cover.velux]` |
+
+Plus rares : `volets_groupe`, `radiateur_puissance`, `robot_station`, `projecteur_cast` et `linky`. Un exemple complet, en YAML :
+
+```yaml
+strategy:
+  type: custom:ma-maison
+  etage: ma_maison
+  prises: [switch.prise_salle_de_bain]
+  poubelle_jaune: {jours: [mardi], semaines: impaires, heure: 7, feries: report}
+```
+
+**Modifier carte par carte** : ✏️ → *Prendre le contrôle*. Home Assistant transforme le tableau en tableau classique, vos entités déjà en place ; il ne se met alors plus à jour tout seul.
+
+**Pour aller plus loin** : le [thème](#2-le-thème-maison_nuit-conseillé) et le [package](#3-le-package--entrées-capteurs-et-automatisations) s'installent à la main, HACS ne sachant pas le faire. Les cartes qui en dépendent apparaissent ensuite d'elles-mêmes.
+
+### Installation à la main
+
 Téléchargez le dépôt avec le bouton vert **Code → Download ZIP**, ou copiez seulement les fichiers qui vous intéressent. Première fois avec Home Assistant ? Le **[guide pas à pas](INSTALLATION.md)** détaille chaque clic.
 
-> **Et HACS ?** Ajouter ce dépôt à HACS (dépôt personnalisé, type *Tableau de bord*) installe uniquement les cartes **Agenda** et **Rappels** ([étape 4](#4-agenda-et-rappels-de-liphone)). Les autres cartes, le thème, le package et les tableaux complets se copient à la main, comme décrit ci-dessous.
-
-### 1. Prérequis
+#### 1. Prérequis
 
 - **Home Assistant** récent (testé sur **2026.10**), pour la vue *Sections* et les cartes *Titre*.
 - **[HACS](https://hacs.xyz)** avec :
@@ -111,7 +176,7 @@ Téléchargez le dépôt avec le bouton vert **Code → Download ZIP**, ou copie
   - **[card-mod](https://github.com/thomasloven/lovelace-card-mod)** : uniquement pour habiller les cartes natives (graphiques, statistiques, caméra…).
 - Pour les cartes **Agenda** et **Rappels** : l'intégration **Apple iCloud** (native) et le fichier [`dist/ma-maison-agenda.js`](dist/ma-maison-agenda.js), installé par HACS ou à la main (voir [étape 4](#4-agenda-et-rappels-de-liphone)).
 
-### 2. Le thème `maison_nuit` (conseillé)
+#### 2. Le thème `maison_nuit` (conseillé)
 
 Les cartes ont leurs propres couleurs, mais elles sont pensées pour ce fond ardoise.
 
@@ -123,7 +188,7 @@ Les cartes ont leurs propres couleurs, mais elles sont pensées pour ce fond ard
    ```
 3. Redémarrez Home Assistant. Le thème est défini pour le **mode sombre**.
 
-### 3. Le package : entrées, capteurs et automatisations
+#### 3. Le package : entrées, capteurs et automatisations
 
 Certaines cartes s'appuient sur des entrées et des automatisations. Tout est réuni dans un seul fichier :
 
@@ -148,13 +213,13 @@ Vous n'utilisez qu'une partie des cartes ? Supprimez les blocs inutiles du packa
 | Vidéoprojecteur | `sensor.projecteur_puissance_estimee`, `sensor.projecteur_energie_aujourd_hui` |
 | Température / humidité du HomePod | `input_text.homepod_temperature`, `input_text.homepod_humidite` + automatisation « relevé HomePod » (webhook) |
 
-### 4. Agenda et rappels de l'iPhone
+#### 4. Agenda et rappels de l'iPhone
 
 Ces deux cartes ne sont pas des button-card : un seul fichier JavaScript fournit `custom:ma-maison-agenda` et `custom:ma-maison-rappels`.
 
 1. Ajoutez l'intégration **Apple iCloud** (*Paramètres → Appareils et services → Ajouter une intégration*) : identifiant Apple, mot de passe, puis le code à 6 chiffres affiché sur l'iPhone. Vos agendas et vos listes de rappels deviennent des entités `calendar.…` et `todo.…`.
 2. Installez le fichier JavaScript, au choix (pas les deux) :
-   - **Avec HACS** : *HACS → ⋮ → Dépôts personnalisés*, dépôt `https://github.com/Dam29830/ha-ma-maison-cards`, type **Tableau de bord**, puis téléchargez « Ma Maison — Agenda et Rappels ». HACS déclare la ressource tout seul.
+   - **Avec HACS** : *HACS → ⋮ → Dépôts personnalisés*, dépôt `https://github.com/Dam29830/ha-ma-maison-cards`, type **Tableau de bord**, puis téléchargez « Ma Maison ». HACS déclare la ressource tout seul.
    - **À la main** : copiez [`dist/ma-maison-agenda.js`](dist/ma-maison-agenda.js) dans `/config/www/`, puis *Paramètres → Tableaux de bord → ⋮ → Ressources → Ajouter une ressource* : adresse `/local/ma-maison-agenda.js`, type **Module JavaScript**.
 3. Rechargez la page (dans l'application, fermez-la puis rouvrez-la).
 
@@ -162,7 +227,7 @@ Rien à remplacer : les cartes trouvent toutes seules les agendas et les listes 
 
 Pour mettre le fichier à jour plus tard : avec HACS, téléchargez simplement la nouvelle version. À la main, recopiez le fichier et changez aussi l'adresse de la ressource (`/local/ma-maison-agenda.js?v=2`, puis `?v=3`…) : sinon les appareils gardent l'ancienne version en cache.
 
-### 5. Ajouter les cartes
+#### 5. Ajouter les cartes
 
 **Tout le tableau d'un coup** : créez un tableau de bord vide (*Paramètres → Tableaux de bord → Ajouter un tableau de bord → Nouveau tableau de bord à partir de zéro*), ouvrez-le, puis ✏️ → ⋮ → *Éditeur de configuration brute* et collez [`dashboard/ma-maison.yaml`](dashboard/ma-maison.yaml).
 
@@ -176,7 +241,7 @@ Il reste à remplacer les entités d'exemple par les vôtres (Ctrl/Cmd + F dans 
 
 ## Entités à remplacer
 
-Les noms d'entités sont des exemples. Remplacez-les par les vôtres, dans les cartes comme dans le package.
+Avec le [tableau automatique](#le-tableau-automatique-recommandé), ce remplacement est fait pour vous. Pour une installation à la main, les noms d'entités sont des exemples : remplacez-les par les vôtres, dans les cartes comme dans le package.
 
 | Entité d'exemple | À remplacer par |
 |---|---|
@@ -201,7 +266,7 @@ Les noms d'entités sont des exemples. Remplacez-les par les vôtres, dans les c
 
 ## Personnaliser
 
-- **Poubelles** : le calendrier est sur la première ligne du champ `head` de chaque carte, par exemple `const DAYS=[2], W=1, H=7, MODE="report";`. `DAYS` : jours de collecte (0 = lundi … 6 = dimanche, plusieurs jours possibles : `[1, 3]`) ; `W` : `1` = semaines impaires, `0` = paires, `null` = toutes ; `H` : heure de passage ; `MODE` : `"report"` décale la collecte après un jour férié, `"aucun"` ne décale pas. Le bac s'envole quand le vent prévu atteint 50 km/h ; un appui sur la carte le déclare « rangé à l'abri » pour la journée.
+- **Poubelles** : avec le tableau automatique, réglez les jours dans ses réglages (`poubelle_jaune`, `poubelle_bleue`). À la main, le calendrier est sur la première ligne du champ `head` de chaque carte, par exemple `const DAYS=[2], W=1, H=7, MODE="report";`. `DAYS` : jours de collecte (0 = lundi … 6 = dimanche, plusieurs jours possibles : `[1, 3]`) ; `W` : `1` = semaines impaires, `0` = paires, `null` = toutes ; `H` : heure de passage ; `MODE` : `"report"` décale la collecte après un jour férié, `"aucun"` ne décale pas. Le bac s'envole quand le vent prévu atteint 50 km/h ; un appui sur la carte le déclare « rangé à l'abri » pour la journée.
 - **Poêle à granulés** : la carte lit les statuts `OFF`, `PELLET LOAD`, `AWAITING FLAME`, `LIGHTING`, `WORKING`, `ASHPAN CLEANING`, `STANDBY`, `FINAL CLEANING`, `ALARM` et `ALARM MEMORY`. Si votre poêle en renvoie d'autres, adaptez le tableau `P` de la variable `pf`. Sans statut reconnu, la carte se rabat sur l'état de l'entité `climate`.
 - **Sacs de granulés** : alerte « stock bas » à 6 sacs ou moins. La carte affiche le stock « sur » le `maximum` du compteur (72, une palette) et le bouton « Livraison » remet le compteur à sa valeur `initial` (72 dans le package).
 - **Humidité** : air sec sous 35 %, confortable jusqu'à 60 %, un peu humide jusqu'à 70 %, très humide au-delà.
@@ -210,6 +275,17 @@ Les noms d'entités sont des exemples. Remplacez-les par les vôtres, dans les c
 - **Numéro sur les poubelles** : remplacez `12` dans `<span class="jnum">12</span>` (bac jaune) et `<span class="bnum">12</span>` (bac bleu), ainsi que `n° 12` dans le titre du drapeau, par votre propre numéro.
 - **Titres des cartes** : le titre affiché est écrit dans le HTML de la carte (champ `info` ou `head`) ; modifier `name:` ne suffit pas, cherchez le texte dans la carte et remplacez-le.
 - **Agenda et rappels** : options facultatives, à ajouter sous `type:`. `exclude: [Travail]` masque des agendas ou des listes par leur nom (la carte Rappels laisse « Courses » de côté par défaut ; `exclude: []` l'affiche) ; `colors: {Famille: "#ff8fab"}` change une couleur ; `days` (7 jours) et `max_items` (4 événements, 5 rappels) règlent la longueur ; `title` change le titre. `entities: [calendar.xxx]` choisit les agendas ou les listes à la main, et `platform: all` prend tous ceux de Home Assistant (Google, CalDAV, agenda local, liste de courses…), pas seulement iCloud.
+
+## Modifier le dépôt
+
+Le fichier installé par HACS, [`dist/ma-maison-agenda.js`](dist/ma-maison-agenda.js), est construit à partir de [`src/`](src) et des trois tableaux du dossier [`dashboard/`](dashboard). Après avoir modifié l'un d'eux :
+
+```bash
+python3 outils/construire.py                                   # reconstruit dist/ma-maison-agenda.js
+node outils/tester.mjs tests/maison-fictive.json '{}' iphone   # génère le tableau d'une maison fictive et le vérifie
+```
+
+Les entités d'exemple des tableaux sont celles que la stratégie remplace : gardez-les telles quelles dans `dashboard/`.
 
 ## Crédits
 - Damien Joulou-Bénardeau
