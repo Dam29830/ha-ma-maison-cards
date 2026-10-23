@@ -694,6 +694,15 @@ views:
             grid_options:
               columns: 12
               rows: auto
+          - type: heading
+            heading: Colis
+            heading_style: subtitle
+            icon: mdi:package-variant-closed
+          - type: custom:ma-maison-colis
+            entity: todo.colis_amazon
+            grid_options:
+              columns: 12
+              rows: auto
     footer:
       card:
         type: custom:button-card

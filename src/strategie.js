@@ -13,7 +13,7 @@
 //  se règlent dans l'éditeur visuel du tableau ou en YAML :
 //    affichage: auto | ordinateur | iphone | ipad
 //    etage: ma_maison                      → seulement les appareils de cet étage
-//    meteo, garage, radiateur, poele, chauffe_eau, robot, projecteur : une entité (ou false)
+//    meteo, garage, radiateur, poele, chauffe_eau, robot, projecteur, colis : une entité (ou false)
 //    personnes, volets, prises, cameras : une liste d'entités (ou false)
 //    volets_groupe, robot_station, projecteur_cast, radiateur_puissance, linky
 //    pieces: [salon, chambre]              → pièces des cartes température / humidité
@@ -97,6 +97,8 @@
     },
     projecteur: "media_player.projecteur",
     projecteurCast: "media_player.projecteur_cast",
+    // Liste To-do remplie par le package colis_amazon (Local To-do « Colis Amazon »).
+    colis: "todo.colis_amazon",
     // Entités créées par le package du dépôt (mêmes noms chez tout le monde).
     paquet: [
       "input_text.meteo_previsions_semaine",
@@ -231,7 +233,7 @@
   // ── Options ───────────────────────────────────────────────────────────────
   const OPTIONS_UNIQUES = [
     "meteo", "volets_groupe", "garage", "radiateur", "radiateur_puissance", "poele", "chauffe_eau",
-    "robot", "robot_station", "projecteur", "projecteur_cast", "linky",
+    "robot", "robot_station", "projecteur", "projecteur_cast", "linky", "colis",
   ];
   const OPTIONS_LISTES = ["personnes", "volets", "prises", "cameras", "pieces", "masquer", "exclure"];
 
@@ -592,9 +594,17 @@
       }
     }
 
-    // Agendas et listes de rappels.
+    // Colis : la liste que remplit le package colis_amazon à partir des e-mails d'Amazon.
+    r.colis = choix(opts.colis, () => {
+      const c = ctx.candidats("todo", (id, st) =>
+        /colis|parcel|package/.test(sansAccents(`${id} ${(st.attributes || {}).friendly_name || ""}`))
+      );
+      return c.find((id) => id === EX.colis) || c.find((id) => (ctx.entites[id] || {}).platform === "local_todo") || c[0] || null;
+    });
+
+    // Agendas et listes de rappels (la liste des colis n'est pas une liste de rappels).
     const plateforme = (dom) => {
-      const ids = Object.keys(states).filter((id) => domaine(id) === dom && ctx.utilisable(id));
+      const ids = Object.keys(states).filter((id) => domaine(id) === dom && ctx.utilisable(id) && id !== r.colis);
       if (!ids.length) return null;
       return ids.some((id) => (ctx.entites[id] || {}).platform === "icloud") ? "icloud" : "all";
     };
@@ -630,6 +640,7 @@
     if (!c || typeof c !== "object") return null;
     if (c.type === "custom:ma-maison-agenda") return "agenda";
     if (c.type === "custom:ma-maison-rappels") return "rappels";
+    if (c.type === "custom:ma-maison-colis") return "colis";
     if (c.type === "history-graph") return "historique";
     if (c.type === "statistic" || c.type === "statistics-graph") return "linky";
     if (c.type === "entities") return "tarifs";
@@ -792,6 +803,8 @@
         if (!plateforme) return [];
         return [plateforme === "icloud" ? cloner(c) : { ...cloner(c), platform: "all" }];
       }
+      case "colis":
+        return r.colis ? [{ ...cloner(c), entity: r.colis }] : [];
       default:
         return [substituer(c, commune)];
     }
@@ -1006,6 +1019,7 @@
         { name: "meteo", selector: ENTITE("weather") },
         { name: "personnes", selector: ENTITE("person", true) },
         { name: "cameras", selector: ENTITE("camera", true) },
+        { name: "colis", selector: ENTITE("todo") },
       ],
     },
     {
@@ -1053,7 +1067,7 @@
                 ["prise", "Prises"], ["radiateur", "Radiateur"], ["poele", "Poêle"], ["granules", "Sacs de granulés"],
                 ["eau_chaude", "Eau chaude"], ["temperatures", "Températures et humidité"], ["electricite", "Électricité"],
                 ["projecteur", "Projecteur"], ["poubelles", "Poubelles"], ["robot", "Robot aspirateur"],
-                ["agenda", "Agenda"], ["rappels", "Rappels"],
+                ["agenda", "Agenda"], ["rappels", "Rappels"], ["colis", "Colis Amazon"],
               ].map(([value, label]) => ({ value, label })),
             },
           },
@@ -1068,6 +1082,7 @@
     meteo: "Météo",
     personnes: "Personnes (2 au plus)",
     cameras: "Caméras",
+    colis: "Colis Amazon (liste To-do)",
     volets: "Volets",
     volets_groupe: "Groupe « tous les volets »",
     garage: "Porte de garage",
@@ -1207,7 +1222,7 @@
       type: "ma-maison",
       strategyType: "dashboard",
       name: "Ma Maison",
-      description: "Le tableau animé Ma Maison, créé tout seul avec vos appareils : météo, volets, poêle, chauffe-eau, robot, agenda…",
+      description: "Le tableau animé Ma Maison, créé tout seul avec vos appareils : météo, volets, poêle, chauffe-eau, robot, agenda, colis…",
       documentationURL: MM_DEPOT,
     });
     console.info(`%c MA-MAISON %c stratégie ${MM_VERSION} `, "background:#4cc9a8;color:#0e1319;font-weight:700", "");

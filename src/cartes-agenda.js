@@ -6,13 +6,13 @@
 //   max_items: 4                       # facultatif : nombre d'événements listés
 //
 //   type: custom:ma-maison-rappels     # rappels animés (cloche qui sonne quand un rappel est dû)
-//   exclude: [Courses]                 # facultatif : listes ignorées (par défaut : Courses)
+//   exclude: [Courses]                 # facultatif : listes ignorées (par défaut : Courses et Colis Amazon)
 //   max_items: 5                       # facultatif
 //
 // Options communes : entities: [calendar.x, ...] pour choisir à la main (sinon détection automatique
 // des entités de l'intégration iCloud, doublons fusionnés), platform: icloud, title: "…",
 // colors: { Famille: "#ff8fab" }.
-const VERSION = "2.0.0";
+const VERSION = "2.1.0";
 
 const PALETTE = ["#7cc4ff", "#ff8fab", "#ffc145", "#4cc9a8", "#b49cff", "#ff9f5a", "#5ad1e8", "#f5d76e"];
 const NAMED = {
@@ -670,7 +670,8 @@ class MaMaisonRappels extends MaMaisonBase {
   }
 
   setConfig(config) {
-    this._config = Object.assign({ max_items: 5, title: "Rappels", exclude: ["Courses"] }, config || {});
+    // « Colis Amazon » : la liste de la carte Colis, pas des rappels (utile avec platform: all).
+    this._config = Object.assign({ max_items: 5, title: "Rappels", exclude: ["Courses", "Colis Amazon"] }, config || {});
     this._sig = undefined;
     if (this._hass) this.hass = this._hass;
   }

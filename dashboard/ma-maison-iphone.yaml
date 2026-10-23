@@ -667,6 +667,17 @@ views:
       - type: grid
         cards:
           - type: heading
+            heading: Colis
+            heading_style: title
+            icon: mdi:package-variant-closed
+          - type: custom:ma-maison-colis
+            entity: todo.colis_amazon
+            grid_options:
+              columns: 12
+              rows: auto
+      - type: grid
+        cards:
+          - type: heading
             heading: Caméras
             heading_style: title
             icon: mdi:cctv

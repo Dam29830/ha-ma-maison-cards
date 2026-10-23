@@ -45,7 +45,8 @@
     "sensor.radiateur_chambre_puissance": { "entity_id": "sensor.radiateur_chambre_puissance", "device_id": "d_radiateur", "platform": "shelly" },
     "sensor.telephone_temperature_batterie": { "entity_id": "sensor.telephone_temperature_batterie", "device_id": "d_telephone", "platform": "mobile_app" },
     "calendar.famille": { "entity_id": "calendar.famille", "platform": "local_calendar" },
-    "todo.courses": { "entity_id": "todo.courses", "platform": "local_todo" }
+    "todo.courses": { "entity_id": "todo.courses", "platform": "local_todo" },
+    "todo.colis_amazon": { "entity_id": "todo.colis_amazon", "platform": "local_todo" }
   },
   "states": {
     "sun.sun": { "entity_id": "sun.sun", "state": "above_horizon", "attributes": { "friendly_name": "Soleil" } },
@@ -69,6 +70,7 @@
     "sensor.radiateur_chambre_puissance": { "entity_id": "sensor.radiateur_chambre_puissance", "state": "0", "attributes": { "friendly_name": "Radiateur chambre Puissance", "device_class": "power", "unit_of_measurement": "W" } },
     "sensor.telephone_temperature_batterie": { "entity_id": "sensor.telephone_temperature_batterie", "state": "31", "attributes": { "friendly_name": "Téléphone d'Alice Température batterie", "device_class": "temperature" } },
     "calendar.famille": { "entity_id": "calendar.famille", "state": "off", "attributes": { "friendly_name": "Famille" } },
-    "todo.courses": { "entity_id": "todo.courses", "state": "2", "attributes": { "friendly_name": "Courses" } }
+    "todo.courses": { "entity_id": "todo.courses", "state": "2", "attributes": { "friendly_name": "Courses" } },
+    "todo.colis_amazon": { "entity_id": "todo.colis_amazon", "state": "3", "attributes": { "friendly_name": "Colis Amazon" } }
   }
 }
