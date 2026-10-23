@@ -16,7 +16,7 @@
 #  Les entités sont des exemples : remplacez-les par les vôtres
 #  (liste complète dans le README).
 #  Nécessite : button-card et card-mod (HACS), thème maison_nuit (conseillé),
-#  www/ma-maison-agenda.js en ressource pour l'agenda et les rappels (guide d'installation, étape 7).
+#  ma-maison-agenda.js (HACS ou ressource) pour l'agenda et les rappels (guide d'installation, étape 7).
 # ══════════════════════════════════════════════════════════════════════
 title: Ma Maison
 views:

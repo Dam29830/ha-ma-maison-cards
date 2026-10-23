@@ -19,7 +19,7 @@ Un tableau de bord sombre et vivant pour Home Assistant : le ciel suit la vraie 
 2. Ouvrez une carte du dossier [`cartes/`](cartes), copiez-la (icône *Copy raw file*), puis dans votre tableau de bord : ✏️ → *Ajouter une carte* → *Manuel* → collez.
 3. Remplacez les entités d'exemple indiquées en tête du fichier par les vôtres.
 
-Les cartes **Agenda** et **Rappels** sont à part : un petit fichier JavaScript à déclarer une fois, sans HACS, et aucune entité à remplacer (voir [Agenda et rappels de l'iPhone](#4-agenda-et-rappels-de-liphone)).
+Les cartes **Agenda** et **Rappels** sont à part : un petit fichier JavaScript, à installer avec HACS ou à la main, et aucune entité à remplacer (voir [Agenda et rappels de l'iPhone](#4-agenda-et-rappels-de-liphone)).
 
 Pour tout installer (thème, package, tableau complet), suivez le **[guide d'installation pas à pas](INSTALLATION.md)**, avec une section dépannage.
 
@@ -94,12 +94,14 @@ Chaque fichier du dossier [`cartes/`](cartes) est une carte prête à coller. En
 | <img src="images/cartes/19-poubelle-jaune.png" alt="Poubelle jaune (emballages)" width="300"> | **Poubelle jaune (emballages)** · [`19-poubelle-jaune.yaml`](cartes/19-poubelle-jaune.yaml)<br>Compte à rebours jusqu'à la prochaine collecte, alerte la veille, report des jours fériés, envol animé du bac quand il y a du vent ; appui = « bac rangé à l'abri » pour la journée.<br><sub>Nécessite : button-card (HACS) + vent max prévu, input_datetime et script poubelle (package)</sub> |
 | <img src="images/cartes/20-poubelle-bleue.png" alt="Poubelle bleue (ordures ménagères)" width="300"> | **Poubelle bleue (ordures ménagères)** · [`20-poubelle-bleue.yaml`](cartes/20-poubelle-bleue.yaml)<br>Même principe que la poubelle jaune, avec son propre calendrier et son animation.<br><sub>Nécessite : button-card (HACS) + vent max prévu, input_datetime et script poubelle (package)</sub> |
 | <img src="images/cartes/21-robot-aspirateur.png" alt="Robot aspirateur" width="300"> | **Robot aspirateur** · [`21-robot-aspirateur.yaml`](cartes/21-robot-aspirateur.yaml)<br>Robot animé selon son état (nettoyage, retour, vidage, lavage, séchage, charge), batterie, réservoirs, erreurs en clair ; boutons démarrer, pause, base, localiser, vider le bac.<br><sub>Nécessite : button-card (HACS) + robot Ecovacs Deebot (Matter + intégration Ecovacs)</sub> |
-| <img src="images/cartes/22-agenda.png" alt="Agenda" width="300"> | **Agenda** · [`22-agenda.yaml`](cartes/22-agenda.yaml)<br>Les agendas de l'iPhone : page d'éphéméride qui se tourne chaque jour, événement en cours avec sa barre de progression, compte à rebours jusqu'au prochain, semaine en pastilles (appui sur un jour = son programme), une couleur par agenda.<br><sub>Nécessite : www/ma-maison-agenda.js en ressource + intégration Apple iCloud</sub> |
-| <img src="images/cartes/23-rappels.png" alt="Rappels" width="300"> | **Rappels** · [`23-rappels.yaml`](cartes/23-rappels.yaml)<br>Les rappels de l'iPhone : la cloche sonne quand un rappel est en retard et tinte pour ceux du jour. Un appui coche le rappel, aussi sur l'iPhone, avec 3,5 s pour annuler.<br><sub>Nécessite : www/ma-maison-agenda.js en ressource + intégration Apple iCloud</sub> |
+| <img src="images/cartes/22-agenda.png" alt="Agenda" width="300"> | **Agenda** · [`22-agenda.yaml`](cartes/22-agenda.yaml)<br>Les agendas de l'iPhone : page d'éphéméride qui se tourne chaque jour, événement en cours avec sa barre de progression, compte à rebours jusqu'au prochain, semaine en pastilles (appui sur un jour = son programme), une couleur par agenda.<br><sub>Nécessite : ma-maison-agenda.js (HACS ou ressource) + intégration Apple iCloud</sub> |
+| <img src="images/cartes/23-rappels.png" alt="Rappels" width="300"> | **Rappels** · [`23-rappels.yaml`](cartes/23-rappels.yaml)<br>Les rappels de l'iPhone : la cloche sonne quand un rappel est en retard et tinte pour ceux du jour. Un appui coche le rappel, aussi sur l'iPhone, avec 3,5 s pour annuler.<br><sub>Nécessite : ma-maison-agenda.js (HACS ou ressource) + intégration Apple iCloud</sub> |
 
 ## Installation
 
 Téléchargez le dépôt avec le bouton vert **Code → Download ZIP**, ou copiez seulement les fichiers qui vous intéressent. Première fois avec Home Assistant ? Le **[guide pas à pas](INSTALLATION.md)** détaille chaque clic.
+
+> **Et HACS ?** Ajouter ce dépôt à HACS (dépôt personnalisé, type *Tableau de bord*) installe uniquement les cartes **Agenda** et **Rappels** ([étape 4](#4-agenda-et-rappels-de-liphone)). Les autres cartes, le thème, le package et les tableaux complets se copient à la main, comme décrit ci-dessous.
 
 ### 1. Prérequis
 
@@ -107,7 +109,7 @@ Téléchargez le dépôt avec le bouton vert **Code → Download ZIP**, ou copie
 - **[HACS](https://hacs.xyz)** avec :
   - **[button-card](https://github.com/custom-cards/button-card)** (testé en 7.x) : toutes les cartes animées ;
   - **[card-mod](https://github.com/thomasloven/lovelace-card-mod)** : uniquement pour habiller les cartes natives (graphiques, statistiques, caméra…).
-- Pour les cartes **Agenda** et **Rappels** : l'intégration **Apple iCloud** (native) et le fichier [`www/ma-maison-agenda.js`](www/ma-maison-agenda.js), sans HACS (voir [étape 4](#4-agenda-et-rappels-de-liphone)).
+- Pour les cartes **Agenda** et **Rappels** : l'intégration **Apple iCloud** (native) et le fichier [`dist/ma-maison-agenda.js`](dist/ma-maison-agenda.js), installé par HACS ou à la main (voir [étape 4](#4-agenda-et-rappels-de-liphone)).
 
 ### 2. Le thème `maison_nuit` (conseillé)
 
@@ -151,13 +153,14 @@ Vous n'utilisez qu'une partie des cartes ? Supprimez les blocs inutiles du packa
 Ces deux cartes ne sont pas des button-card : un seul fichier JavaScript fournit `custom:ma-maison-agenda` et `custom:ma-maison-rappels`.
 
 1. Ajoutez l'intégration **Apple iCloud** (*Paramètres → Appareils et services → Ajouter une intégration*) : identifiant Apple, mot de passe, puis le code à 6 chiffres affiché sur l'iPhone. Vos agendas et vos listes de rappels deviennent des entités `calendar.…` et `todo.…`.
-2. Copiez [`www/ma-maison-agenda.js`](www/ma-maison-agenda.js) dans `/config/www/`.
-3. *Paramètres → Tableaux de bord → ⋮ → Ressources → Ajouter une ressource* : adresse `/local/ma-maison-agenda.js`, type **Module JavaScript**.
-4. Rechargez la page (dans l'application, fermez-la puis rouvrez-la).
+2. Installez le fichier JavaScript, au choix (pas les deux) :
+   - **Avec HACS** : *HACS → ⋮ → Dépôts personnalisés*, dépôt `https://github.com/Dam29830/ha-ma-maison-cards`, type **Tableau de bord**, puis téléchargez « Ma Maison — Agenda et Rappels ». HACS déclare la ressource tout seul.
+   - **À la main** : copiez [`dist/ma-maison-agenda.js`](dist/ma-maison-agenda.js) dans `/config/www/`, puis *Paramètres → Tableaux de bord → ⋮ → Ressources → Ajouter une ressource* : adresse `/local/ma-maison-agenda.js`, type **Module JavaScript**.
+3. Rechargez la page (dans l'application, fermez-la puis rouvrez-la).
 
 Rien à remplacer : les cartes trouvent toutes seules les agendas et les listes d'iCloud, et fusionnent un compte ajouté deux fois. Si Apple redemande le code de double authentification, elles affichent « iCloud déconnecté » avec un bouton qui ouvre l'intégration.
 
-Pour mettre le fichier à jour plus tard, changez aussi l'adresse de la ressource (`/local/ma-maison-agenda.js?v=2`, puis `?v=3`…) : sinon les appareils gardent l'ancienne version en cache.
+Pour mettre le fichier à jour plus tard : avec HACS, téléchargez simplement la nouvelle version. À la main, recopiez le fichier et changez aussi l'adresse de la ressource (`/local/ma-maison-agenda.js?v=2`, puis `?v=3`…) : sinon les appareils gardent l'ancienne version en cache.
 
 ### 5. Ajouter les cartes
 

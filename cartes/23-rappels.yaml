@@ -7,7 +7,7 @@
 #
 #  Entités : aucune à saisir. Les listes de rappels de l'iPhone (intégration Apple
 #  iCloud) sont trouvées toutes seules ; la liste « Courses » est laissée de côté.
-#  Nécessite : www/ma-maison-agenda.js déclaré comme ressource (voir le guide
+#  Nécessite : ma-maison-agenda.js, par HACS ou en ressource (voir le guide
 #  d'installation) + l'intégration Apple iCloud (native, agendas et rappels)
 #  Options, toutes facultatives :
 #    max_items: 5                  → rappels affichés

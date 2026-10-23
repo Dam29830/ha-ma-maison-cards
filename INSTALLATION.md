@@ -36,7 +36,9 @@ Ce que contient le dépôt :
 | `dashboard/ma-maison.yaml` | le tableau de bord complet, toutes les cartes rangées en sections |
 | `configuration/themes/maison_nuit.yaml` | le thème sombre |
 | `configuration/packages/ma_maison.yaml` | les entrées, capteurs, automatisations et le script utilisés par certaines cartes |
-| `www/ma-maison-agenda.js` | les cartes Agenda et Rappels (agendas et rappels de l'iPhone) |
+| `dist/ma-maison-agenda.js` | les cartes Agenda et Rappels (agendas et rappels de l'iPhone) |
+
+> Ajouter ce dépôt à HACS n'installe que les cartes Agenda et Rappels (étape 7). Le reste se copie à la main, comme décrit dans ce guide.
 
 ## 3. Installer button-card et card-mod (HACS)
 
@@ -106,13 +108,14 @@ Certaines cartes ont besoin d'entrées, de capteurs calculés et d'automatisatio
 Les cartes **Agenda** et **Rappels** affichent les agendas et les rappels de l'iPhone. Ce ne sont pas des button-card : elles tiennent dans un seul fichier JavaScript, à déclarer une fois. Passez cette étape si vous ne les voulez pas.
 
 1. **Relier iCloud** : *Paramètres → Appareils et services → Ajouter une intégration* → **Apple iCloud**. Saisissez votre identifiant Apple et votre mot de passe, puis le code à 6 chiffres qui s'affiche sur l'iPhone. Vos agendas et vos listes de rappels apparaissent comme entités `calendar.…` et `todo.…`.
-2. **Copier le fichier** : dans File editor, ouvrez `/config`, créez un dossier `www` s'il n'existe pas, puis dedans un fichier `ma-maison-agenda.js`. Collez-y le contenu de [`www/ma-maison-agenda.js`](www/ma-maison-agenda.js) et enregistrez.
-3. **Déclarer la ressource** : *Paramètres → Tableaux de bord → ⋮ (en haut à droite) → Ressources → Ajouter une ressource*. Adresse : `/local/ma-maison-agenda.js`, type : **Module JavaScript**.
-4. Rechargez la page (Ctrl + F5 sur PC, Cmd + Maj + R sur Mac). Dans l'application mobile, fermez-la complètement puis rouvrez-la.
+2. **Installer le fichier**, au choix (pas les deux) :
+   - **Avec HACS (le plus simple)** : *HACS → ⋮ (en haut à droite) → Dépôts personnalisés*. Dépôt : `https://github.com/Dam29830/ha-ma-maison-cards`, type : **Tableau de bord**, puis **Ajouter**. Ouvrez ensuite « Ma Maison — Agenda et Rappels » dans HACS et cliquez sur **Télécharger**. HACS déclare la ressource lui-même.
+   - **À la main** : dans File editor, ouvrez `/config`, créez un dossier `www` s'il n'existe pas, puis dedans un fichier `ma-maison-agenda.js`. Collez-y le contenu de [`dist/ma-maison-agenda.js`](dist/ma-maison-agenda.js) et enregistrez. Déclarez ensuite la ressource : *Paramètres → Tableaux de bord → ⋮ (en haut à droite) → Ressources → Ajouter une ressource*. Adresse : `/local/ma-maison-agenda.js`, type : **Module JavaScript**.
+3. Rechargez la page (Ctrl + F5 sur PC, Cmd + Maj + R sur Mac). Dans l'application mobile, fermez-la complètement puis rouvrez-la.
 
 Il n'y a aucune entité à remplacer : les cartes trouvent toutes seules les agendas et les listes d'iCloud. La liste « Courses » est laissée de côté par défaut ; les options pour choisir, masquer ou colorer un agenda sont dans le [README](README.md#personnaliser).
 
-> Pour mettre le fichier à jour plus tard, changez aussi l'adresse de la ressource (`/local/ma-maison-agenda.js?v=2`, puis `?v=3`…). Sinon, les appareils gardent l'ancienne version en cache pendant des semaines.
+> Mises à jour : avec HACS, téléchargez simplement la nouvelle version. À la main, recopiez le fichier et changez aussi l'adresse de la ressource (`/local/ma-maison-agenda.js?v=2`, puis `?v=3`…). Sinon, les appareils gardent l'ancienne version en cache pendant des semaines.
 
 ## 8. Créer le tableau de bord
 
@@ -163,7 +166,7 @@ Les cartes utilisent des noms d'entités d'exemple (`cover.salon_volet_tele`, `s
 | « Vérifier la configuration » signale une erreur | Le plus souvent : une clé `homeassistant:` ou `frontend:` présente deux fois dans `configuration.yaml`, ou une indentation décalée. Utilisez des espaces, jamais de tabulations. |
 | Les poubelles annoncent les mauvais jours | Réglez la première ligne du champ `head` de chaque carte : voir [Personnaliser](README.md#personnaliser). |
 | iPhone / iPad : un onglet de la barre du bas affiche une page vide | L'adresse du tableau n'est pas `ma-maison-iphone` (ou `ma-maison-ipad`). Corrigez-la dans *Paramètres → Tableaux de bord*, ou remplacez ce chemin dans le fichier collé. |
-| « Custom element doesn't exist: ma-maison-agenda » (ou `ma-maison-rappels`) | Le fichier n'est pas dans `/config/www/` ou la ressource `/local/ma-maison-agenda.js` n'est pas déclarée : voir l'étape 7, puis rechargez la page. |
+| « Custom element doesn't exist: ma-maison-agenda » (ou `ma-maison-rappels`) | Le fichier n'est pas installé. Avec HACS : vérifiez que « Ma Maison — Agenda et Rappels » est téléchargé. À la main : le fichier doit être dans `/config/www/` et la ressource `/local/ma-maison-agenda.js` déclarée. Voir l'étape 7, puis rechargez la page. |
 | Agenda ou Rappels : « iCloud déconnecté » | Apple redemande le code de double authentification. Le bouton **Ouvrir** de la carte mène à l'intégration Apple iCloud : reconnectez-la avec le code reçu sur l'iPhone. Si elle ne propose pas de le faire, supprimez-la puis ajoutez-la de nouveau (étape 7.1). |
 | Agenda ou Rappels : « Aucun agenda » / « Aucune liste » | L'intégration Apple iCloud n'est pas installée, ou vos agendas viennent d'ailleurs (Google, CalDAV…) : ajoutez `platform: all` sous `type:` dans la carte, ou listez vos entités avec `entities:`. |
 | Les valeurs du HomePod ne bougent pas | Vérifiez que votre raccourci Apple envoie bien vers `https://<votre-home-assistant>/api/webhook/<votre-identifiant>`, avec le même identifiant que dans le package. |
