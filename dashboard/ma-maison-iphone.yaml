@@ -14,7 +14,8 @@
 #
 #  Les entités sont des exemples : remplacez-les par les vôtres
 #  (liste complète dans le README).
-#  Nécessite : button-card et card-mod (HACS), thème maison_nuit (conseillé).
+#  Nécessite : button-card et card-mod (HACS), thème maison_nuit (conseillé),
+#  www/ma-maison-agenda.js en ressource pour l'agenda et les rappels (guide d'installation, étape 7).
 # ══════════════════════════════════════════════════════════════════════
 title: Ma Maison
 views:
@@ -649,6 +650,20 @@ views:
               haptic: success
             type: custom:button-card
             triggers_update: all
+      - type: grid
+        cards:
+          - type: heading
+            heading: Agenda & rappels
+            heading_style: title
+            icon: mdi:calendar-heart
+          - type: custom:ma-maison-agenda
+            grid_options:
+              columns: 12
+              rows: auto
+          - type: custom:ma-maison-rappels
+            grid_options:
+              columns: 12
+              rows: auto
       - type: grid
         cards:
           - type: heading

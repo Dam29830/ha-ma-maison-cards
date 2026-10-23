@@ -1,6 +1,7 @@
 # ══════════════════════════════════════════════════════════════════════
 #  Tableau de bord « Ma Maison iPad » — mêmes cartes que Ma Maison, réglées pour
-#  iPad M1 tenu en portrait (iPad Air 5 : 820 × 1180 points, deux colonnes ; chaque onglet tient sur un écran).
+#  iPad M1 tenu en portrait (iPad Air 5 : 820 × 1180 points, deux colonnes ; chaque onglet tient sur un écran,
+#  sauf l'Accueil qui défile un peu pour l'agenda et les rappels).
 #  Fonctionne aussi sur iPad Pro 11 et 12,9 pouces. En paysage, les deux colonnes s'élargissent et il faut faire défiler un peu.
 #
 #  5 onglets (Accueil, Commandes, Chauffage, Climat, Énergie) et une barre
@@ -14,7 +15,8 @@
 #
 #  Les entités sont des exemples : remplacez-les par les vôtres
 #  (liste complète dans le README).
-#  Nécessite : button-card et card-mod (HACS), thème maison_nuit (conseillé).
+#  Nécessite : button-card et card-mod (HACS), thème maison_nuit (conseillé),
+#  www/ma-maison-agenda.js en ressource pour l'agenda et les rappels (guide d'installation, étape 7).
 # ══════════════════════════════════════════════════════════════════════
 title: Ma Maison
 views:
@@ -680,6 +682,18 @@ views:
               haptic: success
             type: custom:button-card
             triggers_update: all
+          - type: heading
+            heading: Agenda & rappels
+            heading_style: subtitle
+            icon: mdi:calendar-heart
+          - type: custom:ma-maison-agenda
+            grid_options:
+              columns: 12
+              rows: auto
+          - type: custom:ma-maison-rappels
+            grid_options:
+              columns: 12
+              rows: auto
     footer:
       card:
         type: custom:button-card

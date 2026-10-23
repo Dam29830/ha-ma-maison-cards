@@ -1,0 +1,25 @@
+# ══════════════════════════════════════════════════════════════════════
+#  Ma Maison · Rappels
+#  Cloche animée : elle sonne quand un rappel est en retard (badge rouge), tinte pour
+#  ceux du jour et laisse place à une coche verte quand tout est fait. Appui sur le
+#  rond = rappel coché, aussi dans l'app Rappels de l'iPhone (3,5 s pour annuler).
+#  Appui sur le titre = listes de Home Assistant.
+#
+#  Entités : aucune à saisir. Les listes de rappels de l'iPhone (intégration Apple
+#  iCloud) sont trouvées toutes seules ; la liste « Courses » est laissée de côté.
+#  Nécessite : www/ma-maison-agenda.js déclaré comme ressource (voir le guide
+#  d'installation) + l'intégration Apple iCloud (native, agendas et rappels)
+#  Options, toutes facultatives :
+#    max_items: 5                  → rappels affichés
+#    title: Rappels                → titre de la carte
+#    exclude: [Courses]            → listes à masquer (remplace la valeur par défaut)
+#    colors: {Maison: "#4cc9a8"}   → couleur d'une liste
+#    entities: [todo.xxx]          → listes choisies à la main (Liste de courses, Local To-do…)
+#    platform: all                 → toutes les listes de Home Assistant, pas seulement iCloud
+#  À coller dans : ✏️ Modifier le tableau de bord → Ajouter une carte
+#  → « Manuel » (tout en bas de la liste), puis remplacez le contenu.
+# ══════════════════════════════════════════════════════════════════════
+type: custom:ma-maison-rappels
+grid_options:
+  columns: 12
+  rows: auto
