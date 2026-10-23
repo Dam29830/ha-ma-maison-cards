@@ -21,9 +21,12 @@ Un tableau de bord sombre et vivant pour Home Assistant : le ciel suit la vraie 
 
 Pour tout installer (thème, package, tableau complet), suivez le **[guide d'installation pas à pas](INSTALLATION.md)**, avec une section dépannage.
 
+Sur iPhone ou sur iPad, deux tableaux tout prêts vous attendent : [versions iPhone et iPad](#versions-iphone-et-ipad).
+
 ## Sommaire
 
 - [Aperçu du tableau complet](#aperçu-du-tableau-complet)
+- [Versions iPhone et iPad](#versions-iphone-et-ipad)
 - [Les cartes](#les-cartes)
 - [Installation](#installation) · [guide pas à pas](INSTALLATION.md)
 - [Entités à remplacer](#entités-à-remplacer)
@@ -37,6 +40,28 @@ Vue *Sections* sur 3 colonnes, thème `maison_nuit` :
 <img src="images/apercu.png" alt="Tableau de bord Ma Maison complet" width="100%">
 
 Les graphiques sur 24 h, les statistiques Linky et la caméra sont des cartes natives de Home Assistant : elles font partie du [tableau complet](dashboard/ma-maison.yaml) mais n'apparaissent pas sur cette capture.
+
+## Versions iPhone et iPad
+
+Les mêmes cartes, réorganisées pour le tactile en cinq onglets : **Accueil**, **Commandes**, **Chauffage**, **Climat** et **Énergie**. Une barre d'onglets en bas de l'écran permet de passer de l'un à l'autre au pouce.
+
+| Fichier | Réglé pour | Mise en page |
+|---|---|---|
+| [`dashboard/ma-maison-iphone.yaml`](dashboard/ma-maison-iphone.yaml) | **iPhone 18 Pro Max** (440 × 956 points) | une colonne, l'essentiel en haut de chaque onglet |
+| [`dashboard/ma-maison-ipad.yaml`](dashboard/ma-maison-ipad.yaml) | **iPad M1 en portrait** (iPad Air 5 : 820 × 1180 points ; iPad Pro 11 po : 834 × 1194) | deux colonnes ; chaque onglet tient sur un seul écran, pratique pour un iPad posé en écran central de la maison |
+
+<p align="center">
+  <img src="images/iphone.png" alt="Version iPhone : onglets Accueil, Commandes et Chauffage" width="100%">
+</p>
+<p align="center">
+  <img src="images/ipad.png" alt="Version iPad en portrait : onglets Accueil et Commandes" width="100%">
+</p>
+
+Ils fonctionnent aussi sur les autres iPhone et iPad : sur un écran plus petit, il faut simplement faire défiler un peu plus.
+
+Deux réglages en plus par rapport au tableau complet : les boutons des cartes occupent toute la place prévue pour eux (plus faciles à toucher), et les petites cartes Température et Humidité remplissent leur case.
+
+**Installation** : créez un tableau de bord vide nommé « Ma Maison iPhone » (ou « Ma Maison iPad »). Home Assistant remplit son adresse d'après le titre : elle doit être `ma-maison-iphone` (ou `ma-maison-ipad`), car la barre d'onglets l'utilise. Ouvrez-le, puis ✏️ → ⋮ → *Éditeur de configuration brute* et collez le fichier. Avec une autre adresse, remplacez `/ma-maison-iphone/` (ou `/ma-maison-ipad/`) partout dans le fichier.
 
 ## Les cartes
 
@@ -117,6 +142,8 @@ Vous n'utilisez qu'une partie des cartes ? Supprimez les blocs inutiles du packa
 ### 4. Ajouter les cartes
 
 **Tout le tableau d'un coup** : créez un tableau de bord vide (*Paramètres → Tableaux de bord → Ajouter un tableau de bord → Nouveau tableau de bord à partir de zéro*), ouvrez-le, puis ✏️ → ⋮ → *Éditeur de configuration brute* et collez [`dashboard/ma-maison.yaml`](dashboard/ma-maison.yaml).
+
+**Pour un iPhone ou un iPad** : même méthode avec [`dashboard/ma-maison-iphone.yaml`](dashboard/ma-maison-iphone.yaml) ou [`dashboard/ma-maison-ipad.yaml`](dashboard/ma-maison-ipad.yaml), dans un tableau nommé « Ma Maison iPhone » ou « Ma Maison iPad » (voir [Versions iPhone et iPad](#versions-iphone-et-ipad)).
 
 **Ou carte par carte** : ✏️ *Modifier le tableau de bord* → *Ajouter une carte* → *Manuel*, puis collez le contenu d'un fichier de [`cartes/`](cartes).
 

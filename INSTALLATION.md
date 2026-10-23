@@ -109,6 +109,14 @@ Certaines cartes ont besoin d'entrées, de capteurs calculés et d'automatisatio
 
 > Astuce : faites d'abord l'étape 8 dans un éditeur de texte sur votre ordinateur (Rechercher / Remplacer), puis collez le fichier déjà adapté. C'est plus rapide que de corriger carte par carte ensuite.
 
+**Les versions iPhone et iPad**
+
+Mêmes cartes, réparties en cinq onglets avec une barre d'onglets en bas de l'écran. Elles sont réglées pour l'iPhone 18 Pro Max et pour un iPad M1 en portrait, et fonctionnent sur les autres modèles.
+
+1. Créez un tableau de bord vide nommé exactement « Ma Maison iPhone » (ou « Ma Maison iPad »). Vérifiez que l'adresse proposée est `ma-maison-iphone` (ou `ma-maison-ipad`) : la barre d'onglets l'utilise.
+2. Ouvrez-le, puis ✏️ → ⋮ → **Éditeur de configuration brute**, et collez [`dashboard/ma-maison-iphone.yaml`](dashboard/ma-maison-iphone.yaml) (ou [`dashboard/ma-maison-ipad.yaml`](dashboard/ma-maison-ipad.yaml)).
+3. Sur le téléphone ou la tablette, ouvrez ce tableau depuis le menu latéral de l'application Home Assistant.
+
 **Ou seulement quelques cartes**, dans un tableau de bord existant :
 
 1. Ouvrez le tableau, ✏️ → **Ajouter une carte**.
@@ -137,6 +145,7 @@ Les cartes utilisent des noms d'entités d'exemple (`cover.salon_volet_tele`, `s
 | La facture du mois reste à 0 € | Saisissez vos tarifs (étape 6.5) et vérifiez l'identifiant de votre statistique Linky (*Outils → Statistiques*). Les données Linky arrivent avec un ou deux jours de retard. |
 | « Vérifier la configuration » signale une erreur | Le plus souvent : une clé `homeassistant:` ou `frontend:` présente deux fois dans `configuration.yaml`, ou une indentation décalée. Utilisez des espaces, jamais de tabulations. |
 | Les poubelles annoncent les mauvais jours | Réglez la première ligne du champ `head` de chaque carte : voir [Personnaliser](README.md#personnaliser). |
+| iPhone / iPad : un onglet de la barre du bas affiche une page vide | L'adresse du tableau n'est pas `ma-maison-iphone` (ou `ma-maison-ipad`). Corrigez-la dans *Paramètres → Tableaux de bord*, ou remplacez ce chemin dans le fichier collé. |
 | Les valeurs du HomePod ne bougent pas | Vérifiez que votre raccourci Apple envoie bien vers `https://<votre-home-assistant>/api/webhook/<votre-identifiant>`, avec le même identifiant que dans le package. |
 
 Un autre souci ? Ouvrez une *Issue* sur la page GitHub du dépôt en décrivant ce que vous voyez, avec une capture si possible.
