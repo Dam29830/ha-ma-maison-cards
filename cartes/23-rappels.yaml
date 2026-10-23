@@ -6,7 +6,8 @@
 #  Appui sur le titre = listes de Home Assistant.
 #
 #  Entités : aucune à saisir. Les listes de rappels de l'iPhone (intégration Apple
-#  iCloud) sont trouvées toutes seules ; la liste « Courses » est laissée de côté.
+#  iCloud) sont trouvées toutes seules ; les listes « Courses » et « Colis Amazon »
+#  sont laissées de côté.
 #  Nécessite : ma-maison-agenda.js, par HACS ou en ressource (voir le guide
 #  d'installation) + l'intégration Apple iCloud (native, agendas et rappels)
 #  Options, toutes facultatives :

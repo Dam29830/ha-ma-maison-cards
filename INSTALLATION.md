@@ -13,9 +13,10 @@ Ce guide part de zéro. Comptez 20 à 30 minutes pour tout installer, moins si v
 5. [Installer le thème](#5-installer-le-thème)
 6. [Installer le package](#6-installer-le-package)
 7. [Installer l'agenda et les rappels (facultatif)](#7-installer-lagenda-et-les-rappels-facultatif)
-8. [Créer le tableau de bord](#8-créer-le-tableau-de-bord)
-9. [Mettre vos propres entités](#9-mettre-vos-propres-entités)
-10. [Dépannage](#10-dépannage)
+8. [Suivre les colis Amazon (facultatif)](#8-suivre-les-colis-amazon-facultatif)
+9. [Créer le tableau de bord](#9-créer-le-tableau-de-bord)
+10. [Mettre vos propres entités](#10-mettre-vos-propres-entités)
+11. [Dépannage](#11-dépannage)
 
 ---
 
@@ -38,10 +39,11 @@ Ce que contient le dépôt :
 | `dashboard/ma-maison.yaml` | le tableau de bord complet, toutes les cartes rangées en sections |
 | `configuration/themes/maison_nuit.yaml` | le thème sombre |
 | `configuration/packages/ma_maison.yaml` | les entrées, capteurs, automatisations et le script utilisés par certaines cartes |
-| `dist/ma-maison-agenda.js` | les cartes Agenda et Rappels et le tableau automatique (fichier installé par HACS) |
+| `configuration/packages/colis_amazon.yaml` | le suivi des colis Amazon : lecture des e-mails et liste des colis (facultatif) |
+| `dist/ma-maison-agenda.js` | les cartes Agenda, Rappels et Colis et le tableau automatique (fichier installé par HACS) |
 | `src/`, `outils/` | le code de ce fichier et l'outil qui le construit (inutiles pour l'installation) |
 
-> Ajouter ce dépôt à HACS donne le tableau automatique et les cartes Agenda et Rappels. Le thème et le package, eux, se copient à la main (étapes 5 et 6).
+> Ajouter ce dépôt à HACS donne le tableau automatique et les cartes Agenda, Rappels et Colis. Le thème et les packages, eux, se copient à la main (étapes 5, 6 et 8).
 
 ## 3. Installer button-card et card-mod (HACS)
 
@@ -116,11 +118,30 @@ Les cartes **Agenda** et **Rappels** affichent les agendas et les rappels de l'i
    - **À la main** : dans File editor, ouvrez `/config`, créez un dossier `www` s'il n'existe pas, puis dedans un fichier `ma-maison-agenda.js`. Collez-y le contenu de [`dist/ma-maison-agenda.js`](dist/ma-maison-agenda.js) et enregistrez. Déclarez ensuite la ressource : *Paramètres → Tableaux de bord → ⋮ (en haut à droite) → Ressources → Ajouter une ressource*. Adresse : `/local/ma-maison-agenda.js`, type : **Module JavaScript**.
 3. Rechargez la page (Ctrl + F5 sur PC, Cmd + Maj + R sur Mac). Dans l'application mobile, fermez-la complètement puis rouvrez-la.
 
-Il n'y a aucune entité à remplacer : les cartes trouvent toutes seules les agendas et les listes d'iCloud. La liste « Courses » est laissée de côté par défaut ; les options pour choisir, masquer ou colorer un agenda sont dans le [README](README.md#personnaliser).
+Il n'y a aucune entité à remplacer : les cartes trouvent toutes seules les agendas et les listes d'iCloud. Les listes « Courses » et « Colis Amazon » sont laissées de côté par défaut ; les options pour choisir, masquer ou colorer un agenda sont dans le [README](README.md#personnaliser).
 
 > Mises à jour : avec HACS, téléchargez simplement la nouvelle version. À la main, recopiez le fichier et changez aussi l'adresse de la ressource (`/local/ma-maison-agenda.js?v=2`, puis `?v=3`…). Sinon, les appareils gardent l'ancienne version en cache pendant des semaines.
 
-## 8. Créer le tableau de bord
+## 8. Suivre les colis Amazon (facultatif)
+
+La carte **Colis** suit vos commandes Amazon.fr : commandé, expédié, en cours de livraison (avec le créneau annoncé), livré, colis à retirer avec son code, retard, livraison manquée, retour à renvoyer. Amazon ne permet pas à une autre application de lire vos commandes : Home Assistant lit donc les e-mails de suivi qu'Amazon vous envoie, directement dans votre boîte mail, et ne regarde que ceux d'Amazon. Passez cette étape si vous ne voulez pas de cette carte.
+
+1. **Créer la liste des colis** : *Paramètres → Appareils et services → Ajouter une intégration* → **Local To-do**. Nom : `Colis Amazon`, exactement : l'entité créée doit être `todo.colis_amazon`.
+2. **Préparer un mot de passe pour Home Assistant** (Gmail) : votre mot de passe habituel ne fonctionne pas. Dans votre compte Google → **Sécurité**, activez la **validation en deux étapes** si ce n'est pas déjà fait, puis ouvrez **[Mots de passe des applications](https://myaccount.google.com/apppasswords)**, créez-en un nommé « Home Assistant » et copiez les 16 lettres. Pour une autre messagerie, consultez son aide : beaucoup demandent aussi un mot de passe d'application pour les logiciels comme Home Assistant.
+3. **Relier la boîte mail** : *Ajouter une intégration* → **IMAP**. Pour Gmail :
+   - Nom d'utilisateur : votre adresse Gmail ; mot de passe : celui de l'étape précédente ;
+   - Serveur : `imap.gmail.com` ; port : `993` ;
+   - **Recherche** : remplacez `UnSeen UnDeleted` par `FROM amazon.fr` (ainsi, seuls les e-mails d'Amazon comptent, lus ou non).
+
+   Pour une autre messagerie, prenez le serveur IMAP indiqué par votre fournisseur. La recherche se modifie aussi plus tard : intégration IMAP → **Configurer**.
+4. **Installer le package** : copiez [`configuration/packages/colis_amazon.yaml`](configuration/packages/colis_amazon.yaml) dans `/config/packages/`, à côté de `ma_maison.yaml` (le dossier de l'étape 6). Vérifiez la configuration (*Outils → YAML*), puis redémarrez.
+5. **La carte** est fournie par le même fichier JavaScript que l'agenda (étape 7, point 2) : avec HACS, téléchargez la dernière version de « Ma Maison ». Elle fait déjà partie des tableaux (titre « Colis ») et du tableau automatique ; ailleurs, collez [`cartes/24-colis.yaml`](cartes/24-colis.yaml).
+
+Dès que l'intégration IMAP est connectée, elle transmet le dernier e-mail d'Amazon : s'il concerne un colis, celui-ci apparaît aussitôt dans la carte. Ensuite, chaque nouvel e-mail d'Amazon met la carte à jour en quelques secondes ; les e-mails ne sont pas marqués comme lus. Les colis livrés quittent la liste la nuit suivante, et un colis resté sans nouvelles pendant 3 semaines aussi.
+
+> Le package reconnaît les e-mails d'Amazon.fr en français (commande, expédition, livraison, point de retrait, retard, retour, remboursement). Un e-mail qu'il ne comprend pas, comme une publicité, est simplement ignoré.
+
+## 9. Créer le tableau de bord
 
 **Le tableau complet**
 
@@ -128,9 +149,9 @@ Il n'y a aucune entité à remplacer : les cartes trouvent toutes seules les age
 2. Ouvrez-le depuis la barre latérale, cliquez sur ✏️ (en haut à droite), puis ⋮ → **Éditeur de configuration brute**.
 3. Effacez tout le contenu, collez celui de [`dashboard/ma-maison.yaml`](dashboard/ma-maison.yaml), puis **Enregistrer**.
 
-> Astuce : faites d'abord l'étape 9 dans un éditeur de texte sur votre ordinateur (Rechercher / Remplacer), puis collez le fichier déjà adapté. C'est plus rapide que de corriger carte par carte ensuite.
+> Astuce : faites d'abord l'étape 10 dans un éditeur de texte sur votre ordinateur (Rechercher / Remplacer), puis collez le fichier déjà adapté. C'est plus rapide que de corriger carte par carte ensuite.
 
-> Les tableaux contiennent les cartes Agenda et Rappels (titre « Agenda & rappels »). Sans l'étape 7, elles affichent une erreur : faites l'étape 7, ou supprimez ces deux cartes en mode édition (✏️).
+> Les tableaux contiennent les cartes Agenda et Rappels (titre « Agenda & rappels »). Sans l'étape 7, elles affichent une erreur : faites l'étape 7, ou supprimez ces deux cartes en mode édition (✏️). De même, la carte Colis (titre « Colis ») a besoin de l'étape 8 : sans elle, faites-la ou supprimez la carte.
 
 **Les versions iPhone et iPad**
 
@@ -146,7 +167,7 @@ Mêmes cartes, réparties en cinq onglets avec une barre d'onglets en bas de l'�
 2. Tout en bas de la liste, choisissez **Manuel**.
 3. Effacez l'exemple, collez le contenu d'un fichier du dossier [`cartes/`](cartes), remplacez les entités indiquées en tête du fichier, puis **Enregistrer**.
 
-## 9. Mettre vos propres entités
+## 10. Mettre vos propres entités
 
 Les cartes utilisent des noms d'entités d'exemple (`cover.salon_volet_tele`, `sensor.chambre_temperature`…). Il faut les remplacer par les vôtres.
 
@@ -157,7 +178,7 @@ Les cartes utilisent des noms d'entités d'exemple (`cover.salon_volet_tele`, `s
 
 > Le titre affiché sur une carte est écrit dans son code (champ `info` ou `head`). Pour le changer, cherchez le texte dans la carte et remplacez-le : modifier `name:` ne suffit pas.
 
-## 10. Dépannage
+## 11. Dépannage
 
 | Problème | Solution |
 |---|---|
@@ -175,6 +196,9 @@ Les cartes utilisent des noms d'entités d'exemple (`cover.salon_volet_tele`, `s
 | « Custom element doesn't exist: ma-maison-agenda » (ou `ma-maison-rappels`) | Le fichier n'est pas installé. Avec HACS : vérifiez que « Ma Maison » est téléchargé. À la main : le fichier doit être dans `/config/www/` et la ressource `/local/ma-maison-agenda.js` déclarée. Voir l'étape 7, puis rechargez la page. |
 | Agenda ou Rappels : « iCloud déconnecté » | Apple redemande le code de double authentification. Le bouton **Ouvrir** de la carte mène à l'intégration Apple iCloud : reconnectez-la avec le code reçu sur l'iPhone. Si elle ne propose pas de le faire, supprimez-la puis ajoutez-la de nouveau (étape 7.1). |
 | Agenda ou Rappels : « Aucun agenda » / « Aucune liste » | L'intégration Apple iCloud n'est pas installée, ou vos agendas viennent d'ailleurs (Google, CalDAV…) : ajoutez `platform: all` sous `type:` dans la carte, ou listez vos entités avec `entities:`. |
+| « Custom element doesn't exist: ma-maison-colis » | Le fichier JavaScript est trop ancien ou absent : avec HACS, téléchargez la dernière version de « Ma Maison » ; à la main, recopiez `dist/ma-maison-agenda.js` et changez l'adresse de la ressource (`?v=…`). Rechargez ensuite la page. |
+| Colis : « Liste introuvable » | La liste Local To-do n'existe pas ou porte un autre nom : créez-la avec le nom `Colis Amazon` (étape 8.1), ou indiquez la vôtre avec `entity:` dans la carte (et dans le package). |
+| Colis : la carte reste vide | L'intégration IMAP n'est pas reliée ou sa recherche n'est pas `FROM amazon.fr` (étape 8.3). Les colis apparaissent au prochain e-mail d'Amazon. Pour voir ce qui s'est passé : *Paramètres → Automatisations et scènes* → « Colis Amazon — e-mails reçus » → ⋮ → **Traces**. |
 | Les valeurs du HomePod ne bougent pas | Vérifiez que votre raccourci Apple envoie bien vers `https://<votre-home-assistant>/api/webhook/<votre-identifiant>`, avec le même identifiant que dans le package. |
 
 Un autre souci ? Ouvrez une *Issue* sur la page GitHub du dépôt en décrivant ce que vous voyez, avec une capture si possible.

@@ -5260,6 +5260,17 @@ views:
               rows: auto
             type: custom:ma-maison-rappels
         type: grid
+      - cards:
+          - heading: Colis
+            heading_style: title
+            icon: mdi:package-variant-closed
+            type: heading
+          - entity: todo.colis_amazon
+            grid_options:
+              columns: 12
+              rows: auto
+            type: custom:ma-maison-colis
+        type: grid
     theme: maison_nuit
     title: Ma Maison
     type: sections

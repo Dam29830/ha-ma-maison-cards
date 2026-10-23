@@ -1,8 +1,8 @@
 # 🏠 Ma Maison — des cartes animées pour Home Assistant
 
-Un tableau de bord sombre et vivant pour Home Assistant : le ciel suit la vraie météo et la position du soleil, les volets bougent selon leur position réelle, le poêle flambe, le ballon chauffe, le robot se promène, les poubelles s'envolent les jours de grand vent et la cloche sonne quand un rappel de l'iPhone est en retard.
+Un tableau de bord sombre et vivant pour Home Assistant : le ciel suit la vraie météo et la position du soleil, les volets bougent selon leur position réelle, le poêle flambe, le ballon chauffe, le robot se promène, les poubelles s'envolent les jours de grand vent, la cloche sonne quand un rappel de l'iPhone est en retard et la camionnette de livraison file vers la maison le jour où un colis Amazon arrive.
 
-> 🇬🇧 *A French Home Assistant dashboard made of animated `custom:button-card` cards (weather, shutters, pellet stove, water heater, robot vacuum, bins…). Install it from HACS and pick « Ma Maison » when adding a dashboard: it builds itself with your own devices, nothing to copy. You can still copy a single card's YAML and replace the example entity IDs. Two extra JavaScript cards show the iPhone's calendar and reminders (Apple iCloud integration).*
+> 🇬🇧 *A French Home Assistant dashboard made of animated `custom:button-card` cards (weather, shutters, pellet stove, water heater, robot vacuum, bins…). Install it from HACS and pick « Ma Maison » when adding a dashboard: it builds itself with your own devices, nothing to copy. You can still copy a single card's YAML and replace the example entity IDs. Extra JavaScript cards show the iPhone's calendar and reminders (Apple iCloud integration) and track Amazon.fr parcels from their e-mails (IMAP integration + package).*
 
 <p align="center">
   <img src="images/animations.gif" alt="Cartes animées : météo, volets, poêle à granulés, robot aspirateur" width="100%">
@@ -45,7 +45,7 @@ Vue *Sections* sur 3 colonnes, thème `maison_nuit` :
 
 <img src="images/apercu.png" alt="Tableau de bord Ma Maison complet" width="100%">
 
-Les graphiques sur 24 h, les statistiques Linky et la caméra sont des cartes natives de Home Assistant : elles font partie du [tableau complet](dashboard/ma-maison.yaml) mais n'apparaissent pas sur cette capture. L'agenda et les rappels, ajoutés ensuite, sont présentés avec [les autres cartes](#les-cartes).
+Les graphiques sur 24 h, les statistiques Linky et la caméra sont des cartes natives de Home Assistant : elles font partie du [tableau complet](dashboard/ma-maison.yaml) mais n'apparaissent pas sur cette capture. L'agenda, les rappels et les colis, ajoutés ensuite, sont présentés avec [les autres cartes](#les-cartes).
 
 ## Versions iPhone et iPad
 
@@ -54,7 +54,7 @@ Les mêmes cartes, réorganisées pour le tactile en cinq onglets : **Accueil**,
 | Fichier | Réglé pour | Mise en page |
 |---|---|---|
 | [`dashboard/ma-maison-iphone.yaml`](dashboard/ma-maison-iphone.yaml) | **iPhone 18 Pro Max** (440 × 956 points) | une colonne, l'essentiel en haut de chaque onglet |
-| [`dashboard/ma-maison-ipad.yaml`](dashboard/ma-maison-ipad.yaml) | **iPad M1 en portrait** (iPad Air 5 : 820 × 1180 points ; iPad Pro 11 po : 834 × 1194) | deux colonnes ; chaque onglet tient sur un seul écran (l'Accueil défile un peu pour l'agenda et les rappels), pratique pour un iPad posé en écran central de la maison |
+| [`dashboard/ma-maison-ipad.yaml`](dashboard/ma-maison-ipad.yaml) | **iPad M1 en portrait** (iPad Air 5 : 820 × 1180 points ; iPad Pro 11 po : 834 × 1194) | deux colonnes ; chaque onglet tient sur un seul écran (l'Accueil défile un peu pour l'agenda, les rappels et les colis), pratique pour un iPad posé en écran central de la maison |
 
 <p align="center">
   <img src="images/iphone.png" alt="Version iPhone : onglets Accueil, Commandes et Chauffage" width="100%">
@@ -65,7 +65,7 @@ Les mêmes cartes, réorganisées pour le tactile en cinq onglets : **Accueil**,
 
 Ils fonctionnent aussi sur les autres iPhone et iPad : sur un écran plus petit, il faut simplement faire défiler un peu plus.
 
-L'onglet **Accueil** regroupe aussi l'agenda et les rappels de l'iPhone : sous les poubelles sur l'iPhone, dans la colonne de droite sur l'iPad.
+L'onglet **Accueil** regroupe aussi l'agenda et les rappels de l'iPhone, puis les colis Amazon : sous les poubelles sur l'iPhone, dans la colonne de droite sur l'iPad.
 
 Deux réglages en plus par rapport au tableau complet : les boutons des cartes occupent toute la place prévue pour eux (plus faciles à toucher), et les petites cartes Température et Humidité remplissent leur case.
 
@@ -102,6 +102,7 @@ Chaque fichier du dossier [`cartes/`](cartes) est une carte prête à coller. En
 | <img src="images/cartes/21-robot-aspirateur.png" alt="Robot aspirateur" width="300"> | **Robot aspirateur** · [`21-robot-aspirateur.yaml`](cartes/21-robot-aspirateur.yaml)<br>Robot animé selon son état (nettoyage, retour, vidage, lavage, séchage, charge), batterie, réservoirs, erreurs en clair ; boutons démarrer, pause, base, localiser, vider le bac.<br><sub>Nécessite : button-card (HACS) + robot Ecovacs Deebot (Matter + intégration Ecovacs)</sub> |
 | <img src="images/cartes/22-agenda.png" alt="Agenda" width="300"> | **Agenda** · [`22-agenda.yaml`](cartes/22-agenda.yaml)<br>Les agendas de l'iPhone : page d'éphéméride qui se tourne chaque jour, événement en cours avec sa barre de progression, compte à rebours jusqu'au prochain, semaine en pastilles (appui sur un jour = son programme), une couleur par agenda.<br><sub>Nécessite : ma-maison-agenda.js (HACS ou ressource) + intégration Apple iCloud</sub> |
 | <img src="images/cartes/23-rappels.png" alt="Rappels" width="300"> | **Rappels** · [`23-rappels.yaml`](cartes/23-rappels.yaml)<br>Les rappels de l'iPhone : la cloche sonne quand un rappel est en retard et tinte pour ceux du jour. Un appui coche le rappel, aussi sur l'iPhone, avec 3,5 s pour annuler.<br><sub>Nécessite : ma-maison-agenda.js (HACS ou ressource) + intégration Apple iCloud</sub> |
+| <img src="images/cartes/24-colis.png" alt="Colis Amazon" width="300"> | **Colis Amazon** · [`24-colis.yaml`](cartes/24-colis.yaml)<br>Les commandes Amazon.fr, lues dans leurs e-mails de suivi : la camionnette avance sur la frise de chaque colis (commandé, expédié, en route, livré) et file vers la maison le jour de la livraison, avec le créneau annoncé. Casier et code pour un point de retrait, alerte en cas de retard ou de livraison manquée, date limite d'un retour. Un appui ouvre la commande sur Amazon.<br><sub>Nécessite : ma-maison-agenda.js (HACS ou ressource) + intégrations IMAP et Local To-do + package colis_amazon</sub> |
 
 ## Installation
 
@@ -133,6 +134,7 @@ Sans HACS : copiez [`dist/ma-maison-agenda.js`](dist/ma-maison-agenda.js) dans `
 | Caméras | jusqu'à quatre caméras |
 | Linky | la statistique de [ha-linky](https://github.com/bokub/ha-linky) |
 | Agenda et rappels | les agendas et listes iCloud, sinon tous ceux de Home Assistant |
+| Colis | la liste « Colis Amazon », remplie par le [package des colis](#5-suivi-des-colis-amazon) |
 | Prévisions, poubelles, facture, tarifs, granulés, HomePod | apparaissent dès que le [package](#3-le-package--entrées-capteurs-et-automatisations) est installé |
 
 Une carte sans appareil correspondant est simplement masquée. La disposition suit l'écran : ordinateur, iPhone ou iPad, avec la barre d'onglets en bas.
@@ -143,11 +145,11 @@ Une carte sans appareil correspondant est simplement masquée. La disposition su
 |---|---|---|
 | `etage` | n'afficher que les appareils d'un étage (ceux sans pièce restent) : pratique si Home Assistant gère deux maisons | `etage: ma_maison` |
 | `affichage` | imposer une disposition : `ordinateur`, `iphone` ou `ipad` (`auto` par défaut) | `affichage: ipad` |
-| `meteo`, `garage`, `radiateur`, `poele`, `chauffe_eau`, `robot`, `projecteur` | choisir l'entité ; `false` masque la carte | `poele: climate.mon_poele` |
+| `meteo`, `garage`, `radiateur`, `poele`, `chauffe_eau`, `robot`, `projecteur`, `colis` | choisir l'entité ; `false` masque la carte | `poele: climate.mon_poele` |
 | `personnes`, `volets`, `prises`, `cameras` | choisir la liste | `prises: [switch.prise_tele]` |
 | `pieces` | pièces des cartes température et humidité | `pieces: [salon, chambre]` |
 | `poubelle_jaune`, `poubelle_bleue` | jours de collecte (`jours`, `semaines` : `toutes`, `paires` ou `impaires`, `heure`, `feries` : `report` ou `aucun`) | `poubelle_jaune: {jours: [mardi], semaines: impaires, heure: 7}` |
-| `masquer` | cartes à cacher : `robot`, `poubelles`, `eau_chaude`, `temperatures`, `electricite`, `cameras`, `agenda`… | `masquer: [robot]` |
+| `masquer` | cartes à cacher : `robot`, `poubelles`, `eau_chaude`, `temperatures`, `electricite`, `cameras`, `agenda`, `colis`… | `masquer: [robot]` |
 | `exclure` | entités à ignorer dans la détection | `exclure: [cover.velux]` |
 
 Plus rares : `volets_groupe`, `radiateur_puissance`, `robot_station`, `projecteur_cast` et `linky`. Un exemple complet, en YAML :
@@ -175,6 +177,7 @@ Téléchargez le dépôt avec le bouton vert **Code → Download ZIP**, ou copie
   - **[button-card](https://github.com/custom-cards/button-card)** (testé en 7.x) : toutes les cartes animées ;
   - **[card-mod](https://github.com/thomasloven/lovelace-card-mod)** : uniquement pour habiller les cartes natives (graphiques, statistiques, caméra…).
 - Pour les cartes **Agenda** et **Rappels** : l'intégration **Apple iCloud** (native) et le fichier [`dist/ma-maison-agenda.js`](dist/ma-maison-agenda.js), installé par HACS ou à la main (voir [étape 4](#4-agenda-et-rappels-de-liphone)).
+- Pour la carte **Colis** : les intégrations **IMAP** et **Local To-do** (natives), le package [`colis_amazon.yaml`](configuration/packages/colis_amazon.yaml) et le même fichier JavaScript (voir [étape 5](#5-suivi-des-colis-amazon)).
 
 #### 2. Le thème `maison_nuit` (conseillé)
 
@@ -227,13 +230,24 @@ Rien à remplacer : les cartes trouvent toutes seules les agendas et les listes 
 
 Pour mettre le fichier à jour plus tard : avec HACS, téléchargez simplement la nouvelle version. À la main, recopiez le fichier et changez aussi l'adresse de la ressource (`/local/ma-maison-agenda.js?v=2`, puis `?v=3`…) : sinon les appareils gardent l'ancienne version en cache.
 
-#### 5. Ajouter les cartes
+#### 5. Suivi des colis Amazon
+
+Amazon ne permet pas à une autre application de lire les commandes de ses clients : la carte **Colis** s'appuie donc sur les e-mails de suivi d'Amazon.fr, lus dans votre boîte mail par Home Assistant lui-même.
+
+1. Ajoutez l'intégration **Local To-do** avec le nom `Colis Amazon` (l'entité doit être `todo.colis_amazon`).
+2. Ajoutez l'intégration **IMAP**. Pour Gmail : serveur `imap.gmail.com`, port 993, votre adresse et un [mot de passe d'application](https://myaccount.google.com/apppasswords) (la validation en deux étapes doit être activée). Dans **Recherche**, remplacez `UnSeen UnDeleted` par `FROM amazon.fr`.
+3. Copiez [`configuration/packages/colis_amazon.yaml`](configuration/packages/colis_amazon.yaml) dans `/config/packages/`, vérifiez la configuration et redémarrez.
+4. La carte est fournie par le même fichier que l'agenda ([étape 4](#4-agenda-et-rappels-de-liphone), point 2).
+
+Dès que l'intégration est connectée, elle transmet le dernier e-mail d'Amazon ; ensuite, chaque nouvel e-mail met la carte à jour en quelques secondes, sans être marqué comme lu. Les colis livrés quittent la liste la nuit suivante. Le pas à pas est dans le [guide d'installation](INSTALLATION.md#8-suivre-les-colis-amazon-facultatif).
+
+#### 6. Ajouter les cartes
 
 **Tout le tableau d'un coup** : créez un tableau de bord vide (*Paramètres → Tableaux de bord → Ajouter un tableau de bord → Nouveau tableau de bord à partir de zéro*), ouvrez-le, puis ✏️ → ⋮ → *Éditeur de configuration brute* et collez [`dashboard/ma-maison.yaml`](dashboard/ma-maison.yaml).
 
 **Pour un iPhone ou un iPad** : même méthode avec [`dashboard/ma-maison-iphone.yaml`](dashboard/ma-maison-iphone.yaml) ou [`dashboard/ma-maison-ipad.yaml`](dashboard/ma-maison-ipad.yaml), dans un tableau nommé « Ma Maison iPhone » ou « Ma Maison iPad » (voir [Versions iPhone et iPad](#versions-iphone-et-ipad)).
 
-Les trois tableaux contiennent les cartes Agenda et Rappels (titre « Agenda & rappels ») : faites d'abord l'[étape 4](#4-agenda-et-rappels-de-liphone), ou supprimez ces cartes si vous n'utilisez pas iCloud.
+Les trois tableaux contiennent les cartes Agenda et Rappels (titre « Agenda & rappels ») : faites d'abord l'[étape 4](#4-agenda-et-rappels-de-liphone), ou supprimez ces cartes si vous n'utilisez pas iCloud. De même pour la carte Colis (titre « Colis ») : [étape 5](#5-suivi-des-colis-amazon), ou supprimez-la.
 
 **Ou carte par carte** : ✏️ *Modifier le tableau de bord* → *Ajouter une carte* → *Manuel*, puis collez le contenu d'un fichier de [`cartes/`](cartes).
 
@@ -263,6 +277,7 @@ Avec le [tableau automatique](#le-tableau-automatique-recommandé), ce remplacem
 | `vacuum.robot_nettoyeur`, `sensor.robot_nettoyeur_*`, `button.robot_nettoyeur_vider_le_bac_a_poussiere` | le même robot, via l'intégration Ecovacs |
 | `camera.garage` | une caméra |
 | *(Agenda et Rappels)* | rien : les agendas et les listes de l'intégration Apple iCloud sont trouvés tout seuls (option `entities` pour en choisir d'autres, voir [Personnaliser](#personnaliser)) |
+| `todo.colis_amazon` | rien si vous nommez la liste Local To-do « Colis Amazon » : le package utilise ce nom |
 
 ## Personnaliser
 
@@ -274,7 +289,8 @@ Avec le [tableau automatique](#le-tableau-automatique-recommandé), ce remplacem
 - **HomePod** : Home Assistant ne lit pas directement les capteurs du HomePod. Dans l'app Raccourcis (ou Maison), créez une automatisation, par exemple à heure fixe ou quand la température de la pièce change, qui récupère la température et l'humidité mesurées par le HomePod et les envoie en `POST` JSON `{"temperature": 20.5, "humidite": 48}` à `https://<votre-home-assistant>/api/webhook/<votre-identifiant>`. Remplacez `homepod-remplacez-moi` dans le package par un identifiant aléatoire et gardez-le secret : il sert de clé.
 - **Numéro sur les poubelles** : remplacez `12` dans `<span class="jnum">12</span>` (bac jaune) et `<span class="bnum">12</span>` (bac bleu), ainsi que `n° 12` dans le titre du drapeau, par votre propre numéro.
 - **Titres des cartes** : le titre affiché est écrit dans le HTML de la carte (champ `info` ou `head`) ; modifier `name:` ne suffit pas, cherchez le texte dans la carte et remplacez-le.
-- **Agenda et rappels** : options facultatives, à ajouter sous `type:`. `exclude: [Travail]` masque des agendas ou des listes par leur nom (la carte Rappels laisse « Courses » de côté par défaut ; `exclude: []` l'affiche) ; `colors: {Famille: "#ff8fab"}` change une couleur ; `days` (7 jours) et `max_items` (4 événements, 5 rappels) règlent la longueur ; `title` change le titre. `entities: [calendar.xxx]` choisit les agendas ou les listes à la main, et `platform: all` prend tous ceux de Home Assistant (Google, CalDAV, agenda local, liste de courses…), pas seulement iCloud.
+- **Agenda et rappels** : options facultatives, à ajouter sous `type:`. `exclude: [Travail]` masque des agendas ou des listes par leur nom (la carte Rappels laisse « Courses » et « Colis Amazon » de côté par défaut ; `exclude: []` les affiche) ; `colors: {Famille: "#ff8fab"}` change une couleur ; `days` (7 jours) et `max_items` (4 événements, 5 rappels) règlent la longueur ; `title` change le titre. `entities: [calendar.xxx]` choisit les agendas ou les listes à la main, et `platform: all` prend tous ceux de Home Assistant (Google, CalDAV, agenda local, liste de courses…), pas seulement iCloud.
+- **Colis** : options facultatives, à ajouter sous `type:`. `entity` choisit la liste (`todo.colis_amazon` par défaut), `title` change le titre, `max_items` règle le nombre de colis affichés (5) et `delivered_hours` le temps pendant lequel un colis livré reste visible (20 h). Un appui sur le titre ouvre la liste dans Home Assistant, un appui sur un colis ouvre la commande sur Amazon.fr. Le package reconnaît les e-mails d'Amazon.fr en français ; un e-mail qu'il ne comprend pas est simplement ignoré.
 
 ## Modifier le dépôt
 
