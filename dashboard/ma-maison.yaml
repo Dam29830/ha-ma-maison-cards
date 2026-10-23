@@ -7,7 +7,8 @@
 #
 #  Les entités sont des exemples : remplacez-les par les vôtres
 #  (liste complète dans le README).
-#  Nécessite : button-card et card-mod (HACS), thème maison_nuit (conseillé).
+#  Nécessite : button-card et card-mod (HACS), thème maison_nuit (conseillé),
+#  www/ma-maison-agenda.js en ressource pour l'agenda et les rappels (guide d'installation, étape 7).
 # ══════════════════════════════════════════════════════════════════════
 views:
   - icon: mdi:home-heart
@@ -5244,6 +5245,20 @@ views:
                 else k = 'idle';
                 return { k: k, st: st, ph: ph, er: er, chg: chg, mode: mode, mop: mode !== 'Vacuum-Only', b: b, tc: tc, td: td, run: st === 'cleaning' || st === 'returning' };
                 ]]]
+        type: grid
+      - cards:
+          - heading: Agenda & rappels
+            heading_style: title
+            icon: mdi:calendar-heart
+            type: heading
+          - grid_options:
+              columns: 12
+              rows: auto
+            type: custom:ma-maison-agenda
+          - grid_options:
+              columns: 12
+              rows: auto
+            type: custom:ma-maison-rappels
         type: grid
     theme: maison_nuit
     title: Ma Maison

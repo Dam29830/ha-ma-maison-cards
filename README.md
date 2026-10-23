@@ -1,8 +1,8 @@
 # 🏠 Ma Maison — des cartes animées pour Home Assistant
 
-Un tableau de bord sombre et vivant pour Home Assistant : le ciel suit la vraie météo et la position du soleil, les volets bougent selon leur position réelle, le poêle flambe, le ballon chauffe, le robot se promène et les poubelles s'envolent les jours de grand vent.
+Un tableau de bord sombre et vivant pour Home Assistant : le ciel suit la vraie météo et la position du soleil, les volets bougent selon leur position réelle, le poêle flambe, le ballon chauffe, le robot se promène, les poubelles s'envolent les jours de grand vent et la cloche sonne quand un rappel de l'iPhone est en retard.
 
-> 🇬🇧 *A French Home Assistant dashboard made of animated `custom:button-card` cards (weather, shutters, pellet stove, water heater, robot vacuum, bins…). Copy a card's YAML, replace the example entity IDs, done.*
+> 🇬🇧 *A French Home Assistant dashboard made of animated `custom:button-card` cards (weather, shutters, pellet stove, water heater, robot vacuum, bins…). Copy a card's YAML, replace the example entity IDs, done. Two extra JavaScript cards show the iPhone's calendar and reminders (Apple iCloud integration).*
 
 <p align="center">
   <img src="images/animations.gif" alt="Cartes animées : météo, volets, poêle à granulés, robot aspirateur" width="100%">
@@ -18,6 +18,8 @@ Un tableau de bord sombre et vivant pour Home Assistant : le ciel suit la vraie 
 1. Installez **[button-card](https://github.com/custom-cards/button-card)** depuis HACS.
 2. Ouvrez une carte du dossier [`cartes/`](cartes), copiez-la (icône *Copy raw file*), puis dans votre tableau de bord : ✏️ → *Ajouter une carte* → *Manuel* → collez.
 3. Remplacez les entités d'exemple indiquées en tête du fichier par les vôtres.
+
+Les cartes **Agenda** et **Rappels** sont à part : un petit fichier JavaScript à déclarer une fois, sans HACS, et aucune entité à remplacer (voir [Agenda et rappels de l'iPhone](#4-agenda-et-rappels-de-liphone)).
 
 Pour tout installer (thème, package, tableau complet), suivez le **[guide d'installation pas à pas](INSTALLATION.md)**, avec une section dépannage.
 
@@ -39,7 +41,7 @@ Vue *Sections* sur 3 colonnes, thème `maison_nuit` :
 
 <img src="images/apercu.png" alt="Tableau de bord Ma Maison complet" width="100%">
 
-Les graphiques sur 24 h, les statistiques Linky et la caméra sont des cartes natives de Home Assistant : elles font partie du [tableau complet](dashboard/ma-maison.yaml) mais n'apparaissent pas sur cette capture.
+Les graphiques sur 24 h, les statistiques Linky et la caméra sont des cartes natives de Home Assistant : elles font partie du [tableau complet](dashboard/ma-maison.yaml) mais n'apparaissent pas sur cette capture. L'agenda et les rappels, ajoutés ensuite, sont présentés avec [les autres cartes](#les-cartes).
 
 ## Versions iPhone et iPad
 
@@ -48,7 +50,7 @@ Les mêmes cartes, réorganisées pour le tactile en cinq onglets : **Accueil**,
 | Fichier | Réglé pour | Mise en page |
 |---|---|---|
 | [`dashboard/ma-maison-iphone.yaml`](dashboard/ma-maison-iphone.yaml) | **iPhone 18 Pro Max** (440 × 956 points) | une colonne, l'essentiel en haut de chaque onglet |
-| [`dashboard/ma-maison-ipad.yaml`](dashboard/ma-maison-ipad.yaml) | **iPad M1 en portrait** (iPad Air 5 : 820 × 1180 points ; iPad Pro 11 po : 834 × 1194) | deux colonnes ; chaque onglet tient sur un seul écran, pratique pour un iPad posé en écran central de la maison |
+| [`dashboard/ma-maison-ipad.yaml`](dashboard/ma-maison-ipad.yaml) | **iPad M1 en portrait** (iPad Air 5 : 820 × 1180 points ; iPad Pro 11 po : 834 × 1194) | deux colonnes ; chaque onglet tient sur un seul écran (l'Accueil défile un peu pour l'agenda et les rappels), pratique pour un iPad posé en écran central de la maison |
 
 <p align="center">
   <img src="images/iphone.png" alt="Version iPhone : onglets Accueil, Commandes et Chauffage" width="100%">
@@ -58,6 +60,8 @@ Les mêmes cartes, réorganisées pour le tactile en cinq onglets : **Accueil**,
 </p>
 
 Ils fonctionnent aussi sur les autres iPhone et iPad : sur un écran plus petit, il faut simplement faire défiler un peu plus.
+
+L'onglet **Accueil** regroupe aussi l'agenda et les rappels de l'iPhone : sous les poubelles sur l'iPhone, dans la colonne de droite sur l'iPad.
 
 Deux réglages en plus par rapport au tableau complet : les boutons des cartes occupent toute la place prévue pour eux (plus faciles à toucher), et les petites cartes Température et Humidité remplissent leur case.
 
@@ -90,6 +94,8 @@ Chaque fichier du dossier [`cartes/`](cartes) est une carte prête à coller. En
 | <img src="images/cartes/19-poubelle-jaune.png" alt="Poubelle jaune (emballages)" width="300"> | **Poubelle jaune (emballages)** · [`19-poubelle-jaune.yaml`](cartes/19-poubelle-jaune.yaml)<br>Compte à rebours jusqu'à la prochaine collecte, alerte la veille, report des jours fériés, envol animé du bac quand il y a du vent ; appui = « bac rangé à l'abri » pour la journée.<br><sub>Nécessite : button-card (HACS) + vent max prévu, input_datetime et script poubelle (package)</sub> |
 | <img src="images/cartes/20-poubelle-bleue.png" alt="Poubelle bleue (ordures ménagères)" width="300"> | **Poubelle bleue (ordures ménagères)** · [`20-poubelle-bleue.yaml`](cartes/20-poubelle-bleue.yaml)<br>Même principe que la poubelle jaune, avec son propre calendrier et son animation.<br><sub>Nécessite : button-card (HACS) + vent max prévu, input_datetime et script poubelle (package)</sub> |
 | <img src="images/cartes/21-robot-aspirateur.png" alt="Robot aspirateur" width="300"> | **Robot aspirateur** · [`21-robot-aspirateur.yaml`](cartes/21-robot-aspirateur.yaml)<br>Robot animé selon son état (nettoyage, retour, vidage, lavage, séchage, charge), batterie, réservoirs, erreurs en clair ; boutons démarrer, pause, base, localiser, vider le bac.<br><sub>Nécessite : button-card (HACS) + robot Ecovacs Deebot (Matter + intégration Ecovacs)</sub> |
+| <img src="images/cartes/22-agenda.png" alt="Agenda" width="300"> | **Agenda** · [`22-agenda.yaml`](cartes/22-agenda.yaml)<br>Les agendas de l'iPhone : page d'éphéméride qui se tourne chaque jour, événement en cours avec sa barre de progression, compte à rebours jusqu'au prochain, semaine en pastilles (appui sur un jour = son programme), une couleur par agenda.<br><sub>Nécessite : www/ma-maison-agenda.js en ressource + intégration Apple iCloud</sub> |
+| <img src="images/cartes/23-rappels.png" alt="Rappels" width="300"> | **Rappels** · [`23-rappels.yaml`](cartes/23-rappels.yaml)<br>Les rappels de l'iPhone : la cloche sonne quand un rappel est en retard et tinte pour ceux du jour. Un appui coche le rappel, aussi sur l'iPhone, avec 3,5 s pour annuler.<br><sub>Nécessite : www/ma-maison-agenda.js en ressource + intégration Apple iCloud</sub> |
 
 ## Installation
 
@@ -101,6 +107,7 @@ Téléchargez le dépôt avec le bouton vert **Code → Download ZIP**, ou copie
 - **[HACS](https://hacs.xyz)** avec :
   - **[button-card](https://github.com/custom-cards/button-card)** (testé en 7.x) : toutes les cartes animées ;
   - **[card-mod](https://github.com/thomasloven/lovelace-card-mod)** : uniquement pour habiller les cartes natives (graphiques, statistiques, caméra…).
+- Pour les cartes **Agenda** et **Rappels** : l'intégration **Apple iCloud** (native) et le fichier [`www/ma-maison-agenda.js`](www/ma-maison-agenda.js), sans HACS (voir [étape 4](#4-agenda-et-rappels-de-liphone)).
 
 ### 2. Le thème `maison_nuit` (conseillé)
 
@@ -139,11 +146,26 @@ Vous n'utilisez qu'une partie des cartes ? Supprimez les blocs inutiles du packa
 | Vidéoprojecteur | `sensor.projecteur_puissance_estimee`, `sensor.projecteur_energie_aujourd_hui` |
 | Température / humidité du HomePod | `input_text.homepod_temperature`, `input_text.homepod_humidite` + automatisation « relevé HomePod » (webhook) |
 
-### 4. Ajouter les cartes
+### 4. Agenda et rappels de l'iPhone
+
+Ces deux cartes ne sont pas des button-card : un seul fichier JavaScript fournit `custom:ma-maison-agenda` et `custom:ma-maison-rappels`.
+
+1. Ajoutez l'intégration **Apple iCloud** (*Paramètres → Appareils et services → Ajouter une intégration*) : identifiant Apple, mot de passe, puis le code à 6 chiffres affiché sur l'iPhone. Vos agendas et vos listes de rappels deviennent des entités `calendar.…` et `todo.…`.
+2. Copiez [`www/ma-maison-agenda.js`](www/ma-maison-agenda.js) dans `/config/www/`.
+3. *Paramètres → Tableaux de bord → ⋮ → Ressources → Ajouter une ressource* : adresse `/local/ma-maison-agenda.js`, type **Module JavaScript**.
+4. Rechargez la page (dans l'application, fermez-la puis rouvrez-la).
+
+Rien à remplacer : les cartes trouvent toutes seules les agendas et les listes d'iCloud, et fusionnent un compte ajouté deux fois. Si Apple redemande le code de double authentification, elles affichent « iCloud déconnecté » avec un bouton qui ouvre l'intégration.
+
+Pour mettre le fichier à jour plus tard, changez aussi l'adresse de la ressource (`/local/ma-maison-agenda.js?v=2`, puis `?v=3`…) : sinon les appareils gardent l'ancienne version en cache.
+
+### 5. Ajouter les cartes
 
 **Tout le tableau d'un coup** : créez un tableau de bord vide (*Paramètres → Tableaux de bord → Ajouter un tableau de bord → Nouveau tableau de bord à partir de zéro*), ouvrez-le, puis ✏️ → ⋮ → *Éditeur de configuration brute* et collez [`dashboard/ma-maison.yaml`](dashboard/ma-maison.yaml).
 
 **Pour un iPhone ou un iPad** : même méthode avec [`dashboard/ma-maison-iphone.yaml`](dashboard/ma-maison-iphone.yaml) ou [`dashboard/ma-maison-ipad.yaml`](dashboard/ma-maison-ipad.yaml), dans un tableau nommé « Ma Maison iPhone » ou « Ma Maison iPad » (voir [Versions iPhone et iPad](#versions-iphone-et-ipad)).
+
+Les trois tableaux contiennent les cartes Agenda et Rappels (titre « Agenda & rappels ») : faites d'abord l'[étape 4](#4-agenda-et-rappels-de-liphone), ou supprimez ces cartes si vous n'utilisez pas iCloud.
 
 **Ou carte par carte** : ✏️ *Modifier le tableau de bord* → *Ajouter une carte* → *Manuel*, puis collez le contenu d'un fichier de [`cartes/`](cartes).
 
@@ -172,6 +194,7 @@ Les noms d'entités sont des exemples. Remplacez-les par les vôtres, dans les c
 | `vacuum.robot_aspirateur`, `sensor.robot_aspirateur_*`, `select.robot_aspirateur_mode_nettoyage` | un robot Ecovacs Deebot vu par Matter |
 | `vacuum.robot_nettoyeur`, `sensor.robot_nettoyeur_*`, `button.robot_nettoyeur_vider_le_bac_a_poussiere` | le même robot, via l'intégration Ecovacs |
 | `camera.garage` | une caméra |
+| *(Agenda et Rappels)* | rien : les agendas et les listes de l'intégration Apple iCloud sont trouvés tout seuls (option `entities` pour en choisir d'autres, voir [Personnaliser](#personnaliser)) |
 
 ## Personnaliser
 
@@ -183,6 +206,7 @@ Les noms d'entités sont des exemples. Remplacez-les par les vôtres, dans les c
 - **HomePod** : Home Assistant ne lit pas directement les capteurs du HomePod. Dans l'app Raccourcis (ou Maison), créez une automatisation, par exemple à heure fixe ou quand la température de la pièce change, qui récupère la température et l'humidité mesurées par le HomePod et les envoie en `POST` JSON `{"temperature": 20.5, "humidite": 48}` à `https://<votre-home-assistant>/api/webhook/<votre-identifiant>`. Remplacez `homepod-remplacez-moi` dans le package par un identifiant aléatoire et gardez-le secret : il sert de clé.
 - **Numéro sur les poubelles** : remplacez `12` dans `<span class="jnum">12</span>` (bac jaune) et `<span class="bnum">12</span>` (bac bleu), ainsi que `n° 12` dans le titre du drapeau, par votre propre numéro.
 - **Titres des cartes** : le titre affiché est écrit dans le HTML de la carte (champ `info` ou `head`) ; modifier `name:` ne suffit pas, cherchez le texte dans la carte et remplacez-le.
+- **Agenda et rappels** : options facultatives, à ajouter sous `type:`. `exclude: [Travail]` masque des agendas ou des listes par leur nom (la carte Rappels laisse « Courses » de côté par défaut ; `exclude: []` l'affiche) ; `colors: {Famille: "#ff8fab"}` change une couleur ; `days` (7 jours) et `max_items` (4 événements, 5 rappels) règlent la longueur ; `title` change le titre. `entities: [calendar.xxx]` choisit les agendas ou les listes à la main, et `platform: all` prend tous ceux de Home Assistant (Google, CalDAV, agenda local, liste de courses…), pas seulement iCloud.
 
 ## Crédits
 - Damien Joulou-Bénardeau
