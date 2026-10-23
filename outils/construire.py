@@ -2,10 +2,10 @@
 """Construit dist/ma-maison-agenda.js, le fichier installé par HACS.
 
 Il réunit :
-  - src/cartes-agenda.js  : les cartes Agenda et Rappels ;
-  - src/carte-colis.js    : la carte Colis (suivi des colis Amazon) ;
   - src/strategie.js      : la stratégie « Ma Maison » qui génère tout le tableau ;
   - les trois tableaux du dossier dashboard/ (ordinateur, iPhone, iPad), compressés.
+
+La version affichée dans la console du navigateur est VERSION, ci-dessous.
 
 À relancer après chaque modification d'un tableau ou du code :
     python3 outils/construire.py
@@ -14,13 +14,13 @@ import base64
 import gzip
 import json
 import pathlib
-import re
 import sys
 
 import yaml
 
 RACINE = pathlib.Path(__file__).resolve().parent.parent
 SORTIE = RACINE / "dist" / "ma-maison-agenda.js"
+VERSION = "2.2.0"
 TABLEAUX = {
     "ordinateur": "dashboard/ma-maison.yaml",
     "iphone": "dashboard/ma-maison-iphone.yaml",
@@ -70,11 +70,8 @@ def main():
     compresse = gzip.compress(brut, compresslevel=9, mtime=0)
     b64 = base64.b64encode(compresse).decode("ascii")
 
-    agenda = (RACINE / "src" / "cartes-agenda.js").read_text(encoding="utf-8")
-    colis = (RACINE / "src" / "carte-colis.js").read_text(encoding="utf-8")
     strategie = (RACINE / "src" / "strategie.js").read_text(encoding="utf-8")
-    version = re.search(r'const VERSION = "([^"]+)"', agenda)
-    version = version.group(1) if version else "dev"
+    version = VERSION
     for repere in ("__DONNEES__", "__VERSION__"):
         if strategie.count(repere) != 1:
             sys.exit(f"Repère {repere} introuvable ou en double dans src/strategie.js")
@@ -85,12 +82,10 @@ def main():
         "// https://github.com/Dam29830/ha-ma-maison-cards\n"
         "//\n"
         "// Fichier construit par outils/construire.py : ne pas modifier à la main.\n"
-        "// Sources : src/cartes-agenda.js, src/carte-colis.js, src/strategie.js et le dossier dashboard/.\n\n"
+        "// Sources : src/strategie.js et le dossier dashboard/.\n\n"
     )
     SORTIE.parent.mkdir(exist_ok=True)
-    SORTIE.write_text(
-        entete + agenda.rstrip() + "\n\n" + colis.rstrip() + "\n\n" + strategie.rstrip() + "\n", encoding="utf-8"
-    )
+    SORTIE.write_text(entete + strategie.rstrip() + "\n", encoding="utf-8")
     print(
         f"{SORTIE.relative_to(RACINE)} : {SORTIE.stat().st_size // 1024} Ko "
         f"(tableaux {len(brut) // 1024} Ko → {len(compresse) // 1024} Ko compressés), version {version}"

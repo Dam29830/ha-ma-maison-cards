@@ -1,8 +1,8 @@
 # 🏠 Ma Maison — des cartes animées pour Home Assistant
 
-Un tableau de bord sombre et vivant pour Home Assistant : le ciel suit la vraie météo et la position du soleil, les volets bougent selon leur position réelle, le poêle flambe, le ballon chauffe, le robot se promène, les poubelles s'envolent les jours de grand vent, la cloche sonne quand un rappel de l'iPhone est en retard et la camionnette de livraison file vers la maison le jour où un colis Amazon arrive.
+Un tableau de bord sombre et vivant pour Home Assistant : le ciel suit la vraie météo et la position du soleil, les volets bougent selon leur position réelle et les poubelles s'envolent les jours de grand vent.
 
-> 🇬🇧 *A French Home Assistant dashboard made of animated `custom:button-card` cards (weather, shutters, pellet stove, water heater, robot vacuum, bins…). Install it from HACS and pick « Ma Maison » when adding a dashboard: it builds itself with your own devices, nothing to copy. You can still copy a single card's YAML and replace the example entity IDs. Extra JavaScript cards show the iPhone's calendar and reminders (Apple iCloud integration) and track Amazon.fr parcels from their e-mails (IMAP integration + package).*
+> 🇬🇧 *A French Home Assistant dashboard made of animated `custom:button-card` cards (weather, shutters, garage door, smart plugs, temperature, bins…). Install it from HACS and pick « Ma Maison » when adding a dashboard: it builds itself with your own devices, nothing to copy. You can still copy a single card's YAML and replace the example entity IDs.*
 
 <p align="center">
   <img src="images/animations.gif" alt="Cartes animées : météo, volets, poêle à granulés, robot aspirateur" width="100%">
@@ -12,6 +12,8 @@ Un tableau de bord sombre et vivant pour Home Assistant : le ciel suit la vraie 
   <img src="images/poubelle-vent.gif" alt="Jour de grand vent : le bac s'envole" width="39%">
 </p>
 <p align="center"><sub>Captures réalisées avec des données fictives.</sub></p>
+
+> Le poêle à granulés, le ballon d'eau chaude, le robot aspirateur et le vidéoprojecteur, visibles sur certaines captures, ainsi que l'agenda, les rappels et le suivi des colis, sont mis de côté pour l'instant : ils reviendront plus tard.
 
 ## Démarrage rapide
 
@@ -46,7 +48,7 @@ Vue *Sections* sur 3 colonnes, thème `maison_nuit` :
 
 <img src="images/apercu.png" alt="Tableau de bord Ma Maison complet" width="100%">
 
-Les graphiques sur 24 h, les statistiques Linky et la caméra sont des cartes natives de Home Assistant : elles font partie du [tableau complet](dashboard/ma-maison.yaml) mais n'apparaissent pas sur cette capture. L'agenda, les rappels et les colis, ajoutés ensuite, sont présentés avec [les autres cartes](#les-cartes).
+Les graphiques sur 24 h, les statistiques Linky et la caméra sont des cartes natives de Home Assistant : elles font partie du [tableau complet](dashboard/ma-maison.yaml) mais n'apparaissent pas sur cette capture.
 
 ## Versions iPhone et iPad
 
@@ -55,7 +57,7 @@ Les mêmes cartes, réorganisées pour le tactile en cinq onglets : **Accueil**,
 | Fichier | Réglé pour | Mise en page |
 |---|---|---|
 | [`dashboard/ma-maison-iphone.yaml`](dashboard/ma-maison-iphone.yaml) | **iPhone 18 Pro Max** (440 × 956 points) | une colonne, l'essentiel en haut de chaque onglet |
-| [`dashboard/ma-maison-ipad.yaml`](dashboard/ma-maison-ipad.yaml) | **iPad M1 en portrait** (iPad Air 5 : 820 × 1180 points ; iPad Pro 11 po : 834 × 1194) | deux colonnes ; chaque onglet tient sur un seul écran (l'Accueil défile un peu pour l'agenda, les rappels et les colis), pratique pour un iPad posé en écran central de la maison |
+| [`dashboard/ma-maison-ipad.yaml`](dashboard/ma-maison-ipad.yaml) | **iPad M1 en portrait** (iPad Air 5 : 820 × 1180 points ; iPad Pro 11 po : 834 × 1194) | deux colonnes ; chaque onglet tient sur un seul écran, pratique pour un iPad posé en écran central de la maison |
 
 <p align="center">
   <img src="images/iphone.png" alt="Version iPhone : onglets Accueil, Commandes et Chauffage" width="100%">
@@ -65,8 +67,6 @@ Les mêmes cartes, réorganisées pour le tactile en cinq onglets : **Accueil**,
 </p>
 
 Ils fonctionnent aussi sur les autres iPhone et iPad : sur un écran plus petit, il faut simplement faire défiler un peu plus.
-
-L'onglet **Accueil** regroupe aussi l'agenda et les rappels de l'iPhone, puis les colis Amazon : sous les poubelles sur l'iPhone, dans la colonne de droite sur l'iPad.
 
 Deux réglages en plus par rapport au tableau complet : les boutons des cartes occupent toute la place prévue pour eux (plus faciles à toucher), et les petites cartes Température et Humidité remplissent leur case.
 
@@ -88,8 +88,6 @@ Chaque fichier du dossier [`cartes/`](cartes) est une carte prête à coller. En
 | <img src="images/cartes/06-porte-garage.png" alt="Porte de garage" width="300"> | **Porte de garage** · [`06-porte-garage.yaml`](cartes/06-porte-garage.yaml)<br>Porte de garage animée (ouverture, fermeture, état) avec boutons ouvrir / fermer.<br><sub>Nécessite : button-card (HACS)</sub> |
 | <img src="images/cartes/07-prise.png" alt="Prise connectée" width="300"> | **Prise connectée** · [`07-prise.yaml`](cartes/07-prise.yaml)<br>Prise animée : appui = marche / arrêt, appui long = détails.<br><sub>Nécessite : button-card (HACS)</sub> |
 | <img src="images/cartes/08-radiateur.png" alt="Radiateur sur prise" width="300"> | **Radiateur sur prise** · [`08-radiateur.yaml`](cartes/08-radiateur.yaml)<br>Radiateur branché sur une prise qui mesure la puissance : animation de chauffe quand il consomme (Chauffe / En veille / Éteint). Appui = marche / arrêt.<br><sub>Nécessite : button-card (HACS) + une prise avec mesure de puissance</sub> |
-| <img src="images/cartes/09-poele-granules.png" alt="Poêle à granulés" width="300"> | **Poêle à granulés** · [`09-poele-granules.yaml`](cartes/09-poele-granules.yaml)<br>Poêle animé (flammes, braises, étincelles selon la puissance), état, consigne et alarmes.<br><sub>Nécessite : button-card (HACS) + un poêle intégré à Home Assistant (climate + capteurs)</sub> |
-| <img src="images/cartes/10-ballon-eau-chaude.png" alt="Ballon d&#x27;eau chaude" width="300"> | **Ballon d'eau chaude** · [`10-ballon-eau-chaude.yaml`](cartes/10-ballon-eau-chaude.yaml)<br>Ballon animé : eau chaude disponible, chauffe en cours, boost, absence, erreurs.<br><sub>Nécessite : button-card (HACS) + chauffe-eau Atlantic Cozytouch (intégration HACS cozytouch)</sub> |
 | <img src="images/cartes/11-puissance.png" alt="Puissance instantanée" width="300"> | **Puissance instantanée** · [`11-puissance.yaml`](cartes/11-puissance.yaml)<br>Consommation électrique en direct (W) avec jauge animée. Même carte pour le chauffe-eau et le radiateur : changez l'entité, le libellé « Consommation » écrit dans le champ info, et la pleine échelle de la jauge (w / 2400).<br><sub>Nécessite : button-card (HACS)</sub> |
 | <img src="images/cartes/12-cout-en-direct.png" alt="Coût en direct" width="300"> | **Coût en direct** · [`12-cout-en-direct.yaml`](cartes/12-cout-en-direct.yaml)<br>Ce que coûte l'appareil en ce moment, en €/h (tarif heures pleines / creuses).<br><sub>Nécessite : button-card (HACS) + capteur sensor.chauffe_eau_cout_horaire (package)</sub> |
 | <img src="images/cartes/13-mode-chauffe-eau.png" alt="Mode du chauffe-eau" width="300"> | **Mode du chauffe-eau** · [`13-mode-chauffe-eau.yaml`](cartes/13-mode-chauffe-eau.yaml)<br>Choix du mode (Manuel, Éco+, Programmé) en un appui, et bouton Boost.<br><sub>Nécessite : button-card (HACS) + chauffe-eau Atlantic Cozytouch</sub> |
@@ -97,13 +95,8 @@ Chaque fichier du dossier [`cartes/`](cartes) est une carte prête à coller. En
 | <img src="images/cartes/15-humidite.png" alt="Humidité" width="300"> | **Humidité** · [`15-humidite.yaml`](cartes/15-humidite.yaml)<br>Goutte animée avec le taux d'humidité et un avis (air sec, confortable, humide…).<br><sub>Nécessite : button-card (HACS)</sub> |
 | <img src="images/cartes/16-sacs-granules.png" alt="Stock de sacs de granulés" width="300"> | **Stock de sacs de granulés** · [`16-sacs-granules.yaml`](cartes/16-sacs-granules.yaml)<br>Stock de sacs avec boutons − (sac versé), + et « Livraison » (palette livrée), alerte stock bas.<br><sub>Nécessite : button-card (HACS) + counter.sacs_de_granules (package)</sub> |
 | <img src="images/cartes/17-facture-electricite.png" alt="Facture d&#x27;électricité du mois" width="300"> | **Facture d'électricité du mois** · [`17-facture-electricite.yaml`](cartes/17-facture-electricite.yaml)<br>Estimation de la facture du mois et dépense à date, calculées depuis le Linky et vos tarifs.<br><sub>Nécessite : button-card (HACS) + intégration ha-linky + entrées « Électricité » et leur automatisation (package)</sub> |
-| <img src="images/cartes/18-projecteur.png" alt="Vidéoprojecteur" width="300"> | **Vidéoprojecteur** · [`18-projecteur.yaml`](cartes/18-projecteur.yaml)<br>Écran animé qui s'allume avec l'appli en cours, lecture / pause, volume, marche / arrêt et consommation estimée du jour.<br><sub>Nécessite : button-card (HACS) + Android TV Remote et Google Cast + capteurs projecteur (package)</sub> |
 | <img src="images/cartes/19-poubelle-jaune.png" alt="Poubelle jaune (emballages)" width="300"> | **Poubelle jaune (emballages)** · [`19-poubelle-jaune.yaml`](cartes/19-poubelle-jaune.yaml)<br>Compte à rebours jusqu'à la prochaine collecte, alerte la veille, report des jours fériés, envol animé du bac quand il y a du vent ; appui = « bac rangé à l'abri » pour la journée.<br><sub>Nécessite : button-card (HACS) + vent max prévu, input_datetime et script poubelle (package)</sub> |
 | <img src="images/cartes/20-poubelle-bleue.png" alt="Poubelle bleue (ordures ménagères)" width="300"> | **Poubelle bleue (ordures ménagères)** · [`20-poubelle-bleue.yaml`](cartes/20-poubelle-bleue.yaml)<br>Même principe que la poubelle jaune, avec son propre calendrier et son animation.<br><sub>Nécessite : button-card (HACS) + vent max prévu, input_datetime et script poubelle (package)</sub> |
-| <img src="images/cartes/21-robot-aspirateur.png" alt="Robot aspirateur" width="300"> | **Robot aspirateur** · [`21-robot-aspirateur.yaml`](cartes/21-robot-aspirateur.yaml)<br>Robot animé selon son état (nettoyage, retour, vidage, lavage, séchage, charge), batterie, réservoirs, erreurs en clair ; boutons démarrer, pause, base, localiser, vider le bac.<br><sub>Nécessite : button-card (HACS) + robot Ecovacs Deebot (Matter + intégration Ecovacs)</sub> |
-| <img src="images/cartes/22-agenda.png" alt="Agenda" width="300"> | **Agenda** · [`22-agenda.yaml`](cartes/22-agenda.yaml)<br>Les agendas de l'iPhone : page d'éphéméride qui se tourne chaque jour, événement en cours avec sa barre de progression, compte à rebours jusqu'au prochain, semaine en pastilles (appui sur un jour = son programme), une couleur par agenda.<br><sub>Nécessite : ma-maison-agenda.js (HACS ou ressource) + intégration Apple iCloud</sub> |
-| <img src="images/cartes/23-rappels.png" alt="Rappels" width="300"> | **Rappels** · [`23-rappels.yaml`](cartes/23-rappels.yaml)<br>Les rappels de l'iPhone : la cloche sonne quand un rappel est en retard et tinte pour ceux du jour. Un appui coche le rappel, aussi sur l'iPhone, avec 3,5 s pour annuler.<br><sub>Nécessite : ma-maison-agenda.js (HACS ou ressource) + intégration Apple iCloud</sub> |
-| <img src="images/cartes/24-colis.png" alt="Colis Amazon" width="300"> | **Colis Amazon** · [`24-colis.yaml`](cartes/24-colis.yaml)<br>Les commandes Amazon.fr, lues dans leurs e-mails de suivi : la camionnette avance sur la frise de chaque colis (commandé, expédié, en route, livré) et file vers la maison le jour de la livraison, avec le créneau annoncé. Casier et code pour un point de retrait, alerte en cas de retard ou de livraison manquée, date limite d'un retour. Un appui ouvre la commande sur Amazon.<br><sub>Nécessite : ma-maison-agenda.js (HACS ou ressource) + intégrations IMAP et Local To-do + package colis_amazon</sub> |
 
 ## Installation
 
@@ -115,7 +108,7 @@ Chaque fichier du dossier [`cartes/`](cartes) est une carte prête à coller. En
 2. **Créer le tableau** : *Paramètres → Tableaux de bord → Ajouter un tableau de bord*, choisissez **Ma Maison** dans la liste, donnez-lui un nom, puis **Créer**.
 3. Ouvrez-le : c'est prêt.
 
-Sans HACS : copiez [`dist/ma-maison-agenda.js`](dist/ma-maison-agenda.js) dans `/config/www/` et déclarez la ressource `/local/ma-maison-agenda.js` (type **Module JavaScript**, voir l'[étape 4](#4-agenda-et-rappels-de-liphone)) ; la suite est identique.
+Sans HACS : copiez [`dist/ma-maison-agenda.js`](dist/ma-maison-agenda.js) dans `/config/www/` et déclarez la ressource `/local/ma-maison-agenda.js` (*Paramètres → Tableaux de bord → ⋮ → Ressources → Ajouter une ressource*, type **Module JavaScript**) ; la suite est identique.
 
 **Ce qu'il trouve tout seul**
 
@@ -127,15 +120,10 @@ Sans HACS : copiez [`dist/ma-maison-agenda.js`](dist/ma-maison-agenda.js) dans `
 | Porte de garage | une porte de type « garage » |
 | Prises | les prises connectées rangées dans une pièce |
 | Radiateur | un interrupteur nommé « radiateur » qui mesure la puissance |
-| Poêle à granulés | un thermostat dont le nom évoque un poêle, et les capteurs du même appareil |
 | Eau chaude | un chauffe-eau Atlantic Cozytouch |
 | Températures et humidité | une carte par pièce : le capteur choisi dans les réglages de la pièce, sinon celui qui s'y trouve |
-| Robot aspirateur | votre aspirateur, et l'entité de sa station s'il en a deux |
-| Projecteur | un appareil Android TV Remote et son entité Google Cast |
 | Caméras | jusqu'à quatre caméras |
 | Linky | la statistique de [ha-linky](https://github.com/bokub/ha-linky) |
-| Agenda et rappels | les agendas et listes iCloud, sinon tous ceux de Home Assistant |
-| Colis | la liste « Colis Amazon », remplie par le [package des colis](#5-suivi-des-colis-amazon) |
 | Prévisions, poubelles, facture, tarifs, granulés, HomePod | apparaissent dès que le [package](#3-le-package--entrées-capteurs-et-automatisations) est installé |
 
 Une carte sans appareil correspondant est simplement masquée. La disposition suit l'écran : ordinateur, iPhone ou iPad, avec la barre d'onglets en bas.
@@ -146,14 +134,14 @@ Une carte sans appareil correspondant est simplement masquée. La disposition su
 |---|---|---|
 | `etage` | n'afficher que les appareils d'un étage (ceux sans pièce restent) : pratique si Home Assistant gère deux maisons | `etage: ma_maison` |
 | `affichage` | imposer une disposition : `ordinateur`, `iphone` ou `ipad` (`auto` par défaut) | `affichage: ipad` |
-| `meteo`, `garage`, `radiateur`, `poele`, `chauffe_eau`, `robot`, `projecteur`, `colis` | choisir l'entité ; `false` masque la carte | `poele: climate.mon_poele` |
+| `meteo`, `garage`, `radiateur`, `poele`, `chauffe_eau` | choisir l'entité ; `false` masque la carte | `garage: cover.mon_portail` |
 | `personnes`, `volets`, `prises`, `cameras` | choisir la liste | `prises: [switch.prise_tele]` |
 | `pieces` | pièces des cartes température et humidité | `pieces: [salon, chambre]` |
 | `poubelle_jaune`, `poubelle_bleue` | jours de collecte (`jours`, `semaines` : `toutes`, `paires` ou `impaires`, `heure`, `feries` : `report` ou `aucun`) | `poubelle_jaune: {jours: [mardi], semaines: impaires, heure: 7}` |
-| `masquer` | cartes à cacher : `robot`, `poubelles`, `eau_chaude`, `temperatures`, `electricite`, `cameras`, `agenda`, `colis`… | `masquer: [robot]` |
+| `masquer` | cartes à cacher : `poubelles`, `eau_chaude`, `temperatures`, `electricite`, `cameras`… | `masquer: [cameras]` |
 | `exclure` | entités à ignorer dans la détection | `exclure: [cover.velux]` |
 
-Plus rares : `volets_groupe`, `radiateur_puissance`, `robot_station`, `projecteur_cast` et `linky`. Un exemple complet, en YAML :
+Plus rares : `volets_groupe`, `radiateur_puissance` et `linky`. Un exemple complet, en YAML :
 
 ```yaml
 strategy:
@@ -177,8 +165,6 @@ Téléchargez le dépôt avec le bouton vert **Code → Download ZIP**, ou copie
 - **[HACS](https://hacs.xyz)** avec :
   - **[button-card](https://github.com/custom-cards/button-card)** (testé en 7.x) : toutes les cartes animées ;
   - **[card-mod](https://github.com/thomasloven/lovelace-card-mod)** : uniquement pour habiller les cartes natives (graphiques, statistiques, caméra…).
-- Pour les cartes **Agenda** et **Rappels** : l'intégration **Apple iCloud** (native) et le fichier [`dist/ma-maison-agenda.js`](dist/ma-maison-agenda.js), installé par HACS ou à la main (voir [étape 4](#4-agenda-et-rappels-de-liphone)).
-- Pour la carte **Colis** : les intégrations **IMAP** et **Local To-do** (natives), le package [`colis_amazon.yaml`](configuration/packages/colis_amazon.yaml) et le même fichier JavaScript (voir [étape 5](#5-suivi-des-colis-amazon)).
 
 #### 2. Le thème `maison_nuit` (conseillé)
 
@@ -214,41 +200,13 @@ Vous n'utilisez qu'une partie des cartes ? Supprimez les blocs inutiles du packa
 | Facture d'électricité | entrées `input_number.electricite_*` + automatisation « facture du mois » (et l'intégration [ha-linky](https://github.com/bokub/ha-linky)) |
 | Puissance et coût du chauffe-eau | `sensor.chauffe_eau_puissance`, `sensor.chauffe_eau_cout_horaire`, `input_number.chauffe_eau_puissance_nominale` |
 | Sacs de granulés | `counter.sacs_de_granules` |
-| Vidéoprojecteur | `sensor.projecteur_puissance_estimee`, `sensor.projecteur_energie_aujourd_hui` |
 | Température / humidité du HomePod | `input_text.homepod_temperature`, `input_text.homepod_humidite` + automatisation « relevé HomePod » (webhook) |
 
-#### 4. Agenda et rappels de l'iPhone
-
-Ces deux cartes ne sont pas des button-card : un seul fichier JavaScript fournit `custom:ma-maison-agenda` et `custom:ma-maison-rappels`.
-
-1. Ajoutez l'intégration **Apple iCloud** (*Paramètres → Appareils et services → Ajouter une intégration*) : identifiant Apple, mot de passe, puis le code à 6 chiffres affiché sur l'iPhone. Vos agendas et vos listes de rappels deviennent des entités `calendar.…` et `todo.…`.
-2. Installez le fichier JavaScript, au choix (pas les deux) :
-   - **Avec HACS** : *HACS → ⋮ → Dépôts personnalisés*, dépôt `https://github.com/Dam29830/ha-ma-maison-cards`, type **Tableau de bord**, puis téléchargez « Ma Maison ». HACS déclare la ressource tout seul.
-   - **À la main** : copiez [`dist/ma-maison-agenda.js`](dist/ma-maison-agenda.js) dans `/config/www/`, puis *Paramètres → Tableaux de bord → ⋮ → Ressources → Ajouter une ressource* : adresse `/local/ma-maison-agenda.js`, type **Module JavaScript**.
-3. Rechargez la page (dans l'application, fermez-la puis rouvrez-la).
-
-Rien à remplacer : les cartes trouvent toutes seules les agendas et les listes d'iCloud, et fusionnent un compte ajouté deux fois. Si Apple redemande le code de double authentification, elles affichent « iCloud déconnecté » avec un bouton qui ouvre l'intégration.
-
-Pour mettre le fichier à jour plus tard : avec HACS, téléchargez simplement la nouvelle version. À la main, recopiez le fichier et changez aussi l'adresse de la ressource (`/local/ma-maison-agenda.js?v=2`, puis `?v=3`…) : sinon les appareils gardent l'ancienne version en cache.
-
-#### 5. Suivi des colis Amazon
-
-Amazon ne permet pas à une autre application de lire les commandes de ses clients : la carte **Colis** s'appuie donc sur les e-mails de suivi d'Amazon.fr, lus dans votre boîte mail par Home Assistant lui-même.
-
-1. Ajoutez l'intégration **Local To-do** avec le nom `Colis Amazon` (l'entité doit être `todo.colis_amazon`).
-2. Ajoutez l'intégration **IMAP**. Pour Gmail : serveur `imap.gmail.com`, port 993, votre adresse et un [mot de passe d'application](https://myaccount.google.com/apppasswords) (la validation en deux étapes doit être activée). Dans **Recherche**, remplacez `UnSeen UnDeleted` par `FROM amazon.fr`.
-3. Copiez [`configuration/packages/colis_amazon.yaml`](configuration/packages/colis_amazon.yaml) dans `/config/packages/`, vérifiez la configuration et redémarrez.
-4. La carte est fournie par le même fichier que l'agenda ([étape 4](#4-agenda-et-rappels-de-liphone), point 2).
-
-Dès que l'intégration est connectée, elle transmet le dernier e-mail d'Amazon ; ensuite, chaque nouvel e-mail met la carte à jour en quelques secondes, sans être marqué comme lu. Les colis livrés quittent la liste la nuit suivante. Le pas à pas est dans le [guide d'installation](INSTALLATION.md#8-suivre-les-colis-amazon-facultatif).
-
-#### 6. Ajouter les cartes
+#### 4. Ajouter les cartes
 
 **Tout le tableau d'un coup** : créez un tableau de bord vide (*Paramètres → Tableaux de bord → Ajouter un tableau de bord → Nouveau tableau de bord à partir de zéro*), ouvrez-le, puis ✏️ → ⋮ → *Éditeur de configuration brute* et collez [`dashboard/ma-maison.yaml`](dashboard/ma-maison.yaml).
 
 **Pour un iPhone ou un iPad** : même méthode avec [`dashboard/ma-maison-iphone.yaml`](dashboard/ma-maison-iphone.yaml) ou [`dashboard/ma-maison-ipad.yaml`](dashboard/ma-maison-ipad.yaml), dans un tableau nommé « Ma Maison iPhone » ou « Ma Maison iPad » (voir [Versions iPhone et iPad](#versions-iphone-et-ipad)).
-
-Les trois tableaux contiennent les cartes Agenda et Rappels (titre « Agenda & rappels ») : faites d'abord l'[étape 4](#4-agenda-et-rappels-de-liphone), ou supprimez ces cartes si vous n'utilisez pas iCloud. De même pour la carte Colis (titre « Colis ») : [étape 5](#5-suivi-des-colis-amazon), ou supprimez-la.
 
 **Ou carte par carte** : ✏️ *Modifier le tableau de bord* → *Ajouter une carte* → *Manuel*, puis collez le contenu d'un fichier de [`cartes/`](cartes).
 
@@ -268,30 +226,21 @@ Avec le [tableau automatique](#le-tableau-automatique-recommandé), ce remplacem
 | `cover.porte_de_garage` | votre porte de garage |
 | `switch.prise_salle_de_bain` | une prise connectée |
 | `switch.radiateur_salle_de_bain`, `sensor.radiateur_salle_de_bain_puissance` | une prise qui mesure la puissance d'un radiateur |
-| `climate.salon_poele_a_granules`, `sensor.salon_poele_a_granules_*`, `number.salon_poele_a_granules_power` | votre poêle à granulés (voir [Personnaliser](#personnaliser)) |
 | `sensor.domestic_hot_water_*`, `switch.domestic_hot_water_boost_eau_chaude`, `select.domestic_hot_water_mode_eau_chaude` | un chauffe-eau Atlantic piloté par Cozytouch |
 | `sensor.chambre_temperature`, `sensor.chambre_humidite`, `sensor.garage_*`, `sensor.salon_temperature`, `sensor.salon_humidite`, `sensor.salon_poele_a_granules_air_temperature` | vos capteurs de température et d'humidité |
 | `input_text.homepod_temperature`, `input_text.homepod_humidite` | la température et l'humidité d'un HomePod, envoyées par un raccourci Apple (voir [Personnaliser](#personnaliser)) |
 | `linky:00000000000000` | la statistique de votre compteur Linky ([ha-linky](https://github.com/bokub/ha-linky)) |
-| `media_player.projecteur`, `media_player.projecteur_cast` | votre vidéoprojecteur ou TV Android (Android TV Remote) et son entité Google Cast |
-| `vacuum.robot_aspirateur`, `sensor.robot_aspirateur_*`, `select.robot_aspirateur_mode_nettoyage` | un robot Ecovacs Deebot vu par Matter |
-| `vacuum.robot_nettoyeur`, `sensor.robot_nettoyeur_*`, `button.robot_nettoyeur_vider_le_bac_a_poussiere` | le même robot, via l'intégration Ecovacs |
 | `camera.garage` | une caméra |
-| *(Agenda et Rappels)* | rien : les agendas et les listes de l'intégration Apple iCloud sont trouvés tout seuls (option `entities` pour en choisir d'autres, voir [Personnaliser](#personnaliser)) |
-| `todo.colis_amazon` | rien si vous nommez la liste Local To-do « Colis Amazon » : le package utilise ce nom |
 
 ## Personnaliser
 
 - **Poubelles** : avec le tableau automatique, réglez les jours dans ses réglages (`poubelle_jaune`, `poubelle_bleue`). À la main, le calendrier est sur la première ligne du champ `head` de chaque carte, par exemple `const DAYS=[2], W=1, H=7, MODE="report";`. `DAYS` : jours de collecte (0 = lundi … 6 = dimanche, plusieurs jours possibles : `[1, 3]`) ; `W` : `1` = semaines impaires, `0` = paires, `null` = toutes ; `H` : heure de passage ; `MODE` : `"report"` décale la collecte après un jour férié, `"aucun"` ne décale pas. Le bac s'envole quand le vent prévu atteint 50 km/h ; un appui sur la carte le déclare « rangé à l'abri » pour la journée.
-- **Poêle à granulés** : la carte lit les statuts `OFF`, `PELLET LOAD`, `AWAITING FLAME`, `LIGHTING`, `WORKING`, `ASHPAN CLEANING`, `STANDBY`, `FINAL CLEANING`, `ALARM` et `ALARM MEMORY`. Si votre poêle en renvoie d'autres, adaptez le tableau `P` de la variable `pf`. Sans statut reconnu, la carte se rabat sur l'état de l'entité `climate`.
 - **Sacs de granulés** : alerte « stock bas » à 6 sacs ou moins. La carte affiche le stock « sur » le `maximum` du compteur (72, une palette) et le bouton « Livraison » remet le compteur à sa valeur `initial` (72 dans le package).
 - **Humidité** : air sec sous 35 %, confortable jusqu'à 60 %, un peu humide jusqu'à 70 %, très humide au-delà.
 - **Chauffe-eau** : la puissance affichée et le coût en direct viennent de `input_number.chauffe_eau_puissance_nominale` : saisissez celle de votre ballon (souvent 1 500 à 3 000 W, indiquée sur sa plaque).
 - **HomePod** : Home Assistant ne lit pas directement les capteurs du HomePod. Dans l'app Raccourcis (ou Maison), créez une automatisation, par exemple à heure fixe ou quand la température de la pièce change, qui récupère la température et l'humidité mesurées par le HomePod et les envoie en `POST` JSON `{"temperature": 20.5, "humidite": 48}` à `https://<votre-home-assistant>/api/webhook/<votre-identifiant>`. Remplacez `homepod-remplacez-moi` dans le package par un identifiant aléatoire et gardez-le secret : il sert de clé.
 - **Numéro sur les poubelles** : remplacez `12` dans `<span class="jnum">12</span>` (bac jaune) et `<span class="bnum">12</span>` (bac bleu), ainsi que `n° 12` dans le titre du drapeau, par votre propre numéro.
 - **Titres des cartes** : le titre affiché est écrit dans le HTML de la carte (champ `info` ou `head`) ; modifier `name:` ne suffit pas, cherchez le texte dans la carte et remplacez-le.
-- **Agenda et rappels** : options facultatives, à ajouter sous `type:`. `exclude: [Travail]` masque des agendas ou des listes par leur nom (la carte Rappels laisse « Courses » et « Colis Amazon » de côté par défaut ; `exclude: []` les affiche) ; `colors: {Famille: "#ff8fab"}` change une couleur ; `days` (7 jours) et `max_items` (4 événements, 5 rappels) règlent la longueur ; `title` change le titre. `entities: [calendar.xxx]` choisit les agendas ou les listes à la main, et `platform: all` prend tous ceux de Home Assistant (Google, CalDAV, agenda local, liste de courses…), pas seulement iCloud.
-- **Colis** : options facultatives, à ajouter sous `type:`. `entity` choisit la liste (`todo.colis_amazon` par défaut), `title` change le titre, `max_items` règle le nombre de colis affichés (5) et `delivered_hours` le temps pendant lequel un colis livré reste visible (20 h). Un appui sur le titre ouvre la liste dans Home Assistant, un appui sur un colis ouvre la commande sur Amazon.fr. Le package reconnaît les e-mails d'Amazon.fr en français ; un e-mail qu'il ne comprend pas est simplement ignoré.
 
 ## Modifier le dépôt
 

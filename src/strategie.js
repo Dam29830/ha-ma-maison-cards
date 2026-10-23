@@ -13,12 +13,12 @@
 //  se règlent dans l'éditeur visuel du tableau ou en YAML :
 //    affichage: auto | ordinateur | iphone | ipad
 //    etage: ma_maison                      → seulement les appareils de cet étage
-//    meteo, garage, radiateur, poele, chauffe_eau, robot, projecteur, colis : une entité (ou false)
+//    meteo, garage, radiateur, poele, chauffe_eau : une entité (ou false)
 //    personnes, volets, prises, cameras : une liste d'entités (ou false)
-//    volets_groupe, robot_station, projecteur_cast, radiateur_puissance, linky
+//    volets_groupe, radiateur_puissance, linky
 //    pieces: [salon, chambre]              → pièces des cartes température / humidité
 //    poubelle_jaune / poubelle_bleue: { jours: [mardi], semaines: impaires, heure: 7, feries: report }
-//    masquer: [robot, poubelles, …]        → cartes à ne pas afficher
+//    masquer: [poubelles, cameras, …]     → cartes à ne pas afficher
 //    exclure: [cover.xxx, …]               → entités à ignorer dans la détection
 // ════════════════════════════════════════════════════════════════════════
 {
@@ -1019,7 +1019,6 @@
         { name: "meteo", selector: ENTITE("weather") },
         { name: "personnes", selector: ENTITE("person", true) },
         { name: "cameras", selector: ENTITE("camera", true) },
-        { name: "colis", selector: ENTITE("todo") },
       ],
     },
     {
@@ -1041,15 +1040,6 @@
         { name: "pieces", selector: { area: { multiple: true } } },
       ],
     },
-    {
-      type: "expandable", name: "", flatten: true, title: "Multimédia et ménage",
-      schema: [
-        { name: "projecteur", selector: ENTITE("media_player") },
-        { name: "projecteur_cast", selector: ENTITE("media_player") },
-        { name: "robot", selector: ENTITE("vacuum") },
-        { name: "robot_station", selector: ENTITE("vacuum") },
-      ],
-    },
     POUBELLE("poubelle_jaune", "Poubelle jaune (package requis)"),
     POUBELLE("poubelle_bleue", "Poubelle bleue (package requis)"),
     {
@@ -1064,10 +1054,9 @@
               options: [
                 ["presence", "Présence"], ["meteo", "Météo"], ["previsions", "Prévisions"], ["cameras", "Caméras"],
                 ["facade", "Façade (tous les volets)"], ["volet", "Volets un par un"], ["garage", "Porte de garage"],
-                ["prise", "Prises"], ["radiateur", "Radiateur"], ["poele", "Poêle"], ["granules", "Sacs de granulés"],
+                ["prise", "Prises"], ["radiateur", "Radiateur"], ["granules", "Sacs de granulés"],
                 ["eau_chaude", "Eau chaude"], ["temperatures", "Températures et humidité"], ["electricite", "Électricité"],
-                ["projecteur", "Projecteur"], ["poubelles", "Poubelles"], ["robot", "Robot aspirateur"],
-                ["agenda", "Agenda"], ["rappels", "Rappels"], ["colis", "Colis Amazon"],
+                ["poubelles", "Poubelles"],
               ].map(([value, label]) => ({ value, label })),
             },
           },
@@ -1082,7 +1071,6 @@
     meteo: "Météo",
     personnes: "Personnes (2 au plus)",
     cameras: "Caméras",
-    colis: "Colis Amazon (liste To-do)",
     volets: "Volets",
     volets_groupe: "Groupe « tous les volets »",
     garage: "Porte de garage",
@@ -1092,10 +1080,6 @@
     poele: "Poêle à granulés",
     chauffe_eau: "Chauffe-eau Cozytouch (capteur « eau chaude disponible »)",
     pieces: "Pièces des cartes température et humidité",
-    projecteur: "Projecteur ou télé Android",
-    projecteur_cast: "Projecteur : entité Google Cast",
-    robot: "Robot aspirateur",
-    robot_station: "Robot : entité de la station",
     jours: "Jours de collecte",
     semaines: "Semaines",
     heure: "Heure de passage",
@@ -1222,7 +1206,7 @@
       type: "ma-maison",
       strategyType: "dashboard",
       name: "Ma Maison",
-      description: "Le tableau animé Ma Maison, créé tout seul avec vos appareils : météo, volets, poêle, chauffe-eau, robot, agenda, colis…",
+      description: "Le tableau animé Ma Maison, créé tout seul avec vos appareils : météo, volets, garage, prises, températures, poubelles…",
       documentationURL: MM_DEPOT,
     });
     console.info(`%c MA-MAISON %c stratégie ${MM_VERSION} `, "background:#4cc9a8;color:#0e1319;font-weight:700", "");

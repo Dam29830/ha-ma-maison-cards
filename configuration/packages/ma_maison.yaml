@@ -13,7 +13,6 @@
 #   - linky:00000000000000 → votre statistique Linky (intégration ha-linky)
 #   - weather.forecast_maison → votre entité météo (Met.no par défaut)
 #   - sensor.domestic_hot_water_* → les entités de votre chauffe-eau
-#   - media_player.projecteur(_cast) → votre vidéoprojecteur / votre TV
 #   - homepod-remplacez-moi → un identifiant de webhook aléatoire, à garder
 #     secret (il sert de clé au raccourci Apple qui envoie les mesures du HomePod)
 #  Vous n'utilisez pas une carte ? Supprimez simplement le bloc correspondant.
@@ -127,7 +126,7 @@ counter:
     restore: true
     icon: mdi:sack
 
-# ─── Capteurs calculés (chauffe-eau, projecteur) ───────────────────────
+# ─── Capteurs calculés (chauffe-eau) ───────────────────────────────────
 template:
   - sensor:
       - name: Chauffe-eau puissance
@@ -141,30 +140,6 @@ template:
         state_class: measurement
         unit_of_measurement: €/h
         state: "{% set p = (states('input_number.chauffe_eau_puissance_nominale')|float(2400)) if is_state('sensor.domestic_hot_water_resistance','on') else 0 %}{% set tarif = states('input_number.electricite_prix_hc')|float(0) if is_state('sensor.domestic_hot_water_heures_creuses','on') else states('input_number.electricite_prix_hp')|float(0) %}{{ (p/1000*tarif)|round(3) }}"
-      - name: Projecteur puissance estimée
-        unique_id: ma_maison_projecteur_puissance_estimee
-        device_class: power
-        state_class: measurement
-        unit_of_measurement: W
-        state: "{% set r = states('media_player.projecteur') %}{% set c = states('media_player.projecteur_cast') %}{% if r not in ['off', 'standby', 'unavailable', 'unknown'] or c in ['playing', 'paused', 'buffering'] %}65{% else %}0.5{% endif %}"
-sensor:
-  - platform: integration
-    name: Projecteur énergie estimée
-    unique_id: ma_maison_projecteur_energie_estimee
-    source: sensor.projecteur_puissance_estimee
-    unit_prefix: k
-    unit_time: h
-    method: left
-    round: 3
-    max_sub_interval:
-      minutes: 1
-utility_meter:
-  projecteur_energie_aujourd_hui:
-    name: "Projecteur énergie aujourd'hui"
-    unique_id: ma_maison_projecteur_energie_aujourd_hui
-    source: sensor.projecteur_energie_estimee
-    cycle: daily
-    periodically_resetting: true
 
 # ─── Automatisations (prévisions, vent max, facture, relevé HomePod) ───
 automation:
