@@ -37,6 +37,7 @@ Sur iPhone ou sur iPad, deux tableaux tout prêts vous attendent : [versions iPh
 - [Installation](#installation) : [le tableau automatique](#le-tableau-automatique-recommandé) · [à la main](#installation-à-la-main) · [guide pas à pas](INSTALLATION.md)
 - [Entités à remplacer](#entités-à-remplacer)
 - [Personnaliser](#personnaliser)
+- [Soutenir le projet](#soutenir-le-projet)
 - [Crédits](#crédits)
 
 ## Aperçu du tableau complet
@@ -302,6 +303,12 @@ node outils/tester.mjs tests/maison-fictive.json '{}' iphone   # génère le tab
 ```
 
 Les entités d'exemple des tableaux sont celles que la stratégie remplace : gardez-les telles quelles dans `dashboard/`.
+
+## Soutenir le projet
+
+Les cartes sont gratuites et le resteront. Si elles vous plaisent, vous pouvez offrir un café : les dons servent à acheter de nouveaux appareils connectés pour créer de nouvelles cartes, gratuites elles aussi. Une idée d'appareil à animer ? Dites-le dans votre message.
+
+[![Offrir un café sur Ko-fi](https://img.shields.io/badge/Ko--fi-Offrir%20un%20caf%C3%A9-FF5E5B?logo=kofi&logoColor=white)](https://ko-fi.com/dam29830)
 
 ## Crédits
 - Damien Joulou-Bénardeau
