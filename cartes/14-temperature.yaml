@@ -1,0 +1,71 @@
+# ══════════════════════════════════════════════════════════════════════
+#  Ma Maison · Température
+#  Thermomètre animé avec la température de la pièce. Dupliquez-la pour chaque capteur.
+#
+#  Entités utilisées (exemples à remplacer par les vôtres) :
+#    - sensor.chambre_temperature
+#  Nécessite : button-card (HACS)
+#  À coller dans : ✏️ Modifier le tableau de bord → Ajouter une carte
+#  → « Manuel » (tout en bas de la liste), puis remplacez le contenu.
+# ══════════════════════════════════════════════════════════════════════
+type: custom:button-card
+entity: sensor.chambre_temperature
+name: Température
+custom_fields:
+  body: |-
+    [[[
+    const v = entity ? Number(entity.state) : NaN;
+    const ok = !!entity && entity.state !== '' && !isNaN(v);
+    const u = (entity && entity.attributes.unit_of_measurement) || '°C';
+    const hue = ok ? Math.round(Math.max(0, Math.min(220, 220 - v * 5.5))) : 210;
+    const c1 = `hsl(${hue},90%,66%)`;
+    const c2 = `hsl(${Math.max(0, hue - 28)},90%,60%)`;
+    const c3 = `hsl(${Math.min(240, hue + 22)},90%,74%)`;
+    const pos = ok ? Math.max(2, Math.min(100, v / 40 * 100)) : 0;
+    const val = ok ? `${v.toLocaleString('fr-FR', {maximumFractionDigits: 1})} ${u}` : 'Indisponible';
+    const ico = ok ? `background:hsla(${hue},85%,58%,.18);color:hsl(${hue},85%,62%)` : `background:rgba(127,127,127,.15);color:var(--secondary-text-color)`;
+    const bar = ok ? `<div class='tt-bar'><div class='tt-fill' style='width:${pos.toFixed(1)}%;background-size:${(10000 / pos).toFixed(1)}% 100%'></div><div class='tt-mark' style='left:${pos.toFixed(1)}%;background:hsl(${hue},90%,64%);box-shadow:0 0 8px hsl(${hue},90%,60%)'></div></div>` : `<div class='tt-bar'></div>`;
+    return `<div class='tt'><div class='tt-head'><div class='tt-ico' style='${ico}'><ha-icon icon='mdi:thermometer'></ha-icon></div><div class='tt-txt'><div class='tt-name'>Température</div><div class='tt-val${ok ? ' tgrad' : ''}' style='--t1:${c1};--t2:${c2};--t3:${c3}'>${val}</div></div></div>${bar}</div>`;
+    ]]]
+extra_styles: |-
+  .tt{display:flex;flex-direction:column;justify-content:space-between;height:100%;box-sizing:border-box;padding:10px 12px 12px;}
+  .tt-head{display:flex;align-items:center;gap:10px;min-width:0;}
+  .tt-ico{flex:0 0 36px;width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;}
+  .tt-ico ha-icon{--mdc-icon-size:20px;}
+  .tt-txt{min-width:0;display:flex;flex-direction:column;align-items:flex-start;}
+  .tt-name{font-size:14px;font-weight:500;line-height:20px;color:var(--primary-text-color);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .tt-val{font-size:16px;font-weight:700;line-height:20px;color:var(--secondary-text-color);white-space:nowrap;}
+  .tt-val.tgrad{display:inline-block;background:linear-gradient(90deg,var(--t1),var(--t2),var(--t3),var(--t1));background-size:200% 100%;-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:transparent;animation:tgflow 5s linear infinite;}
+  .tt-bar{position:relative;height:6px;border-radius:3px;background:rgba(127,127,127,.22);}
+  .tt-fill{position:absolute;left:0;top:0;bottom:0;border-radius:3px;overflow:hidden;background-image:linear-gradient(90deg,hsl(220,85%,60%),hsl(165,85%,52%),hsl(110,75%,48%),hsl(55,90%,52%),hsl(28,95%,55%),hsl(0,85%,58%));background-repeat:no-repeat;}
+  .tt-fill::after{content:'';position:absolute;inset:0;background:linear-gradient(90deg,transparent 0%,rgba(255,255,255,.55) 50%,transparent 100%);background-size:40% 100%;background-repeat:no-repeat;animation:ttshine 2.6s linear infinite;}
+  .tt-mark{position:absolute;top:50%;width:10px;height:10px;margin:-5px 0 0 -5px;border-radius:50%;border:2px solid var(--card-background-color,#fff);box-sizing:border-box;animation:ttpulse 2s ease-in-out infinite;}
+  @keyframes tgflow{from{background-position:0% 50%;}to{background-position:200% 50%;}}
+  @keyframes ttshine{from{background-position:-60% 0;}to{background-position:160% 0;}}
+  @keyframes ttpulse{0%,100%{transform:scale(1);}50%{transform:scale(1.25);}}
+  @media (prefers-reduced-motion: reduce){.tt *,.tt *::after{animation:none !important;}}
+grid_options:
+  columns: 6
+  rows: 2
+hold_action:
+  action: none
+show_icon: false
+show_label: false
+show_name: false
+show_state: false
+styles:
+  card:
+    - padding: '0'
+    - height: 100%
+    - overflow: hidden
+  custom_fields:
+    body:
+      - width: 100%
+      - height: 100%
+  grid:
+    - grid-template-areas: '"body"'
+    - grid-template-columns: 1fr
+    - grid-template-rows: 1fr
+    - height: 100%
+tap_action:
+  action: more-info

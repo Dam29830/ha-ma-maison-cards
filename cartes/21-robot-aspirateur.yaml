@@ -1,0 +1,488 @@
+# ══════════════════════════════════════════════════════════════════════
+#  Ma Maison · Robot aspirateur
+#  Robot animé selon son état (nettoyage, retour, vidage, lavage, séchage, charge),
+#  batterie, réservoirs, erreurs en clair ; boutons démarrer, pause, base, localiser, vider le bac.
+#
+#  Entités utilisées (exemples à remplacer par les vôtres) :
+#    - button.robot_nettoyeur_vider_le_bac_a_poussiere
+#    - vacuum.robot_aspirateur
+#    - sensor.robot_nettoyeur_surface_nettoyee
+#    - sensor.robot_nettoyeur_duree_de_nettoyage
+#    - sensor.robot_aspirateur_temps_avant_charge_complete
+#    - vacuum.robot_nettoyeur
+#    - sensor.robot_aspirateur_phase_actuelle
+#    - sensor.robot_aspirateur_batterie
+#    - sensor.robot_aspirateur_etat_de_charge_de_la_batterie
+#    - sensor.robot_aspirateur_erreur_de_fonctionnement
+#    - select.robot_aspirateur_mode_nettoyage
+#    - sensor.robot_nettoyeur_etat_de_la_station
+#    - sensor.robot_nettoyeur_batterie
+#  Nécessite : button-card (HACS) + robot Ecovacs Deebot (Matter + intégration Ecovacs)
+#  À coller dans : ✏️ Modifier le tableau de bord → Ajouter une carte
+#  → « Manuel » (tout en bas de la liste), puis remplacez le contenu.
+# ══════════════════════════════════════════════════════════════════════
+type: custom:button-card
+entity: vacuum.robot_aspirateur
+name: Robot aspirateur
+custom_fields:
+  dust:
+    card:
+      color: var(--primary-text-color)
+      icon: mdi:delete-empty
+      show_name: false
+      styles:
+        card:
+          - height: 34px
+          - width: 100%
+          - padding: 0 6px
+          - border-radius: 12px
+          - background: var(--rvx-bg, rgba(255,255,255,0.08))
+          - border: 1px solid var(--rvx-bd, rgba(255,255,255,0.16))
+          - box-shadow: inset 0 1px 0 rgba(255,255,255,0.12)
+          - transition: background .4s, border-color .4s, box-shadow .4s
+        grid:
+          - grid-template-areas: '"i"'
+          - grid-template-columns: min-content
+          - grid-template-rows: 1fr
+          - justify-content: center
+          - align-items: center
+        icon:
+          - width: 18px
+          - height: 18px
+        img_cell:
+          - width: 18px
+          - height: 18px
+      tap_action:
+        action: perform-action
+        perform_action: button.press
+        target:
+          entity_id: button.robot_nettoyeur_vider_le_bac_a_poussiere
+      type: custom:button-card
+  go:
+    card:
+      color: var(--primary-text-color)
+      icon: mdi:play
+      show_name: false
+      styles:
+        card:
+          - height: 34px
+          - width: 100%
+          - padding: 0 6px
+          - border-radius: 12px
+          - background: var(--rvx-bg, rgba(255,255,255,0.08))
+          - border: 1px solid var(--rvx-bd, rgba(255,255,255,0.16))
+          - box-shadow: inset 0 1px 0 rgba(255,255,255,0.12)
+          - transition: background .4s, border-color .4s, box-shadow .4s
+        grid:
+          - grid-template-areas: '"i"'
+          - grid-template-columns: min-content
+          - grid-template-rows: 1fr
+          - justify-content: center
+          - align-items: center
+        icon:
+          - width: 18px
+          - height: 18px
+        img_cell:
+          - width: 18px
+          - height: 18px
+      tap_action:
+        action: perform-action
+        perform_action: vacuum.start
+        target:
+          entity_id: vacuum.robot_aspirateur
+      type: custom:button-card
+  home:
+    card:
+      color: var(--primary-text-color)
+      icon: mdi:home-lightning-bolt
+      show_name: false
+      styles:
+        card:
+          - height: 34px
+          - width: 100%
+          - padding: 0 6px
+          - border-radius: 12px
+          - background: var(--rvx-bg, rgba(255,255,255,0.08))
+          - border: 1px solid var(--rvx-bd, rgba(255,255,255,0.16))
+          - box-shadow: inset 0 1px 0 rgba(255,255,255,0.12)
+          - transition: background .4s, border-color .4s, box-shadow .4s
+        grid:
+          - grid-template-areas: '"i"'
+          - grid-template-columns: min-content
+          - grid-template-rows: 1fr
+          - justify-content: center
+          - align-items: center
+        icon:
+          - width: 18px
+          - height: 18px
+        img_cell:
+          - width: 18px
+          - height: 18px
+      tap_action:
+        action: perform-action
+        perform_action: vacuum.return_to_base
+        target:
+          entity_id: vacuum.robot_aspirateur
+      type: custom:button-card
+  info: |-
+    [[[
+    const v = variables.rv;
+    const S = (id) => { const s = states[id]; return s ? s.state : undefined; };
+    const docked = ['dock','empty','wash','dry'].includes(v.k);
+    const charging = v.chg === 'charging' && v.k !== 'off';
+    const TT = {empty: ['Eau propre vide', 'Remplissez le réservoir'], missing: ['Réservoir absent', 'Remettez le réservoir'], lid: ['Couvercle ouvert', 'Fermez le couvercle'], full: ['Eau sale pleine', 'Videz le réservoir'], dmissing: ['Bac sale absent', 'Remettez le réservoir']};
+    const tk = v.k === 'tank' ? (v.tc !== 'ok' ? TT[v.tc] : TT[v.td === 'missing' ? 'dmissing' : 'full']) : null;
+    const T = {clean: 'Nettoyage', ret: 'Retour à la base', empty: 'Vidage du bac', wash: 'Lavage', dry: 'Séchage', dock: charging ? 'En charge' : 'À la base', pause: 'En pause', err: 'Erreur', idle: 'En attente', off: 'Hors ligne', tank: tk ? tk[0] : ''};
+    const C = {clean: '#4cc9a8', ret: '#8fd0ff', empty: '#e8b06c', wash: '#6cc4ff', dry: '#ffb37a', dock: charging ? '#7fe0a0' : '#8fb3d9', pause: '#ffc46b', err: '#ff6b5f', idle: '#8fb3d9', off: 'var(--secondary-text-color)', tank: '#ff8a5c'};
+    const M = {'Vacuum & Mop': 'Aspiration + serpillière', 'Vacuum-Only': 'Aspiration seule', 'Mopping': 'Serpillière seule', 'Mop after Vacuum': 'Aspiration puis serpillière'};
+    const E = {stuck: 'Robot coincé', wheels_jammed: 'Roues bloquées', brush_jammed: 'Brosse bloquée', dust_bin_missing: 'Bac à poussière absent', dust_bin_full: 'Bac à poussière plein', water_tank_empty: 'Réservoir d’eau vide', water_tank_missing: 'Réservoir d’eau absent', water_tank_lid_open: 'Couvercle du réservoir ouvert', dirty_water_tank_full: 'Réservoir d’eau sale plein', dirty_water_tank_missing: 'Réservoir d’eau sale absent', mop_cleaning_pad_missing: 'Serpillière absente', low_battery: 'Batterie faible', cannot_reach_target_area: 'Zone inaccessible', failed_to_find_charging_dock: 'Station introuvable', navigation_sensor_obscured: 'Capteur de navigation obstrué', unable_to_start_or_resume: 'Démarrage impossible', unable_to_complete_operation: 'Tâche interrompue', command_invalid_in_state: 'Commande refusée'};
+    const area = parseFloat(S('sensor.robot_nettoyeur_surface_nettoyee'));
+    const mins = parseFloat(S('sensor.robot_nettoyeur_duree_de_nettoyage'));
+    let dur = '';
+    if (!isNaN(mins)) { const t = Math.round(mins); dur = t >= 60 ? Math.floor(t / 60) + ' h ' + String(t % 60).padStart(2, '0') : t + ' min'; }
+    const job = [isNaN(area) ? '' : '<b>' + Math.round(area) + ' m²</b>', dur].filter(Boolean).join(' · ');
+    const mode = M[v.mode] || '';
+    const tf = parseFloat(S('sensor.robot_aspirateur_temps_avant_charge_complete'));
+    let d = '';
+    if (v.k === 'clean') d = [job, mode].filter(Boolean).join(' · ');
+    else if (v.k === 'pause') d = job ? job + ' · tâche en pause' : 'Tâche en pause';
+    else if (v.k === 'ret') d = v.ph === 'Return Collect Dirt' ? 'Pour vider le bac' : (v.ph === 'Return Wash Mop' ? 'Pour laver la serpillière' : (v.ph === 'Return Collect And Wash' ? 'Pour vider le bac et laver la serpillière' : 'Vers la station'));
+    else if (v.k === 'empty') d = 'La station aspire le bac';
+    else if (v.k === 'wash') d = 'La station lave la serpillière';
+    else if (v.k === 'dry') d = 'Serpillière séchée à l’air chaud';
+    else if (v.k === 'dock') d = charging && tf > 0 ? 'Pleine dans ' + Math.round(tf) + ' min' : (job ? 'Dernier : ' + job : 'Prêt');
+    else if (v.k === 'tank') d = tk[1];
+    else if (v.k === 'err') d = E[v.er] || 'Vérifiez le robot';
+    else if (v.k === 'idle') d = 'Hors de la station';
+    else d = 'Robot injoignable';
+    const bt = isNaN(v.b) ? null : Math.max(0, Math.min(100, Math.round(v.b)));
+    const bc = bt === null ? 'transparent' : (bt <= 20 ? '#ff6b5f' : (bt <= 45 ? '#ffc46b' : '#5dd39e'));
+    const bolt = charging ? '<svg viewBox="0 0 7 10"><path d="M4.2 0 0 5.6h2.6L2 10l5-6.2H4.3z"/></svg>' : '';
+    const pill = (bt === null || v.k === 'off') ? '' : `<div class='rv-bat' style='--bl:${bt / 100};--bc:${bc}'><i><s></s>${bolt}</i><span>${bt} %</span></div>`;
+    const okc = '<svg viewBox="0 0 10 10"><path d="M1.5 5.2 4 7.6 8.6 2.6"/></svg>';
+    const KC = {ok: ['ok', okc], empty: ['bad', 'vide'], missing: ['bad', 'absent'], lid: ['bad', 'ouvert'], unk: ['unk', '–']}[v.tc];
+    const KD = {ok: ['ok', okc], full: ['bad', 'pleine'], missing: ['bad', 'absent'], unk: ['unk', '–']}[v.td];
+    const tanks = v.k === 'off' ? '' : `<div class='rv-tks'><span class='rv-tk c ${KC[0]}'><i></i>Eau propre<b>${KC[1]}</b></span>`
+     + `<span class='rv-tk d ${KD[0]}'><i></i>Eau sale<b>${KD[1]}</b></span></div>`;
+    return `<div class='hd-info' style='left:178px;right:12px;top:12px'><div class='hd-name'>Robot aspirateur</div>`
+     + `<div class='hd-title rv-t' style='color:${C[v.k]}'>${T[v.k]}</div><div class='hd-sub rv-s'>${d}</div></div>${tanks}${pill}`;
+    ]]]
+  loc:
+    card:
+      color: var(--primary-text-color)
+      icon: mdi:map-marker-radius
+      show_name: false
+      styles:
+        card:
+          - height: 34px
+          - width: 100%
+          - padding: 0 6px
+          - border-radius: 12px
+          - background: var(--rvx-bg, rgba(255,255,255,0.08))
+          - border: 1px solid var(--rvx-bd, rgba(255,255,255,0.16))
+          - box-shadow: inset 0 1px 0 rgba(255,255,255,0.12)
+          - transition: background .4s, border-color .4s, box-shadow .4s
+        grid:
+          - grid-template-areas: '"i"'
+          - grid-template-columns: min-content
+          - grid-template-rows: 1fr
+          - justify-content: center
+          - align-items: center
+        icon:
+          - width: 18px
+          - height: 18px
+        img_cell:
+          - width: 18px
+          - height: 18px
+      tap_action:
+        action: perform-action
+        perform_action: vacuum.locate
+        target:
+          entity_id: vacuum.robot_aspirateur
+      type: custom:button-card
+  pz:
+    card:
+      color: var(--primary-text-color)
+      icon: mdi:pause
+      show_name: false
+      styles:
+        card:
+          - height: 34px
+          - width: 100%
+          - padding: 0 6px
+          - border-radius: 12px
+          - background: var(--rvx-bg, rgba(255,255,255,0.08))
+          - border: 1px solid var(--rvx-bd, rgba(255,255,255,0.16))
+          - box-shadow: inset 0 1px 0 rgba(255,255,255,0.12)
+          - transition: background .4s, border-color .4s, box-shadow .4s
+        grid:
+          - grid-template-areas: '"i"'
+          - grid-template-columns: min-content
+          - grid-template-rows: 1fr
+          - justify-content: center
+          - align-items: center
+        icon:
+          - width: 18px
+          - height: 18px
+        img_cell:
+          - width: 18px
+          - height: 18px
+      tap_action:
+        action: perform-action
+        perform_action: vacuum.pause
+        target:
+          entity_id: vacuum.robot_aspirateur
+      type: custom:button-card
+  scene: <div class="hd-scene"><div class="rv-world"><div class="rv-floor"></div><div class="rv-g-tr"><svg class="rv-trail" viewBox="0 0 176 160" width="176" height="160" aria-hidden="true"><path class="rv-tp" d="M92,28 H146 A11,11 0 0 1 146,50 H92 A11,11 0 0 0 92,72 H146 A11,11 0 0 1 146,94 H92 A11,11 0 0 0 92,116 H146 A11,11 0 0 1 146,138 H92"/><path class="rv-tp2" d="M92,28 H146 A11,11 0 0 1 146,50 H92 A11,11 0 0 0 92,72 H146 A11,11 0 0 1 146,94 H92 A11,11 0 0 0 92,116 H146 A11,11 0 0 1 146,138 H92"/></svg></div><div class="rv-g-ret"><svg class="rv-route" viewBox="0 0 176 160" width="176" height="160" aria-hidden="true"><path d="M128,62 C104,62 84,80 66,80 L55,80"/></svg><i class="rv-beacon"></i><i class="rv-beacon b"></i></div><div class="rv-sta"><i class="rv-plate"></i><i class="rv-tray"></i><i class="rv-pin a"></i><i class="rv-pin b"></i><div class="rv-box"><i class="rv-tank c"></i><i class="rv-win"><u></u></i><i class="rv-tank d"></i><i class="rv-sled"></i></div></div><div class="rv-fx-w"><i style="animation-delay:0s"></i><i style="animation-delay:-0.6s"></i><i style="animation-delay:-1.2s"></i></div><div class="rv-fx-y"><i class="rv-heat"></i></div><div class="rv-g-dk"><div class="rv-bot rv-dk"><i class="rv-mop"></i><div class="rv-brush"><svg viewBox="-8 -8 16 16" aria-hidden="true"><path d="M0 0V-6.6M0 0L5.7 3.3M0 0L-5.7 3.3"/><circle r="1.7"/></svg></div><div class="rv-shell"><i class="rv-bump"></i><i class="rv-top"></i><i class="rv-gloss"></i><i class="rv-eye"></i><i class="rv-led"></i></div><i class="rv-ring"><u></u></i></div></div><div class="rv-fx-y2"><b style="left:46px;animation-delay:0s"></b><b style="left:54px;animation-delay:-0.55s"></b><b style="left:62px;animation-delay:-1.1s"></b></div><div class="rv-fx-e"><b style="left:52px;top:72px;animation-delay:0s"></b><b style="left:54px;top:86px;animation-delay:-0.14s"></b><b style="left:50px;top:92px;animation-delay:-0.28s"></b><b style="left:49px;top:66px;animation-delay:-0.42s"></b><b style="left:53px;top:79px;animation-delay:-0.56s"></b><b style="left:56px;top:75px;animation-delay:-0.7s"></b><b style="left:51px;top:84px;animation-delay:-0.84s"></b></div><div class="rv-g-rt"><div class="rv-bot rv-rt"><i class="rv-mop"></i><div class="rv-brush"><svg viewBox="-8 -8 16 16" aria-hidden="true"><path d="M0 0V-6.6M0 0L5.7 3.3M0 0L-5.7 3.3"/><circle r="1.7"/></svg></div><div class="rv-shell"><i class="rv-bump"></i><i class="rv-top"></i><i class="rv-gloss"></i><i class="rv-eye"></i><i class="rv-led"></i></div><i class="rv-ring"><u></u></i></div></div><div class="rv-g-cl"><div class="rv-bot rv-cl"><i class="rv-mop"></i><div class="rv-brush"><svg viewBox="-8 -8 16 16" aria-hidden="true"><path d="M0 0V-6.6M0 0L5.7 3.3M0 0L-5.7 3.3"/><circle r="1.7"/></svg></div><div class="rv-shell"><i class="rv-bump"></i><i class="rv-top"></i><i class="rv-gloss"></i><i class="rv-eye"></i><i class="rv-led"></i></div><i class="rv-ring"><u></u></i></div></div></div></div>
+extra_styles: |-
+  .hd-scene{position:absolute;inset:0;overflow:hidden;pointer-events:none;}
+  .hd-info{position:absolute;display:flex;flex-direction:column;gap:2px;text-align:left;white-space:normal;min-width:0;}
+  .hd-name{font-size:13px;font-weight:600;line-height:1.25;color:var(--secondary-text-color);opacity:.92;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .hd-name.w{white-space:normal;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;}
+  .hd-title{font-size:22px;font-weight:600;line-height:1.15;color:var(--primary-text-color);transition:color .8s;}
+  .hd-title.s{font-size:15.5px;}
+  .hd-sub{font-size:12.5px;line-height:1.3;color:var(--secondary-text-color);}
+  .hd-sub b{color:var(--primary-text-color);font-weight:600;}
+  @media (prefers-reduced-motion: reduce){.hd-scene *,.hd-scene *::before,.hd-scene *::after{animation:none !important;}}
+  .rv-world{position:absolute;left:0;top:0;width:176px;height:160px;filter:grayscale(var(--rv-gs,0));opacity:var(--rv-dim,1);transition:opacity 1s,filter 1s;}
+  .rv-floor{position:absolute;left:60px;top:4px;width:116px;height:152px;background:repeating-linear-gradient(180deg,rgba(255,255,255,.055) 0 1px,transparent 1px 22px) 0 13px,repeating-linear-gradient(90deg,rgba(255,255,255,.03) 0 1px,transparent 1px 58px) 17px 0,linear-gradient(140deg,rgba(255,255,255,.075),rgba(255,255,255,.02));-webkit-mask-image:radial-gradient(closest-side,#000 72%,transparent 100%);mask-image:radial-gradient(closest-side,#000 72%,transparent 100%);}
+  .rv-g-tr{position:absolute;inset:0;opacity:var(--rv-tr,0);transition:opacity 1s;}
+  .rv-trail{position:absolute;left:0;top:0;overflow:visible;}
+  .rv-tp,.rv-tp2{fill:none;stroke-dasharray:498 498;stroke-dashoffset:498;animation:rvtrail 20s linear -7s infinite;animation-play-state:var(--rv-run,paused);}
+  .rv-tp{stroke:var(--rv-tc,rgba(255,255,255,.09));stroke-width:24;}
+  .rv-tp2{stroke:rgba(255,255,255,.13);stroke-width:1.1;}
+  @keyframes rvtrail{0%{stroke-dashoffset:498;opacity:1;}80.06%{stroke-dashoffset:0;opacity:1;}87.04%{stroke-dashoffset:0;opacity:1;}100%{stroke-dashoffset:0;opacity:0;}}
+  .rv-g-ret{position:absolute;inset:0;opacity:var(--rv-r,0);transition:opacity .8s;}
+  .rv-route{position:absolute;left:0;top:0;overflow:visible;}
+  .rv-route path{fill:none;stroke:rgba(143,208,255,.6);stroke-width:1.6;stroke-linecap:round;stroke-dasharray:1.6 5;animation:rvmarch .9s linear infinite;animation-play-state:var(--rv-rrun,paused);}
+  @keyframes rvmarch{to{stroke-dashoffset:-6.6;}}
+  .rv-beacon{position:absolute;left:55px;top:80px;width:44px;height:44px;margin:-22px 0 0 -22px;border-radius:50%;border:1.5px solid rgba(143,208,255,.75);animation:rvping 2s ease-out infinite;animation-play-state:var(--rv-rrun,paused);}
+  .rv-beacon.b{animation-delay:-1s;}
+  @keyframes rvping{0%{transform:scale(.45);opacity:0;}20%{opacity:.9;}100%{transform:scale(1.25);opacity:0;}}
+  .rv-sta{position:absolute;inset:0;}
+  .rv-plate{position:absolute;left:32px;top:57px;width:28px;height:46px;border-radius:0 10px 10px 0;background:linear-gradient(90deg,#1b2027,#2c323b);box-shadow:0 0 0 .6px rgba(255,255,255,.09),0 3px 8px rgba(0,0,0,.45);}
+  .rv-tray{position:absolute;left:36px;top:60px;width:24px;height:40px;border-radius:0 9px 9px 0;background:radial-gradient(ellipse at 62% 50%,rgba(120,195,255,.6),rgba(120,195,255,0) 72%);opacity:var(--rv-w,0);transition:opacity 1s;}
+  .rv-pin{position:absolute;left:39px;width:4px;height:3px;border-radius:1px;background:linear-gradient(180deg,#f3d58b,#b48a2c);}
+  .rv-pin.a{top:71px;}.rv-pin.b{top:86px;}
+  .rv-box{position:absolute;left:8px;top:46px;width:30px;height:68px;border-radius:9px;background:linear-gradient(90deg,#c3cad3 0%,#f3f5f8 34%,#e4e8ed 70%,#b6bec8 100%);box-shadow:0 0 0 .6px rgba(0,0,0,.35),0 5px 12px rgba(0,0,0,.45),inset 0 1px 0 rgba(255,255,255,.75);}
+  .rv-tank{position:absolute;left:4px;right:4px;height:17px;border-radius:5px;background:linear-gradient(180deg,#e3e7ec,#c6cdd6);box-shadow:inset 0 0 0 .6px rgba(0,0,0,.2);}
+  .rv-tank.c{top:5px;box-shadow:inset 0 0 0 .6px rgba(0,0,0,.2),0 0 0 1.4px var(--rv-tkco,transparent);}
+  .rv-tank.d{bottom:5px;box-shadow:inset 0 0 0 .6px rgba(0,0,0,.2),0 0 0 1.4px var(--rv-tkdo,transparent);}
+  .rv-tank::after{content:'';position:absolute;left:5px;right:5px;top:7px;height:3px;border-radius:2px;background:rgba(0,0,0,.17);}
+  .rv-tank::before{content:'';position:absolute;right:3px;top:3px;width:3.5px;height:3.5px;border-radius:50%;animation:rvblink 1s ease-in-out infinite;}
+  .rv-tank.c::before{background:var(--rv-tkc,#5fb6ff);box-shadow:0 0 3px var(--rv-tkc,transparent);animation-play-state:var(--rv-tkcr,paused);}
+  .rv-tank.d::before{background:var(--rv-tkd,#a08f78);box-shadow:0 0 3px var(--rv-tkdg,transparent);animation-play-state:var(--rv-tkdr,paused);}
+  @keyframes rvblink{0%,100%{opacity:1;}50%{opacity:.25;}}
+  .rv-win{position:absolute;left:7px;right:7px;top:26px;height:16px;border-radius:5px;background:linear-gradient(160deg,#39414c,#161a20 70%);overflow:hidden;box-shadow:inset 0 0 0 .6px rgba(255,255,255,.16);}
+  .rv-win u{position:absolute;inset:-7px;background:conic-gradient(rgba(214,180,138,0),rgba(214,180,138,.9),rgba(214,180,138,0) 38%,rgba(214,180,138,.65) 68%,rgba(214,180,138,0));opacity:var(--rv-e,0);transition:opacity .8s;animation:rvspin .7s linear infinite;animation-play-state:var(--rv-fxrun,paused);}
+  .rv-sled{position:absolute;right:2px;top:22px;bottom:22px;width:2px;border-radius:2px;background:var(--rv-sled,#5d6670);box-shadow:0 0 6px 1px var(--rv-sledg,transparent);transition:background .8s,box-shadow .8s;}
+  .rv-fx-w{position:absolute;inset:0;opacity:var(--rv-w,0);transition:opacity 1s;}
+  .rv-fx-w i{position:absolute;left:55px;top:80px;width:42px;height:42px;margin:-21px 0 0 -21px;border-radius:50%;border:1.5px solid rgba(125,198,255,.9);animation:rvripple 1.8s ease-out infinite;animation-play-state:var(--rv-fxrun,paused);}
+  @keyframes rvripple{0%{transform:scale(.55);opacity:0;}15%{opacity:.95;}100%{transform:scale(1.4);opacity:0;}}
+  .rv-fx-y{position:absolute;inset:0;opacity:var(--rv-y,0);transition:opacity 1.2s;}
+  .rv-heat{position:absolute;left:55px;top:80px;width:64px;height:64px;margin:-32px 0 0 -32px;border-radius:50%;background:radial-gradient(closest-side,rgba(255,150,80,.42),rgba(255,130,60,0));animation:rvglow 2.4s ease-in-out infinite alternate;animation-play-state:var(--rv-fxrun,paused);}
+  @keyframes rvglow{0%{transform:scale(.85);opacity:.7;}100%{transform:scale(1.08);opacity:1;}}
+  .rv-fx-y2{position:absolute;left:0;top:44px;width:90px;height:24px;opacity:var(--rv-y,0);transition:opacity 1.2s;}
+  .rv-fx-y2 b{position:absolute;bottom:0;width:8px;height:18px;border-radius:50%;border-left:2px solid rgba(255,190,140,.8);animation:rvwave 2.2s ease-in infinite;animation-play-state:var(--rv-fxrun,paused);}
+  @keyframes rvwave{0%{transform:translateY(8px) scaleY(.6);opacity:0;}30%{opacity:1;}100%{transform:translateY(-10px) scaleY(1.1);opacity:0;}}
+  .rv-fx-e{position:absolute;inset:0;opacity:var(--rv-e,0);transition:opacity .8s;}
+  .rv-fx-e b{position:absolute;width:4px;height:4px;margin:-2px 0 0 -2px;border-radius:50%;background:#f0d7ae;box-shadow:0 0 5px 1px rgba(240,200,140,.75);animation:rvsuck 1s cubic-bezier(.5,0,.9,.6) infinite;animation-play-state:var(--rv-fxrun,paused);}
+  @keyframes rvsuck{0%{transform:translate(0,0) scale(1);opacity:0;}15%{opacity:1;}100%{transform:translate(-27px,-1px) scale(.3);opacity:0;}}
+  .rv-g-dk{position:absolute;inset:0;opacity:var(--rv-d,0);transition:opacity .8s;}
+  .rv-g-rt{position:absolute;inset:0;opacity:var(--rv-r,0);transition:opacity .8s;}
+  .rv-g-cl{position:absolute;inset:0;opacity:var(--rv-c,0);transition:opacity .8s;}
+  .rv-bot{position:absolute;left:0;top:0;width:34px;height:34px;margin:-17px 0 0 -17px;}
+  .rv-dk{transform:translate(55px,80px) rotate(180deg);}
+  .rv-cl{transform:translate(124px,72px);}
+  .rv-rt{transform:translate(100px,70px) rotate(160deg);}
+  .rv-cl{animation:rvpath 20s linear -7s infinite;animation-play-state:var(--rv-run,paused);}
+  .rv-rt{animation:rvret 6s linear infinite;animation-play-state:var(--rv-rrun,paused);}
+  .rv-mop{position:absolute;left:.5px;top:6px;width:16px;height:22px;border-radius:50%;background:radial-gradient(ellipse at 40% 50%,rgba(175,215,255,.85),rgba(110,180,255,.35) 70%,rgba(110,180,255,0));opacity:calc(var(--rv-mop,0) * .9);transition:opacity .8s;}
+  .rv-brush{position:absolute;left:19px;top:20px;width:16px;height:16px;}
+  .rv-brush svg{display:block;width:16px;height:16px;animation:rvspin .45s linear infinite;animation-play-state:var(--rv-spin,paused);}
+  .rv-brush path{stroke:rgba(235,240,246,.85);stroke-width:1.1;stroke-linecap:round;fill:none;}
+  .rv-brush circle{fill:#3a414b;}
+  @keyframes rvspin{to{transform:rotate(360deg);}}
+  .rv-shell{position:absolute;inset:2px;border-radius:50%;background:radial-gradient(circle at 34% 30%,#ffffff 0%,#edf0f4 42%,#c7ced7 82%,#9ba5b1 100%);box-shadow:0 0 0 .6px rgba(0,0,0,.4),0 0 7px rgba(0,0,0,.55);}
+  .rv-bump{position:absolute;inset:1.2px;border-radius:50%;border:1.3px solid transparent;border-right-color:rgba(55,64,76,.38);}
+  .rv-top{position:absolute;inset:5.5px;border-radius:50%;background:radial-gradient(circle at 38% 32%,#4b5360 0%,#2a3038 55%,#161a20 100%);box-shadow:inset 0 0 0 .6px rgba(255,255,255,.12);}
+  .rv-gloss{position:absolute;left:8px;top:7px;width:10px;height:6px;border-radius:50%;background:radial-gradient(closest-side,rgba(255,255,255,.38),rgba(255,255,255,0));transform:rotate(-28deg);}
+  .rv-eye{position:absolute;left:20.5px;top:12.5px;width:4px;height:5px;border-radius:1.5px;background:#0a0d11;box-shadow:0 0 0 .7px rgba(150,168,188,.7),0 0 5px rgba(110,235,255,calc(var(--rv-scan,0) * .95));transition:box-shadow .8s;}
+  .rv-led{position:absolute;left:7.5px;top:14px;width:2.2px;height:2.2px;border-radius:50%;background:var(--rv-led,#454c56);box-shadow:0 0 4px 1px var(--rv-led,transparent);transition:background .8s,box-shadow .8s;}
+  .rv-ring{position:absolute;inset:-4px;border-radius:50%;opacity:0;transition:opacity .8s;}
+  .rv-ring u{position:absolute;inset:0;border-radius:50%;border:2px solid var(--rv-ring,transparent);animation:rvhalo 1.6s ease-out infinite;animation-play-state:var(--rv-halo,paused);}
+  .rv-cl .rv-ring{opacity:var(--rv-ro,0);}
+  .rv-dk .rv-ring{opacity:var(--rv-chg,0);}
+  .rv-dk .rv-ring u{border-color:rgba(93,255,160,.85);animation-duration:2.4s;}
+  @keyframes rvhalo{0%{transform:scale(.82);opacity:1;}100%{transform:scale(1.28);opacity:0;}}
+  .rv-t{font-size:18px;line-height:1.2;white-space:normal;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+  .rv-s{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .rv-tks{position:absolute;left:178px;right:12px;bottom:55px;display:flex;flex-wrap:wrap;align-items:center;column-gap:12px;row-gap:5px;font-size:11.5px;font-weight:600;line-height:13px;color:var(--secondary-text-color);white-space:nowrap;}
+  .rv-tk{flex:none;display:flex;align-items:center;gap:4px;}
+  .rv-tk i{flex:none;width:6.5px;height:6.5px;margin:2px 2px 0 1px;border-radius:0 50% 50% 50%;transform:rotate(45deg);}
+  .rv-tk.c i{background:#5fb6ff;box-shadow:0 0 4px rgba(95,182,255,.6);}
+  .rv-tk.d i{background:#a08f78;}
+  .rv-tk b{display:flex;align-items:center;margin-left:1px;font-weight:600;}
+  .rv-tk b svg{width:10px;height:10px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;}
+  .rv-tk.ok b{color:#5dd39e;}
+  .rv-tk.bad,.rv-tk.bad b{color:#ff8a5c;}
+  .rv-tk.bad i{background:#ff6b4f;box-shadow:0 0 5px rgba(255,107,79,.85);animation:rvblink 1s ease-in-out infinite;}
+  .rv-bat{position:absolute;left:12px;bottom:11px;display:flex;align-items:center;gap:5px;font-size:12px;font-weight:600;color:var(--primary-text-color);}
+  .rv-bat i{position:relative;display:block;width:19px;height:10px;border-radius:3px;border:1.4px solid rgba(255,255,255,.5);box-sizing:border-box;}
+  .rv-bat i::after{content:'';position:absolute;right:-3.8px;top:2px;width:2px;height:3.2px;border-radius:0 1px 1px 0;background:rgba(255,255,255,.5);}
+  .rv-bat s{position:absolute;left:1px;top:1px;bottom:1px;width:calc((100% - 2px) * var(--bl,0));border-radius:1.5px;background:var(--bc);}
+  .rv-bat svg{position:absolute;left:50%;top:50%;width:7px;height:10px;margin:-5px 0 0 -3.5px;fill:#fff;filter:drop-shadow(0 0 1px rgba(0,0,0,.8));animation:rvbolt 1.6s ease-in-out infinite;}
+  @keyframes rvbolt{0%,100%{opacity:.55;}50%{opacity:1;}}
+  @keyframes rvpath{0%{transform:translate(92px,28px) rotate(0deg);}8.7%{transform:translate(146px,28px) rotate(0deg);}9.4%{transform:translate(150.21px,28.84px) rotate(22.5deg);}10.1%{transform:translate(153.78px,31.22px) rotate(45deg);}10.79%{transform:translate(156.16px,34.79px) rotate(67.5deg);}11.49%{transform:translate(157px,39px) rotate(90deg);}12.18%{transform:translate(156.16px,43.21px) rotate(112.5deg);}12.88%{transform:translate(153.78px,46.78px) rotate(135deg);}13.58%{transform:translate(150.21px,49.16px) rotate(157.5deg);}14.27%{transform:translate(146px,50px) rotate(180deg);}22.98%{transform:translate(92px,50px) rotate(180deg);}23.67%{transform:translate(87.79px,50.84px) rotate(157.5deg);}24.37%{transform:translate(84.22px,53.22px) rotate(135deg);}25.06%{transform:translate(81.84px,56.79px) rotate(112.5deg);}25.76%{transform:translate(81px,61px) rotate(90deg);}26.46%{transform:translate(81.84px,65.21px) rotate(67.5deg);}27.15%{transform:translate(84.22px,68.78px) rotate(45deg);}27.85%{transform:translate(87.79px,71.16px) rotate(22.5deg);}28.54%{transform:translate(92px,72px) rotate(0deg);}37.25%{transform:translate(146px,72px) rotate(0deg);}37.94%{transform:translate(150.21px,72.84px) rotate(22.5deg);}38.64%{transform:translate(153.78px,75.22px) rotate(45deg);}39.34%{transform:translate(156.16px,78.79px) rotate(67.5deg);}40.03%{transform:translate(157px,83px) rotate(90deg);}40.73%{transform:translate(156.16px,87.21px) rotate(112.5deg);}41.42%{transform:translate(153.78px,90.78px) rotate(135deg);}42.12%{transform:translate(150.21px,93.16px) rotate(157.5deg);}42.82%{transform:translate(146px,94px) rotate(180deg);}51.52%{transform:translate(92px,94px) rotate(180deg);}52.22%{transform:translate(87.79px,94.84px) rotate(157.5deg);}52.91%{transform:translate(84.22px,97.22px) rotate(135deg);}53.61%{transform:translate(81.84px,100.79px) rotate(112.5deg);}54.3%{transform:translate(81px,105px) rotate(90deg);}55%{transform:translate(81.84px,109.21px) rotate(67.5deg);}55.7%{transform:translate(84.22px,112.78px) rotate(45deg);}56.39%{transform:translate(87.79px,115.16px) rotate(22.5deg);}57.09%{transform:translate(92px,116px) rotate(0deg);}65.79%{transform:translate(146px,116px) rotate(0deg);}66.49%{transform:translate(150.21px,116.84px) rotate(22.5deg);}67.18%{transform:translate(153.78px,119.22px) rotate(45deg);}67.88%{transform:translate(156.16px,122.79px) rotate(67.5deg);}68.58%{transform:translate(157px,127px) rotate(90deg);}69.27%{transform:translate(156.16px,131.21px) rotate(112.5deg);}69.97%{transform:translate(153.78px,134.78px) rotate(135deg);}70.67%{transform:translate(150.21px,137.16px) rotate(157.5deg);}71.36%{transform:translate(146px,138px) rotate(180deg);}80.06%{transform:translate(92px,138px) rotate(180deg);}80.82%{transform:translate(87.41px,137.09px) rotate(202.5deg);}81.58%{transform:translate(83.51px,134.49px) rotate(225deg);}82.34%{transform:translate(80.91px,130.59px) rotate(247.5deg);}83.1%{transform:translate(80px,126px) rotate(270deg);}96.96%{transform:translate(80px,40px) rotate(270deg);}97.72%{transform:translate(80.91px,35.41px) rotate(292.5deg);}98.48%{transform:translate(83.51px,31.51px) rotate(315deg);}99.24%{transform:translate(87.41px,28.91px) rotate(337.5deg);}100%{transform:translate(92px,28px) rotate(360deg);}}
+  @keyframes rvret{0%{transform:translate(128px,62px) rotate(180deg);opacity:0;}7%{opacity:1;}4.68%{transform:translate(122.92px,62.26px) rotate(174.18deg);}9.3%{transform:translate(117.95px,63px) rotate(169.1deg);}13.89%{transform:translate(113.1px,64.13px) rotate(164.84deg);}18.45%{transform:translate(108.36px,65.57px) rotate(161.44deg);}22.99%{transform:translate(103.73px,67.25px) rotate(158.88deg);}27.5%{transform:translate(99.19px,69.08px) rotate(157.17deg);}31.95%{transform:translate(94.75px,71px) rotate(156.3deg);}36.32%{transform:translate(90.4px,72.92px) rotate(156.3deg);}40.59%{transform:translate(86.14px,74.75px) rotate(157.22deg);}44.74%{transform:translate(81.97px,76.43px) rotate(159.17deg);}48.74%{transform:translate(77.87px,77.87px) rotate(162.26deg);}52.58%{transform:translate(73.84px,79px) rotate(166.68deg);}56.29%{transform:translate(69.89px,79.74px) rotate(172.56deg);}59.87%{transform:translate(66px,80px) rotate(180deg);}70%{transform:translate(55px,80px) rotate(180deg);}86%{transform:translate(55px,80px) rotate(180deg);opacity:1;}96%{opacity:0;}100%{transform:translate(55px,80px) rotate(180deg);opacity:0;}}
+grid_options:
+  columns: 12
+  rows: auto
+show_icon: false
+show_name: false
+styles:
+  card:
+    - height: 160px
+    - border-radius: 24px
+    - overflow: hidden
+    - padding: '0'
+    - background: rgba(140,170,200,0.10)
+    - backdrop-filter: blur(16px) saturate(170%)
+    - -webkit-backdrop-filter: blur(16px) saturate(170%)
+    - border: 1px solid rgba(255,255,255,0.16)
+    - box-shadow: 0 8px 30px rgba(0,0,0,0.40), inset 0 1px 0 rgba(255,255,255,0.22)
+    - --rv-c: "[[[ return ['clean','pause','err','idle'].includes(variables.rv.k) ? '1' : '0'; ]]]"
+    - --rv-tr: "[[[ return ['clean','pause','err'].includes(variables.rv.k) ? '1' : '0'; ]]]"
+    - --rv-run: "[[[ return variables.rv.k === 'clean' ? 'running' : 'paused'; ]]]"
+    - --rv-spin: "[[[ return variables.rv.k === 'clean' ? 'running' : 'paused'; ]]]"
+    - --rv-ro: "[[[ return ['pause','err'].includes(variables.rv.k) ? '1' : '0'; ]]]"
+    - --rv-ring: "[[[ return variables.rv.k === 'err' ? '#ff5a4f' : (variables.rv.k === 'pause' ? '#ffc46b' : 'transparent'); ]]]"
+    - --rv-r: "[[[ return variables.rv.k === 'ret' ? '1' : '0'; ]]]"
+    - --rv-rrun: "[[[ return variables.rv.k === 'ret' ? 'running' : 'paused'; ]]]"
+    - --rv-d: "[[[ return ['dock','empty','wash','dry','off','tank'].includes(variables.rv.k) ? '1' : '0'; ]]]"
+    - --rv-e: "[[[ return variables.rv.k === 'empty' ? '1' : '0'; ]]]"
+    - --rv-w: "[[[ return variables.rv.k === 'wash' ? '1' : '0'; ]]]"
+    - --rv-y: "[[[ return variables.rv.k === 'dry' ? '1' : '0'; ]]]"
+    - --rv-chg: "[[[ return (variables.rv.k === 'dock' && variables.rv.chg === 'charging') ? '1' : '0'; ]]]"
+    - --rv-fxrun: "[[[ return ['empty','wash','dry'].includes(variables.rv.k) ? 'running' : 'paused'; ]]]"
+    - --rv-halo: "[[[ return (['pause','err'].includes(variables.rv.k) || (variables.rv.k === 'dock' && variables.rv.chg === 'charging')) ? 'running' : 'paused'; ]]]"
+    - --rv-scan: "[[[ return ['clean','ret'].includes(variables.rv.k) ? '1' : '0'; ]]]"
+    - --rv-mop: "[[[ return variables.rv.mop ? '1' : '0'; ]]]"
+    - --rv-tc: "[[[ return variables.rv.mop ? 'rgba(120,190,255,0.17)' : 'rgba(255,255,255,0.09)'; ]]]"
+    - --rv-led: "[[[ const m = {clean: '#5dffa0', ret: '#8fd0ff', pause: '#ffc46b', err: '#ff5a4f', idle: '#8fb3d9', off: '#454c56', tank: '#ffb15c'}; return m[variables.rv.k] || (variables.rv.chg === 'charging' ? '#5dffa0' : '#8fb3d9'); ]]]"
+    - --rv-sled: "[[[ const m = {empty: '#e8b06c', wash: '#59b8ff', dry: '#ff9f5a', off: '#454c56', tank: '#ff6b4f'}; return m[variables.rv.k] || '#cfe0f2'; ]]]"
+    - --rv-sledg: "[[[ const m = {empty: 'rgba(232,176,108,.7)', wash: 'rgba(89,184,255,.7)', dry: 'rgba(255,159,90,.7)', tank: 'rgba(255,107,79,.75)'}; return m[variables.rv.k] || (variables.rv.k === 'off' ? 'transparent' : 'rgba(207,224,242,.45)'); ]]]"
+    - --rv-tkc: "[[[ const t = variables.rv.tc; return t === 'ok' ? '#5fb6ff' : (t === 'unk' ? '#8d97a3' : '#ff6b4f'); ]]]"
+    - --rv-tkd: "[[[ const t = variables.rv.td; return t === 'ok' ? '#a08f78' : (t === 'unk' ? '#8d97a3' : '#ff6b4f'); ]]]"
+    - --rv-tkdg: "[[[ return ['ok','unk'].includes(variables.rv.td) ? 'transparent' : '#ff6b4f'; ]]]"
+    - --rv-tkcr: "[[[ return ['ok','unk'].includes(variables.rv.tc) ? 'paused' : 'running'; ]]]"
+    - --rv-tkdr: "[[[ return ['ok','unk'].includes(variables.rv.td) ? 'paused' : 'running'; ]]]"
+    - --rv-tkco: "[[[ return ['ok','unk'].includes(variables.rv.tc) ? 'transparent' : 'rgba(255,107,79,.85)'; ]]]"
+    - --rv-tkdo: "[[[ return ['ok','unk'].includes(variables.rv.td) ? 'transparent' : 'rgba(255,107,79,.85)'; ]]]"
+    - --rv-gs: "[[[ return variables.rv.k === 'off' ? '1' : '0'; ]]]"
+    - --rv-dim: "[[[ return variables.rv.k === 'off' ? '0.55' : '1'; ]]]"
+  custom_fields:
+    dust:
+      - position: absolute
+      - left: calc(178px + 2 * calc((100% - 178px - 12px - 18px) / 4) + 12px)
+      - bottom: 14px
+      - width: calc((100% - 178px - 12px - 18px) / 4)
+      - height: 34px
+      - z-index: '2'
+      - --rvx-bg: "[[[ return variables.rv.k === 'empty' ? 'rgba(232,176,108,0.22)' : 'rgba(255,255,255,0.08)'; ]]]"
+      - --rvx-bd: "[[[ return variables.rv.k === 'empty' ? 'rgba(232,176,108,0.55)' : 'rgba(255,255,255,0.16)'; ]]]"
+    go:
+      - position: absolute
+      - left: 178px
+      - bottom: 14px
+      - width: calc((100% - 178px - 12px - 18px) / 4)
+      - height: 34px
+      - z-index: '2'
+      - display: "[[[ return variables.rv.run ? 'none' : 'block'; ]]]"
+    home:
+      - position: absolute
+      - left: calc(178px + 1 * calc((100% - 178px - 12px - 18px) / 4) + 6px)
+      - bottom: 14px
+      - width: calc((100% - 178px - 12px - 18px) / 4)
+      - height: 34px
+      - z-index: '2'
+      - --rvx-bg: "[[[ return variables.rv.k === 'ret' ? 'rgba(143,208,255,0.22)' : 'rgba(255,255,255,0.08)'; ]]]"
+      - --rvx-bd: "[[[ return variables.rv.k === 'ret' ? 'rgba(143,208,255,0.55)' : 'rgba(255,255,255,0.16)'; ]]]"
+    info:
+      - position: absolute
+      - inset: '0'
+      - width: 100%
+      - height: 100%
+      - z-index: '1'
+      - pointer-events: none
+    loc:
+      - position: absolute
+      - left: calc(178px + 3 * calc((100% - 178px - 12px - 18px) / 4) + 18px)
+      - bottom: 14px
+      - width: calc((100% - 178px - 12px - 18px) / 4)
+      - height: 34px
+      - z-index: '2'
+    pz:
+      - position: absolute
+      - left: 178px
+      - bottom: 14px
+      - width: calc((100% - 178px - 12px - 18px) / 4)
+      - height: 34px
+      - z-index: '2'
+      - display: "[[[ return variables.rv.run ? 'block' : 'none'; ]]]"
+      - --rvx-bg: rgba(76,201,168,0.20)
+      - --rvx-bd: rgba(76,201,168,0.50)
+    scene:
+      - position: absolute
+      - inset: '0'
+      - width: 100%
+      - height: 100%
+      - z-index: '0'
+      - pointer-events: none
+  grid:
+    - position: relative
+tap_action:
+  action: more-info
+  entity: vacuum.robot_nettoyeur
+triggers_update:
+  - sensor.robot_aspirateur_phase_actuelle
+  - sensor.robot_aspirateur_batterie
+  - sensor.robot_aspirateur_etat_de_charge_de_la_batterie
+  - sensor.robot_aspirateur_temps_avant_charge_complete
+  - sensor.robot_aspirateur_erreur_de_fonctionnement
+  - select.robot_aspirateur_mode_nettoyage
+  - sensor.robot_nettoyeur_etat_de_la_station
+  - sensor.robot_nettoyeur_surface_nettoyee
+  - sensor.robot_nettoyeur_duree_de_nettoyage
+  - sensor.robot_nettoyeur_batterie
+variables:
+  rv: |-
+    [[[
+    const S = (id) => { const s = states[id]; return s ? s.state : undefined; };
+    const bad = (x) => x === undefined || x === 'unavailable' || x === 'unknown';
+    const st = entity ? entity.state : 'unavailable';
+    const ph = S('sensor.robot_aspirateur_phase_actuelle') || '';
+    const sta = S('sensor.robot_nettoyeur_etat_de_la_station');
+    const er = S('sensor.robot_aspirateur_erreur_de_fonctionnement');
+    const chg = S('sensor.robot_aspirateur_etat_de_charge_de_la_batterie');
+    const mode = S('select.robot_aspirateur_mode_nettoyage') || '';
+    let b = parseFloat(S('sensor.robot_aspirateur_batterie'));
+    if (isNaN(b)) b = parseFloat(S('sensor.robot_nettoyeur_batterie'));
+    const TC = {water_tank_empty: 'empty', water_tank_missing: 'missing', water_tank_lid_open: 'lid'};
+    const TD = {dirty_water_tank_full: 'full', dirty_water_tank_missing: 'missing'};
+    const tc = bad(er) ? 'unk' : (TC[er] || 'ok');
+    const td = bad(er) ? 'unk' : (TD[er] || 'ok');
+    let k;
+    if (bad(st)) k = 'off';
+    else if (TC[er] || TD[er]) k = 'tank';
+    else if (st === 'error' || (!bad(er) && er !== 'no_error')) k = 'err';
+    else if (st === 'paused') k = 'pause';
+    else if (ph.indexOf('Return') === 0 || st === 'returning') k = 'ret';
+    else if (ph === 'Auto Collect Dirt' || ph === 'Hand Collect Dirt' || sta === 'emptying_dustbin') k = 'empty';
+    else if (ph === 'Wash Mop' || ph === 'Pump Water' || ph === 'Self Clean' || sta === 'washing_mop') k = 'wash';
+    else if (ph === 'Dry Mop' || sta === 'drying_mop') k = 'dry';
+    else if (st === 'cleaning') k = 'clean';
+    else if (st === 'docked') k = 'dock';
+    else k = 'idle';
+    return { k: k, st: st, ph: ph, er: er, chg: chg, mode: mode, mop: mode !== 'Vacuum-Only', b: b, tc: tc, td: td, run: st === 'cleaning' || st === 'returning' };
+    ]]]

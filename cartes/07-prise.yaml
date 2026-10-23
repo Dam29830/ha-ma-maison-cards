@@ -1,0 +1,86 @@
+# ══════════════════════════════════════════════════════════════════════
+#  Ma Maison · Prise connectée
+#  Prise animée : appui = marche / arrêt, appui long = détails.
+#
+#  Entités utilisées (exemples à remplacer par les vôtres) :
+#    - switch.prise_salle_de_bain
+#  Nécessite : button-card (HACS)
+#  À coller dans : ✏️ Modifier le tableau de bord → Ajouter une carte
+#  → « Manuel » (tout en bas de la liste), puis remplacez le contenu.
+# ══════════════════════════════════════════════════════════════════════
+type: custom:button-card
+entity: switch.prise_salle_de_bain
+name: Prise salle de bain
+custom_fields:
+  info: |-
+    [[[
+    const on = entity && entity.state === 'on';
+    const ko = !entity || ['unavailable','unknown'].includes(entity.state);
+    const t = ko ? 'Indisponible' : (on ? 'Allumée' : 'Éteinte');
+    const c = ko ? 'var(--secondary-text-color)' : (on ? '#4cc9a8' : '#8fb3d9');
+    const d = ko ? '' : (on ? 'Sous tension' : 'Hors tension');
+    return `<div class='hd-info' style='left:14px;right:12px;top:11px'><div class='hd-name w'>Prise salle de bain</div></div>`
+     + `<div class='hd-info' style='left:88px;right:10px;top:58px'><div class='hd-title s' style='color:${c}'>${t}</div>${d ? `<div class='hd-sub'>${d}</div>` : ''}</div>`;
+    ]]]
+  scene: <div class="hd-scene"><div class="pz"><div class="pz-plate"><div class="pz-cup"><i class="h l"></i><i class="h r"></i><i class="pin"></i></div></div><div class="pz-cable"><i></i><i></i><i></i></div><div class="pz-plug"><div class="pz-face"><span class="pz-led"></span></div></div></div></div>
+extra_styles: |-
+  .hd-scene{position:absolute;inset:0;overflow:hidden;pointer-events:none;}
+  .hd-info{position:absolute;display:flex;flex-direction:column;gap:2px;text-align:left;white-space:normal;min-width:0;}
+  .hd-name{font-size:13px;font-weight:600;line-height:1.25;color:var(--secondary-text-color);opacity:.92;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .hd-name.w{white-space:normal;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;}
+  .hd-title{font-size:22px;font-weight:600;line-height:1.15;color:var(--primary-text-color);transition:color .8s;}
+  .hd-title.s{font-size:15.5px;}
+  .hd-sub{font-size:12.5px;line-height:1.3;color:var(--secondary-text-color);}
+  .hd-sub b{color:var(--primary-text-color);font-weight:600;}
+  @media (prefers-reduced-motion: reduce){.hd-scene *,.hd-scene *::before,.hd-scene *::after{animation:none !important;}}
+  .pz{position:absolute;left:14px;top:50px;width:62px;height:100px;}
+  .pz-plate{position:absolute;left:0;top:0;width:60px;height:60px;border-radius:13px;background:linear-gradient(145deg,#fbfcfd,#d6dce3);box-shadow:0 5px 12px rgba(0,0,0,.42),inset 0 -2px 3px rgba(0,0,0,.12);}
+  .pz-cup{position:absolute;left:10px;top:10px;width:40px;height:40px;border-radius:50%;background:radial-gradient(circle at 50% 40%,#e9edf1,#c3cbd3);box-shadow:inset 0 3px 5px rgba(0,0,0,.28);}
+  .pz-cup .h{position:absolute;top:17px;width:6px;height:6px;border-radius:50%;background:#2a2f36;box-shadow:inset 0 1px 1px rgba(0,0,0,.8);}
+  .pz-cup .h.l{left:8px;}
+  .pz-cup .h.r{right:8px;}
+  .pz-cup .pin{position:absolute;left:17px;top:3px;width:6px;height:7px;border-radius:2px;background:linear-gradient(90deg,#9aa3ad,#e8ecf0,#9aa3ad);}
+  .pz-plug{position:absolute;left:11px;top:11px;width:38px;height:38px;transform:translateY(calc((1 - var(--pz-on,0)) * 50px)) rotate(calc((1 - var(--pz-on,0)) * -8deg));transition:transform .9s cubic-bezier(.3,1.4,.5,1);}
+  .pz-face{position:absolute;inset:0;border-radius:50%;background:radial-gradient(circle at 40% 35%,#56606c,#262b32 70%);box-shadow:0 4px 9px rgba(0,0,0,.55),inset 0 1px 1px rgba(255,255,255,.22);}
+  .pz-led{position:absolute;left:50%;top:50%;width:9px;height:9px;margin:-4.5px 0 0 -4.5px;border-radius:50%;background:var(--pz-led,#454c56);box-shadow:0 0 10px 3px var(--pz-glow,transparent);transition:background .6s,box-shadow .6s;}
+  .pz-cable{position:absolute;left:27px;top:44px;width:6px;height:64px;border-radius:3px;background:linear-gradient(90deg,#1c2026,#3a414b,#1c2026);overflow:hidden;transform:translateY(calc((1 - var(--pz-on,0)) * 50px));transition:transform .9s cubic-bezier(.3,1.4,.5,1);}
+  .pz-cable i{position:absolute;left:1px;width:4px;height:9px;border-radius:2px;background:#7dffb0;box-shadow:0 0 6px #4cff95;opacity:var(--pz-on,0);animation:hdflow 1.2s linear infinite;}
+  .pz-cable i:nth-child(2){animation-delay:-.4s;}
+  .pz-cable i:nth-child(3){animation-delay:-.8s;}
+  @keyframes hdflow{from{top:64px;}to{top:-10px;}}
+grid_options:
+  columns: 6
+  rows: auto
+hold_action:
+  action: more-info
+show_icon: false
+show_name: false
+styles:
+  card:
+    - height: 150px
+    - border-radius: 24px
+    - overflow: hidden
+    - padding: '0'
+    - background: rgba(140,170,200,0.10)
+    - backdrop-filter: blur(16px) saturate(170%)
+    - -webkit-backdrop-filter: blur(16px) saturate(170%)
+    - border: 1px solid rgba(255,255,255,0.16)
+    - box-shadow: 0 8px 30px rgba(0,0,0,0.40), inset 0 1px 0 rgba(255,255,255,0.22)
+    - --pz-on: "[[[ return String((entity && entity.state === 'on') ? 1 : 0); ]]]"
+    - --pz-led: "[[[ return String((entity && entity.state === 'on') ? '#5dffa0' : '#454c56'); ]]]"
+    - --pz-glow: "[[[ return String((entity && entity.state === 'on') ? 'rgba(80,255,150,.55)' : 'transparent'); ]]]"
+  custom_fields:
+    info:
+      - position: absolute
+      - inset: '0'
+      - width: 100%
+      - height: 100%
+    scene:
+      - position: absolute
+      - inset: '0'
+      - width: 100%
+      - height: 100%
+  grid:
+    - position: relative
+tap_action:
+  action: toggle

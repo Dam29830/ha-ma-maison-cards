@@ -1,0 +1,378 @@
+# ══════════════════════════════════════════════════════════════════════
+#  Package « Ma Maison » — tout ce dont les cartes ont besoin, en un fichier
+#
+#  1. Dans /config/configuration.yaml, ajoutez une seule fois :
+#
+#       homeassistant:
+#         packages: !include_dir_named packages
+#
+#  2. Copiez ce fichier dans /config/packages/ma_maison.yaml
+#  3. Outils → YAML → « Vérifier la configuration », puis redémarrez.
+#
+#  À adapter :
+#   - linky:00000000000000 → votre statistique Linky (intégration ha-linky)
+#   - weather.forecast_maison → votre entité météo (Met.no par défaut)
+#   - sensor.domestic_hot_water_* → les entités de votre chauffe-eau
+#   - media_player.projecteur(_cast) → votre vidéoprojecteur / votre TV
+#   - homepod-remplacez-moi → un identifiant de webhook aléatoire, à garder
+#     secret (il sert de clé au raccourci Apple qui envoie les mesures du HomePod)
+#  Vous n'utilisez pas une carte ? Supprimez simplement le bloc correspondant.
+# ══════════════════════════════════════════════════════════════════════
+
+# ─── Entrées (helpers) utilisées par les cartes ────────────────────────
+input_text:
+  meteo_previsions_semaine:
+    name: Météo – prévisions semaine
+    min: 0
+    max: 255
+    mode: text
+    icon: mdi:weather-partly-cloudy
+  homepod_temperature:
+    name: HomePod température
+    min: 0
+    max: 10
+    mode: text
+    unit_of_measurement: °C
+    icon: mdi:thermometer
+  homepod_humidite:
+    name: HomePod humidité
+    min: 0
+    max: 10
+    mode: text
+    unit_of_measurement: '%'
+    icon: mdi:water-percent
+input_number:
+  electricite_prix_hp:
+    name: Électricité – prix HP
+    min: 0
+    max: 1
+    step: 0.0001
+    mode: box
+    unit_of_measurement: €/kWh
+    icon: mdi:currency-eur
+  electricite_prix_hc:
+    name: Électricité – prix HC
+    min: 0
+    max: 1
+    step: 0.0001
+    mode: box
+    unit_of_measurement: €/kWh
+    icon: mdi:currency-eur
+  electricite_abonnement:
+    name: Électricité – abonnement
+    min: 0
+    max: 100
+    step: 0.01
+    mode: box
+    unit_of_measurement: €/mois
+    icon: mdi:file-document-outline
+  electricite_part_heures_creuses:
+    name: Électricité – part heures creuses
+    min: 0
+    max: 100
+    step: 1
+    mode: slider
+    unit_of_measurement: '%'
+    icon: mdi:weather-night
+  electricite_facture_estimee_du_mois:
+    name: Électricité – facture estimée du mois
+    min: 0
+    max: 2000
+    step: 0.01
+    mode: box
+    unit_of_measurement: €
+    icon: mdi:cash-clock
+  electricite_depense_ce_mois_ci:
+    name: Électricité – dépensé ce mois-ci
+    min: 0
+    max: 2000
+    step: 0.01
+    mode: box
+    unit_of_measurement: €
+    icon: mdi:cash
+  chauffe_eau_puissance_nominale:
+    name: Chauffe-eau puissance nominale
+    min: 500
+    max: 4000
+    step: 50
+    mode: box
+    unit_of_measurement: W
+    icon: mdi:flash
+  vent_max_prevu_24_h:
+    name: Vent max prévu 24 h
+    min: 0
+    max: 250
+    step: 1
+    mode: box
+    unit_of_measurement: km/h
+    icon: mdi:weather-windy
+input_datetime:
+  bac_jaune_a_l_abri:
+    name: "Bac jaune à l'abri"
+    has_date: true
+    has_time: false
+    icon: mdi:home-roof
+  bac_bleu_a_l_abri:
+    name: "Bac bleu à l'abri"
+    has_date: true
+    has_time: false
+    icon: mdi:home-roof
+counter:
+  sacs_de_granules:
+    name: Sacs de granulés
+    initial: 72
+    minimum: 0
+    maximum: 72
+    step: 1
+    restore: true
+    icon: mdi:sack
+
+# ─── Capteurs calculés (chauffe-eau, projecteur) ───────────────────────
+template:
+  - sensor:
+      - name: Chauffe-eau puissance
+        unique_id: ma_maison_chauffe_eau_puissance
+        device_class: power
+        state_class: measurement
+        unit_of_measurement: W
+        state: "{{ (states('input_number.chauffe_eau_puissance_nominale')|float(2400)) if is_state('sensor.domestic_hot_water_resistance','on') else 0 }}"
+      - name: Chauffe-eau coût horaire
+        unique_id: ma_maison_chauffe_eau_cout_horaire
+        state_class: measurement
+        unit_of_measurement: €/h
+        state: "{% set p = (states('input_number.chauffe_eau_puissance_nominale')|float(2400)) if is_state('sensor.domestic_hot_water_resistance','on') else 0 %}{% set tarif = states('input_number.electricite_prix_hc')|float(0) if is_state('sensor.domestic_hot_water_heures_creuses','on') else states('input_number.electricite_prix_hp')|float(0) %}{{ (p/1000*tarif)|round(3) }}"
+      - name: Projecteur puissance estimée
+        unique_id: ma_maison_projecteur_puissance_estimee
+        device_class: power
+        state_class: measurement
+        unit_of_measurement: W
+        state: "{% set r = states('media_player.projecteur') %}{% set c = states('media_player.projecteur_cast') %}{% if r not in ['off', 'standby', 'unavailable', 'unknown'] or c in ['playing', 'paused', 'buffering'] %}65{% else %}0.5{% endif %}"
+sensor:
+  - platform: integration
+    name: Projecteur énergie estimée
+    unique_id: ma_maison_projecteur_energie_estimee
+    source: sensor.projecteur_puissance_estimee
+    unit_prefix: k
+    unit_time: h
+    method: left
+    round: 3
+    max_sub_interval:
+      minutes: 1
+utility_meter:
+  projecteur_energie_aujourd_hui:
+    name: "Projecteur énergie aujourd'hui"
+    unique_id: ma_maison_projecteur_energie_aujourd_hui
+    source: sensor.projecteur_energie_estimee
+    cycle: daily
+    periodically_resetting: true
+
+# ─── Automatisations (prévisions, vent max, facture, relevé HomePod) ───
+automation:
+  - id: ma_maison_meteo_previsions_semaine
+    alias: Météo – prévisions de la semaine (carte animée)
+    description: Récupère chaque heure les prévisions journalières de weather.forecast_maison et les stocke en format compact (jour,condition,max,min,pluie mm,vent km/h;…) dans input_text.meteo_previsions_semaine, lu par la carte animée des prévisions du tableau de bord Ma Maison.
+    mode: restart
+    triggers:
+      - trigger: homeassistant
+        event: start
+      # Toutes les heures : Met.no met ses prévisions à jour régulièrement.
+      - trigger: time_pattern
+        minutes: '3'
+    conditions: []
+    actions:
+      - action: weather.get_forecasts
+        target:
+          entity_id: weather.forecast_maison
+        data:
+          type: daily
+        response_variable: fc_resp
+      # Format : jour de la semaine (0 = dimanche), condition abrégée, max, min, pluie (mm), vent (km/h).
+      - variables:
+          compact: |-
+            {%- set fc = fc_resp.get('weather.forecast_maison', {}).get('forecast', []) -%}
+            {%- set codes = {'sunny':'su','clear-night':'cn','partlycloudy':'pc','cloudy':'cl','rainy':'ra','pouring':'po','lightning':'li','lightning-rainy':'lr','snowy':'sn','snowy-rainy':'sr','hail':'ha','fog':'fo','windy':'wi','windy-variant':'wv','exceptional':'ex'} -%}
+            {%- set ns = namespace(out=[]) -%}
+            {%- for d in fc[:7] -%}
+              {%- set dt = as_local(as_datetime(d.datetime | string)) -%}
+              {%- set hi = d.temperature | float(0) -%}
+              {%- set lo = d.templow | float(hi) -%}
+              {%- set ns.out = ns.out + [[dt.isoweekday() % 7, codes.get(d.condition, 'cl'), hi | round(0) | int, lo | round(0) | int, d.precipitation | float(0) | round(1), d.wind_speed | float(0) | round(0) | int] | join(',')] -%}
+            {%- endfor -%}
+            {{ ns.out | join(';') }}
+      # Sans prévision reçue, on garde la dernière valeur.
+      - condition: template
+        value_template: '{{ compact | length > 0 }}'
+      - action: input_text.set_value
+        target:
+          entity_id: input_text.meteo_previsions_semaine
+        data:
+          value: '{{ compact }}'
+  - id: ma_maison_meteo_vent_max_24h
+    alias: Météo — vent max prévu (24 h)
+    description: Chaque heure, lit la prévision horaire Met.no de weather.forecast_maison et range dans input_number.vent_max_prevu_24_h la vitesse de vent la plus forte prévue sur les 24 prochaines heures (utilisée par les cartes Poubelles de « Ma Maison »).
+    mode: single
+    triggers:
+      - trigger: time_pattern
+        minutes: '5'
+      - trigger: homeassistant
+        event: start
+    conditions: []
+    actions:
+      - action: weather.get_forecasts
+        target:
+          entity_id: weather.forecast_maison
+        data:
+          type: hourly
+        response_variable: prevision
+      - action: input_number.set_value
+        target:
+          entity_id: input_number.vent_max_prevu_24_h
+        data:
+          value: "{% set fin = now() + timedelta(hours=24) %}{% set ns = namespace(v=state_attr('weather.forecast_maison', 'wind_speed') | float(0)) %}{% for h in prevision.get('weather.forecast_maison', {}).get('forecast', []) %}{% if as_datetime(h.datetime) <= fin %}{% set ns.v = [ns.v, h.wind_speed | float(0)] | max %}{% endif %}{% endfor %}{{ [ns.v, 250] | min | round(0) }}"
+  - id: ma_maison_facture_electricite
+    alias: Électricité – estimation de la facture du mois
+    description: "Calcule chaque heure la facture d'électricité estimée du mois à partir des relevés Linky journaliers (statistique linky:00000000000000, importée avec environ 1 à 2 jours de décalage) et des tarifs saisis dans les entrées « Électricité – … ». Les jours restants du mois sont estimés avec la moyenne des 7 derniers jours connus. Les données Linky étant journalières, la répartition heures pleines / heures creuses est une hypothèse réglable (entrée « part heures creuses »)."
+    mode: restart
+    triggers:
+      - trigger: homeassistant
+        event: start
+      # Toutes les heures : les données Linky arrivent une fois par jour, à une heure variable.
+      - trigger: time_pattern
+        minutes: '7'
+      # Recalcule dès qu'un tarif ou la part d'heures creuses change.
+      - trigger: state
+        entity_id:
+          - input_number.electricite_prix_hp
+          - input_number.electricite_prix_hc
+          - input_number.electricite_abonnement
+          - input_number.electricite_part_heures_creuses
+    conditions: []
+    actions:
+      # Consommation journalière depuis 14 jours avant le début du mois, pour avoir une moyenne récente même en début de mois.
+      - action: recorder.get_statistics
+        data:
+          period: day
+          start_time: '{{ (today_at().replace(day=1) - timedelta(days=14)).isoformat() }}'
+          statistic_ids:
+            - linky:00000000000000
+          types:
+            - change
+          units:
+            energy: kWh
+        response_variable: stats
+      # kWh du mois, jours couverts par les données, jours du mois, moyenne des 7 derniers jours connus.
+      - variables:
+          calc: |-
+            {%- set rows = stats.statistics.get('linky:00000000000000', []) -%}
+            {%- set ms = today_at().replace(day=1) -%}
+            {%- set nm = (ms + timedelta(days=32)).replace(day=1) -%}
+            {%- set ns = namespace(kwh=0.0, n=0) -%}
+            {%- for r in rows -%}
+              {%- set s = as_local(as_datetime(r.start | string)) -%}
+              {%- if s >= ms and s < nm -%}
+                {%- set ns.kwh = ns.kwh + (r.change | float(0)) -%}
+                {%- set ns.n = ns.n + 1 -%}
+              {%- endif -%}
+            {%- endfor -%}
+            {%- set recent = rows[-7:] | map(attribute='change') | map('float', 0) | list -%}
+            {%- set moy = ((recent | sum) / (recent | count)) if (recent | count) > 0 else 0 -%}
+            {{ {'kwh_mois': ns.kwh | round(3), 'jours_mesures': ns.n, 'jours_mois': (nm - ms).days, 'moy_7j': moy | round(3), 'lignes': rows | count} }}
+      # Sans donnée Linky, on laisse les valeurs affichées telles quelles.
+      - condition: template
+        value_template: '{{ calc.lignes > 0 }}'
+      - variables:
+          abonnement: "{{ states('input_number.electricite_abonnement') | float(0) }}"
+          jours_restants: '{{ [calc.jours_mois - calc.jours_mesures, 0] | max }}'
+          kwh_estimes: '{{ calc.kwh_mois + calc.moy_7j * jours_restants }}'
+          part_hc: "{{ states('input_number.electricite_part_heures_creuses') | float(0) / 100 }}"
+          prix_hc: "{{ states('input_number.electricite_prix_hc') | float(0) }}"
+          prix_hp: "{{ states('input_number.electricite_prix_hp') | float(0) }}"
+          prix_moyen: '{{ prix_hp * (1 - part_hc) + prix_hc * part_hc }}'
+      # Abonnement du mois + kWh mesurés + kWh estimés pour les jours restants, au prix moyen HP/HC.
+      - action: input_number.set_value
+        target:
+          entity_id: input_number.electricite_facture_estimee_du_mois
+        data:
+          value: '{{ (abonnement + kwh_estimes * prix_moyen) | round(2) }}'
+      # Abonnement au prorata des jours mesurés + kWh déjà consommés.
+      - action: input_number.set_value
+        target:
+          entity_id: input_number.electricite_depense_ce_mois_ci
+        data:
+          value: '{{ (abonnement * calc.jours_mesures / calc.jours_mois + calc.kwh_mois * prix_moyen) | round(2) }}'
+  - id: ma_maison_homepod_releve
+    alias: 'HomePod : relevé température et humidité'
+    description: "Reçoit la température et l'humidité mesurées par le HomePod, envoyées par un raccourci Apple (webhook POST en JSON : temperature, humidite), et les range dans « HomePod température » et « HomePod humidité » affichées sur « Ma Maison ». L'adresse du webhook sert de clé : ne pas la partager."
+    mode: queued
+    triggers:
+      - trigger: webhook
+        allowed_methods:
+          - POST
+        local_only: false
+        webhook_id: homepod-remplacez-moi
+    actions:
+      - variables:
+          humidite: "{%- set p = trigger.json if trigger.json is defined else (trigger.data if trigger.data is defined else {}) -%}{{- (p.get('humidite', '') | string | replace('−', '-') | regex_replace('[^0-9,.-]', '') | replace(',', '.')) | float(none) -}}"
+          temperature: "{%- set p = trigger.json if trigger.json is defined else (trigger.data if trigger.data is defined else {}) -%}{{- (p.get('temperature', '') | string | replace('−', '-') | regex_replace('[^0-9,.-]', '') | replace(',', '.')) | float(none) -}}"
+      - if:
+          - condition: template
+            value_template: '{{ temperature is number and -30 <= temperature <= 60 }}'
+        then:
+          - action: input_text.set_value
+            target:
+              entity_id: input_text.homepod_temperature
+            data:
+              value: '{{ temperature | round(1) }}'
+      - if:
+          - condition: template
+            value_template: '{{ humidite is number and 0 <= humidite <= 100 }}'
+        then:
+          - action: input_text.set_value
+            target:
+              entity_id: input_text.homepod_humidite
+            data:
+              value: '{{ humidite | round(0) | int }}'
+    max: 5
+
+# ─── Script appelé par les cartes Poubelles ────────────────────────────
+script:
+  poubelle_a_l_abri:
+    alias: "Poubelle rangée à l'abri"
+    description: "Appelé par un appui sur la carte du bac (tableau « Ma Maison », section Poubelles) : marque le bac comme rangé à l'abri pour aujourd'hui, ce qui arrête l'animation d'envol jusqu'à minuit. Un nouvel appui le même jour annule. L'envol reprend tout seul le prochain jour de vent."
+    icon: mdi:home-roof
+    mode: queued
+    fields:
+      bac:
+        description: 'Couleur du bac : jaune ou bleu'
+        example: jaune
+        name: Bac
+        required: true
+        selector:
+          select:
+            options:
+              - label: Bac jaune
+                value: jaune
+              - label: Bac bleu
+                value: bleu
+    sequence:
+      - variables:
+          aujourdhui: '{{ now().date() | string }}'
+          cible: input_datetime.bac_{{ bac }}_a_l_abri
+          deja_a_l_abri: '{{ states(cible) == aujourdhui }}'
+      - if:
+          - condition: template
+            value_template: '{{ deja_a_l_abri }}'
+        then:
+          # Annulation : une date passée = plus à l'abri aujourd'hui.
+          - action: input_datetime.set_datetime
+            target:
+              entity_id: '{{ cible }}'
+            data:
+              date: '2000-01-01'
+        else:
+          # Valable uniquement aujourd'hui : le tableau compare cette date à la date du jour.
+          - action: input_datetime.set_datetime
+            target:
+              entity_id: '{{ cible }}'
+            data:
+              date: '{{ aujourdhui }}'

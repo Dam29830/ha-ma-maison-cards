@@ -1,0 +1,93 @@
+# ══════════════════════════════════════════════════════════════════════
+#  Ma Maison · Radiateur sur prise
+#  Radiateur branché sur une prise qui mesure la puissance : animation de chauffe
+#  quand il consomme (Chauffe / En veille / Éteint). Appui = marche / arrêt.
+#
+#  Entités utilisées (exemples à remplacer par les vôtres) :
+#    - sensor.radiateur_salle_de_bain_puissance
+#    - switch.radiateur_salle_de_bain
+#  Nécessite : button-card (HACS) + une prise avec mesure de puissance
+#  À coller dans : ✏️ Modifier le tableau de bord → Ajouter une carte
+#  → « Manuel » (tout en bas de la liste), puis remplacez le contenu.
+# ══════════════════════════════════════════════════════════════════════
+type: custom:button-card
+entity: switch.radiateur_salle_de_bain
+name: Radiateur salle de bain
+custom_fields:
+  info: |-
+    [[[
+    const on = entity && entity.state === 'on';
+    const ko = !entity || ['unavailable','unknown'].includes(entity.state);
+    const w = (() => { const s = states['sensor.radiateur_salle_de_bain_puissance']; let w = s ? parseFloat(s.state) : NaN; if (!isNaN(w) && s.attributes.unit_of_measurement === 'kW') w *= 1000; return w; })();
+    const heat = on && w >= 30;
+    const t = ko ? 'Indisponible' : (!on ? 'Éteint' : (heat ? 'Chauffe' : 'En veille'));
+    const c = ko ? 'var(--secondary-text-color)' : (!on ? '#8fb3d9' : (heat ? '#ff8a4c' : '#e8b06c'));
+    const d = (ko || isNaN(w)) ? '' : Math.round(w).toLocaleString('fr-FR') + ' W';
+    return `<div class='hd-info' style='left:14px;right:12px;top:11px'><div class='hd-name w'>Radiateur salle de bain</div></div>`
+     + `<div class='hd-info' style='left:88px;right:10px;top:58px'><div class='hd-title s' style='color:${c}'>${t}</div>${d ? `<div class='hd-sub'>${d}</div>` : ''}</div>`;
+    ]]]
+  scene: <div class="hd-scene"><div class="ts"><div class="ts-glow"></div><div class="ts-waves"><b style="left:5px;animation-delay:-0.00s"></b><b style="left:17px;animation-delay:-0.55s"></b><b style="left:29px;animation-delay:-1.10s"></b><b style="left:41px;animation-delay:-1.65s"></b></div><div class="ts-rail l"></div><div class="ts-rail r"></div><div class="ts-bars"><i style="top:6px"></i><i style="top:17px"></i><i style="top:28px"></i><i style="top:39px"></i><i style="top:50px"></i><i style="top:61px"></i><i style="top:72px"></i></div><div class="ts-hot"><i style="top:6px"></i><i style="top:17px"></i><i style="top:28px"></i><i style="top:39px"></i><i style="top:50px"></i><i style="top:61px"></i><i style="top:72px"></i></div><div class="ts-box"><span></span></div></div></div>
+extra_styles: |-
+  .hd-scene{position:absolute;inset:0;overflow:hidden;pointer-events:none;}
+  .hd-info{position:absolute;display:flex;flex-direction:column;gap:2px;text-align:left;white-space:normal;min-width:0;}
+  .hd-name{font-size:13px;font-weight:600;line-height:1.25;color:var(--secondary-text-color);opacity:.92;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .hd-name.w{white-space:normal;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;}
+  .hd-title{font-size:22px;font-weight:600;line-height:1.15;color:var(--primary-text-color);transition:color .8s;}
+  .hd-title.s{font-size:15.5px;}
+  .hd-sub{font-size:12.5px;line-height:1.3;color:var(--secondary-text-color);}
+  .hd-sub b{color:var(--primary-text-color);font-weight:600;}
+  @media (prefers-reduced-motion: reduce){.hd-scene *,.hd-scene *::before,.hd-scene *::after{animation:none !important;}}
+  .ts{position:absolute;left:18px;top:56px;width:50px;height:88px;}
+  .ts-rail{position:absolute;top:0;bottom:8px;width:7px;border-radius:4px;background:linear-gradient(90deg,#a8b1bb,#f1f4f7 50%,#a8b1bb);box-shadow:0 3px 6px rgba(0,0,0,.35);}
+  .ts-rail.l{left:0;}
+  .ts-rail.r{right:0;}
+  .ts-bars,.ts-hot{position:absolute;inset:0;}
+  .ts-bars i,.ts-hot i{position:absolute;left:4px;right:4px;height:6px;border-radius:3px;}
+  .ts-bars i{background:linear-gradient(180deg,#f1f4f7,#aeb7c1);box-shadow:0 1px 2px rgba(0,0,0,.35);}
+  .ts-hot{opacity:var(--ts-heat,0);transition:opacity 2s;}
+  .ts-hot i{background:linear-gradient(180deg,#ffd29a,#ff7a3d);box-shadow:0 0 8px rgba(255,120,50,.75);animation:hdglow 2.2s ease-in-out infinite alternate;}
+  .ts-glow{position:absolute;left:-28px;right:-28px;top:-18px;bottom:-8px;border-radius:50%;background:radial-gradient(closest-side,rgba(255,130,60,.35),rgba(255,110,40,0));opacity:var(--ts-heat,0);transition:opacity 2s;}
+  .ts-waves{position:absolute;left:0;right:0;top:-24px;height:24px;opacity:var(--ts-heat,0);transition:opacity 2s;}
+  .ts-waves b{position:absolute;bottom:0;width:8px;height:18px;border-radius:50%;border-left:2px solid rgba(255,190,140,.75);animation:hdwave 2.2s ease-in infinite;}
+  .ts-box{position:absolute;left:13px;bottom:0;width:24px;height:12px;border-radius:3px;background:linear-gradient(180deg,#eef2f6,#b5bec8);box-shadow:0 2px 4px rgba(0,0,0,.4);}
+  .ts-box span{position:absolute;right:4px;top:4px;width:4px;height:4px;border-radius:50%;background:var(--ts-led,#454c56);box-shadow:0 0 5px 1px var(--ts-ledg,transparent);}
+  @keyframes hdglow{0%{filter:brightness(.85);}100%{filter:brightness(1.2);}}
+  @keyframes hdwave{0%{transform:translateY(8px) scaleY(.6);opacity:0;}30%{opacity:1;}100%{transform:translateY(-10px) scaleY(1.1);opacity:0;}}
+grid_options:
+  columns: 6
+  rows: auto
+hold_action:
+  action: more-info
+show_icon: false
+show_name: false
+styles:
+  card:
+    - height: 150px
+    - border-radius: 24px
+    - overflow: hidden
+    - padding: '0'
+    - background: rgba(140,170,200,0.10)
+    - backdrop-filter: blur(16px) saturate(170%)
+    - -webkit-backdrop-filter: blur(16px) saturate(170%)
+    - border: 1px solid rgba(255,255,255,0.16)
+    - box-shadow: 0 8px 30px rgba(0,0,0,0.40), inset 0 1px 0 rgba(255,255,255,0.22)
+    - --ts-heat: "[[[ return String((entity && entity.state === 'on' && (() => { const s = states['sensor.radiateur_salle_de_bain_puissance']; let w = s ? parseFloat(s.state) : NaN; if (!isNaN(w) && s.attributes.unit_of_measurement === 'kW') w *= 1000; return w; })() >= 30) ? 1 : 0); ]]]"
+    - --ts-led: "[[[ return String((entity && entity.state === 'on') ? '#5dffa0' : '#454c56'); ]]]"
+    - --ts-ledg: "[[[ return String((entity && entity.state === 'on') ? 'rgba(80,255,150,.6)' : 'transparent'); ]]]"
+  custom_fields:
+    info:
+      - position: absolute
+      - inset: '0'
+      - width: 100%
+      - height: 100%
+    scene:
+      - position: absolute
+      - inset: '0'
+      - width: 100%
+      - height: 100%
+  grid:
+    - position: relative
+tap_action:
+  action: toggle
+triggers_update:
+  - sensor.radiateur_salle_de_bain_puissance

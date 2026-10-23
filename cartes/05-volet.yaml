@@ -1,0 +1,219 @@
+# ══════════════════════════════════════════════════════════════════════
+#  Ma Maison · Volet
+#  Une fenêtre et son volet animé (position, mouvement), avec le même ciel animé
+#  et les boutons monter / stop / descendre. Dupliquez la carte pour chaque volet.
+#
+#  Entités utilisées (exemples à remplacer par les vôtres) :
+#    - cover.salon_volet_tele
+#    - weather.forecast_maison
+#    - sun.sun
+#  Nécessite : button-card (HACS)
+#  À coller dans : ✏️ Modifier le tableau de bord → Ajouter une carte
+#  → « Manuel » (tout en bas de la liste), puis remplacez le contenu.
+# ══════════════════════════════════════════════════════════════════════
+type: custom:button-card
+entity: cover.salon_volet_tele
+name: Volet télé
+custom_fields:
+  down:
+    card:
+      color: var(--primary-text-color)
+      icon: mdi:arrow-down
+      show_name: false
+      styles:
+        card:
+          - height: 32px
+          - width: 100%
+          - padding: 0 6px
+          - border-radius: 12px
+          - background: rgba(255,255,255,0.08)
+          - border: 1px solid rgba(255,255,255,0.16)
+          - box-shadow: inset 0 1px 0 rgba(255,255,255,0.12)
+          - transition: background .4s, border-color .4s, box-shadow .4s
+        grid:
+          - grid-template-areas: '"i"'
+          - grid-template-columns: min-content
+          - grid-template-rows: 1fr
+          - justify-content: center
+          - align-items: center
+        icon:
+          - width: 18px
+          - height: 18px
+        img_cell:
+          - width: 18px
+          - height: 18px
+      tap_action:
+        action: perform-action
+        perform_action: cover.close_cover
+        target:
+          entity_id: cover.salon_volet_tele
+      type: custom:button-card
+  info: |-
+    [[[
+    const st = entity ? entity.state : 'unavailable';
+    const pos = entity && entity.attributes.current_position != null ? Number(entity.attributes.current_position) : (st === 'open' ? 100 : 0);
+    let t, c, d = '';
+    if (st === 'opening') { t = 'Ouverture…'; c = '#ffc145'; }
+    else if (st === 'closing') { t = 'Fermeture…'; c = '#ffc145'; }
+    else if (st === 'unavailable' || st === 'unknown') { t = 'Indisponible'; c = 'var(--secondary-text-color)'; }
+    else if (pos <= 0) { t = 'Fermé'; c = '#8fb3d9'; }
+    else if (pos >= 100) { t = 'Ouvert'; c = '#4cc9a8'; }
+    else { t = 'Entrouvert'; c = '#4cc9a8'; d = 'à ' + pos + ' %'; }
+
+    return `<div class='hd-info' style='left:14px;right:12px;top:11px'><div class='hd-name'>Volet télé</div></div>`
+     + `<div class='hd-info' style='left:72px;right:8px;top:0;bottom:48px;justify-content:center;padding-top:36px'><div class='hd-title s' style='color:${c}'>${t}</div>${d ? `<div class='hd-sub'>${d}</div>` : ''}</div>`;
+    ]]]
+  scene: "[[[ const w = states['weather.forecast_maison']; const s = w ? String(w.state) : ''; const a = (w && w.attributes) || {}; const wind = Number(a.wind_speed) || 0; const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v)); const storm = ['lightning', 'lightning-rainy', 'exceptional'].includes(s); const rainy = ['rainy', 'pouring', 'lightning-rainy', 'snowy-rainy'].includes(s); const pouring = s === 'pouring'; const snowy = ['snowy', 'snowy-rainy'].includes(s); const hail = s === 'hail'; const fog = s === 'fog'; const grey = ['cloudy', 'fog', 'snowy'].includes(s); const partly = ['partlycloudy', 'windy', 'windy-variant'].includes(s); const breezy = ['windy', 'windy-variant'].includes(s) || wind >= 35; const tone = storm ? 'ws-s' : ((rainy || hail) ? 'ws-w' : (grey ? 'ws-g' : 'ws-c')); const nCl = tone === 'ws-c' ? (partly ? 2 : 0) : 3; const base = Math.round(clamp(420 / (wind + 10), 12, 40)); const sky = (big, k) => { let h = ''; const tops = tone === 'ws-c' ? [6, 38] : [-2, 18, 38]; for (let i = 0; i < nCl; i++) { const sc = (tone === 'ws-c' ? 1 - i * 0.25 : 1.2 - i * 0.15).toFixed(2); const d = Math.round(base * (1 + i * 0.35)); h += `<span class='ws-cl' style='top:${tops[i]}%;transform:scale(${sc});animation-duration:${d}s;animation-delay:-${Math.round(d * ((0.15 + i * 0.45 + k * 0.29) % 1))}s'></span>`; } if (fog) { for (let i = 0; i < 2; i++) h += `<span class='ws-fg' style='top:${28 + i * 34}%;animation-duration:${7 + i * 3}s;animation-delay:-${k + i * 2}s'></span>`; } if (rainy) { const n = (pouring ? 9 : 6) - (big ? 0 : 3); for (let i = 0; i < n; i++) h += `<span class='ws-dr' style='left:${(i * 37 + k * 13 + 9) % 100}%;animation-duration:${((pouring ? 0.45 : 0.7) + ((i * 7) % 5) * 0.06).toFixed(2)}s;animation-delay:-${((i * 0.23 + k * 0.11) % 1.2).toFixed(2)}s'></span>`; } if (snowy || hail) { const n = big ? 6 : 3; for (let i = 0; i < n; i++) h += `<span class='${hail ? 'ws-ha' : 'ws-fl'}' style='left:${(i * 41 + k * 17 + 7) % 100}%;animation-duration:${(hail ? 0.7 + (i % 3) * 0.1 : 3 + (i % 3) * 0.6).toFixed(2)}s;animation-delay:-${((i * 0.47 + k * 0.3) % 3).toFixed(2)}s'></span>`; } if (breezy) { for (let i = 0; i < 2; i++) h += `<span class='ws-wd' style='top:${32 + i * 30}%;animation-duration:${clamp(30 / (wind + 5), 0.8, 2.5).toFixed(2)}s;animation-delay:-${(i * 0.7 + k * 0.23).toFixed(2)}s'></span>`; } if (storm) h += `<span class='ws-fx'></span><svg class='ws-bo' style='left:${k % 2 ? 12 : 60}%' viewBox='0 0 60 180' preserveAspectRatio='none'><polyline points='34,2 22,54 40,60 18,116 42,122 26,178' fill='none' stroke='#f4f8ff' stroke-width='${big ? 1.8 : 1.2}' vector-effect='non-scaling-stroke' stroke-linejoin='round' stroke-linecap='round'/></svg>`; return h; }; const glass = (big, k) => `<div class='vw-night'></div><div class='vw-day'></div><div class='ws-stars'></div><div class='ws-glow'></div><div class='ws-sun'><i></i></div>${sky(big, k)}<div class='vw-shut'></div><div class='vw-cross'></div><div class='vw-shine'></div>`; const k = entity ? entity.entity_id.length % 5 : 0; return `<div class='hd-scene ws ${tone}' style='--ws-u:4px'><div class='vw' style='left:14px;top:42px;width:48px;height:56px'><div class='vw-frame'></div><div class='vw-glass'>${glass(true, k)}</div><div class='vw-box'></div><div class='vw-sill'></div></div><div class='mv' style='left:33px;top:49px'><i></i><i></i></div></div>`; ]]]"
+  stop:
+    card:
+      color: var(--primary-text-color)
+      icon: mdi:stop
+      show_name: false
+      styles:
+        card:
+          - height: 32px
+          - width: 100%
+          - padding: 0 6px
+          - border-radius: 12px
+          - background: rgba(255,255,255,0.08)
+          - border: 1px solid rgba(255,255,255,0.16)
+          - box-shadow: inset 0 1px 0 rgba(255,255,255,0.12)
+          - transition: background .4s, border-color .4s, box-shadow .4s
+        grid:
+          - grid-template-areas: '"i"'
+          - grid-template-columns: min-content
+          - grid-template-rows: 1fr
+          - justify-content: center
+          - align-items: center
+        icon:
+          - width: 18px
+          - height: 18px
+        img_cell:
+          - width: 18px
+          - height: 18px
+      tap_action:
+        action: perform-action
+        perform_action: cover.stop_cover
+        target:
+          entity_id: cover.salon_volet_tele
+      type: custom:button-card
+  up:
+    card:
+      color: var(--primary-text-color)
+      icon: mdi:arrow-up
+      show_name: false
+      styles:
+        card:
+          - height: 32px
+          - width: 100%
+          - padding: 0 6px
+          - border-radius: 12px
+          - background: rgba(255,255,255,0.08)
+          - border: 1px solid rgba(255,255,255,0.16)
+          - box-shadow: inset 0 1px 0 rgba(255,255,255,0.12)
+          - transition: background .4s, border-color .4s, box-shadow .4s
+        grid:
+          - grid-template-areas: '"i"'
+          - grid-template-columns: min-content
+          - grid-template-rows: 1fr
+          - justify-content: center
+          - align-items: center
+        icon:
+          - width: 18px
+          - height: 18px
+        img_cell:
+          - width: 18px
+          - height: 18px
+      tap_action:
+        action: perform-action
+        perform_action: cover.open_cover
+        target:
+          entity_id: cover.salon_volet_tele
+      type: custom:button-card
+extra_styles: |-
+  .hd-scene{position:absolute;inset:0;overflow:hidden;pointer-events:none;}
+  .hd-info{position:absolute;display:flex;flex-direction:column;gap:2px;text-align:left;white-space:normal;min-width:0;}
+  .hd-name{font-size:13px;font-weight:600;line-height:1.25;color:var(--secondary-text-color);opacity:.92;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .hd-name.w{white-space:normal;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;}
+  .hd-title{font-size:22px;font-weight:600;line-height:1.15;color:var(--primary-text-color);transition:color .8s;}
+  .hd-title.s{font-size:15.5px;}
+  .hd-sub{font-size:12.5px;line-height:1.3;color:var(--secondary-text-color);}
+  .hd-sub b{color:var(--primary-text-color);font-weight:600;}
+  @media (prefers-reduced-motion: reduce){.hd-scene *,.hd-scene *::before,.hd-scene *::after{animation:none !important;}}
+  .vw{position:absolute;}
+  .vw-frame{position:absolute;inset:0;border-radius:3px;background:linear-gradient(180deg,#f4f7fa,#c9d1da);box-shadow:0 4px 10px rgba(0,0,0,.40),inset 0 -1px 0 rgba(0,0,0,.15);}
+  .vw-glass{position:absolute;left:4px;right:4px;top:4px;bottom:4px;overflow:hidden;border-radius:1px;background:#0b1430;}
+  .vw-night{position:absolute;inset:0;background:radial-gradient(circle at 74% 24%,#fff6d8 0 7%,rgba(255,246,216,.25) 9%,transparent 16%),radial-gradient(1.2px 1.2px at 22% 26%,#fff 99%,transparent),radial-gradient(1px 1px at 48% 14%,#fff 99%,transparent),radial-gradient(1px 1px at 36% 52%,rgba(255,255,255,.75) 99%,transparent),radial-gradient(1.2px 1.2px at 84% 66%,rgba(255,255,255,.7) 99%,transparent),linear-gradient(180deg,#0a1230 0%,#1d2d58 100%);}
+  .vw-day{position:absolute;inset:0;background:radial-gradient(circle at 76% 24%,#fff8d0 0 8%,rgba(255,240,170,.55) 11%,rgba(255,240,170,0) 24%),linear-gradient(180deg,#4f9df5 0%,#9fcdfb 70%,#d8ecff 100%);opacity:var(--vo-day,0);transition:opacity 2s;}
+  .vw-shut{position:absolute;left:0;right:0;top:0;height:calc((1 - var(--vo-pos,0)) * 100%);background:repeating-linear-gradient(180deg,#eef1f4 0 3px,#c4cbd3 3px 4px,#98a2ad 4px 5px);box-shadow:0 2px 3px rgba(0,0,0,.45);transition:height 1.6s cubic-bezier(.4,.1,.3,1);}
+  .vw-shut::after{content:'';position:absolute;left:0;right:0;bottom:0;height:3px;background:linear-gradient(180deg,#8c96a1,#5f6974);}
+  .vw-cross{position:absolute;left:50%;top:0;bottom:0;width:3px;margin-left:-1.5px;background:linear-gradient(90deg,#c3cbd4,#f3f6f9,#c3cbd4);}
+  .vw-shine{position:absolute;inset:0;background:linear-gradient(125deg,rgba(255,255,255,.22) 0 18%,rgba(255,255,255,0) 19% 48%,rgba(255,255,255,.10) 49% 56%,rgba(255,255,255,0) 57%);}
+  .vw-box{position:absolute;left:-3px;right:-3px;top:-8px;height:10px;border-radius:3px 3px 1px 1px;background:linear-gradient(180deg,#f2f5f8,#b3bcc6);box-shadow:0 1px 2px rgba(0,0,0,.45);}
+  .vw-sill{position:absolute;left:-5px;right:-5px;bottom:-4px;height:5px;border-radius:1px;background:linear-gradient(180deg,#f2f5f8,#a3adb8);box-shadow:0 2px 4px rgba(0,0,0,.4);}
+
+  .mv{position:absolute;width:10px;height:44px;opacity:var(--vo-mv,0);transition:opacity .6s;filter:drop-shadow(0 0 2px rgba(0,0,0,.9)) drop-shadow(0 0 1px rgba(0,0,0,.9));}
+  .mv i{position:absolute;left:1px;width:7px;height:7px;border-left:2px solid #ffc145;border-top:2px solid #ffc145;transform:rotate(var(--vo-dir,45deg));animation:hdmv 1s ease-in-out infinite;animation-direction:var(--vo-adir,normal);}
+  .mv i:nth-child(2){animation-delay:-.5s;}
+  @keyframes hdmv{0%{top:34px;opacity:0;}30%{opacity:1;}100%{top:2px;opacity:0;}}/*ws-sky*/.ws{--ws-k:1;}.ws-g{--ws-k:.4;}.ws-w{--ws-k:.1;}.ws-s{--ws-k:0;}.vw-night{background:linear-gradient(180deg,#0a1230 0%,#1d2d58 100%);}.ws-stars{position:absolute;inset:0;background:radial-gradient(circle at 74% 24%,#fff6d8 0 7%,rgba(255,246,216,.25) 9%,transparent 16%),radial-gradient(1.2px 1.2px at 22% 26%,#fff 99%,transparent),radial-gradient(1px 1px at 48% 14%,#fff 99%,transparent),radial-gradient(1px 1px at 36% 52%,rgba(255,255,255,.75) 99%,transparent),radial-gradient(1.2px 1.2px at 84% 66%,rgba(255,255,255,.7) 99%,transparent);opacity:var(--ws-night,0);transition:opacity 3s;}.ws-g .ws-stars,.ws-w .ws-stars,.ws-s .ws-stars{display:none;}.vw-day{background:linear-gradient(180deg,#4f9df5 0%,#9fcdfb 70%,#d8ecff 100%);transition:opacity 3s;}.ws-g .vw-day{background:linear-gradient(180deg,#8494a8 0%,#b8c4d2 100%);}.ws-w .vw-day{background:linear-gradient(180deg,#56677d 0%,#8798ad 100%);}.ws-s .vw-day{background:linear-gradient(180deg,#363f52 0%,#5f6d82 100%);}.ws-g .vw-night,.ws-w .vw-night,.ws-s .vw-night{background:linear-gradient(180deg,#121a27 0%,#273345 100%);}.ws-glow{position:absolute;inset:0;background:radial-gradient(130% 75% at var(--ws-sx,50%) 100%,rgba(255,150,70,.9) 0%,rgba(255,110,90,.4) 45%,rgba(255,110,90,0) 78%);opacity:calc(var(--ws-glow,0) * (.25 + .75 * var(--ws-k,1)));transition:opacity 3s;}.ws-sun{position:absolute;left:var(--ws-sx,70%);top:var(--ws-sy,30%);width:calc(var(--ws-u,4px) * 3.6);height:calc(var(--ws-u,4px) * 3.6);margin:calc(var(--ws-u,4px) * -1.8) 0 0 calc(var(--ws-u,4px) * -1.8);opacity:calc(var(--vo-day,1) * var(--ws-k,1));transition:left 90s linear,top 90s linear,opacity 3s;}.ws-sun::before{content:'';position:absolute;inset:-42%;border-radius:50%;background:repeating-conic-gradient(rgba(255,222,100,.65) 0deg 8deg,transparent 8deg 30deg);-webkit-mask:radial-gradient(circle,transparent 37%,#000 39%,#000 58%,transparent 70%);mask:radial-gradient(circle,transparent 37%,#000 39%,#000 58%,transparent 70%);animation:wsspin 16s linear infinite;}.fa .ws-sun::before{inset:-30%;}.ws-sun i{position:absolute;inset:0;border-radius:50%;background:radial-gradient(circle at 40% 38%,#fff7c2 0%,#ffd84a 55%,#ffb300 100%);box-shadow:0 0 calc(var(--ws-u,4px) * 2) calc(var(--ws-u,4px) * .6) rgba(255,210,60,.7);animation:wspulse 3.5s ease-in-out infinite;}.ws-sun i::after{content:'';position:absolute;inset:0;border-radius:50%;background:radial-gradient(circle at 42% 40%,#fff1c0 0%,#ff9d3c 55%,#ff6a00 100%);opacity:var(--ws-glow,0);transition:opacity 3s;}.ws-cl{position:absolute;left:-70%;width:calc(var(--ws-u,4px) * 6.5);height:calc(var(--ws-u,4px) * 2.2);border-radius:calc(var(--ws-u,4px) * 2.2);background:#f4f7fb;transform-origin:left center;filter:brightness(calc(.3 + .7 * var(--vo-day,1))) drop-shadow(0 1px 1px rgba(0,0,0,.25));transition:filter 3s;animation:wsdrift linear infinite;}.ws-cl::before{content:'';position:absolute;width:calc(var(--ws-u,4px) * 2.8);height:calc(var(--ws-u,4px) * 2.8);left:calc(var(--ws-u,4px) * 1);top:calc(var(--ws-u,4px) * -1.4);border-radius:50%;background:inherit;}.ws-cl::after{content:'';position:absolute;width:calc(var(--ws-u,4px) * 3.4);height:calc(var(--ws-u,4px) * 3.4);left:calc(var(--ws-u,4px) * 2.5);top:calc(var(--ws-u,4px) * -1.9);border-radius:50%;background:inherit;}.ws-g .ws-cl{background:#d3dae4;}.ws-w .ws-cl{background:#a7b3c4;}.ws-s .ws-cl{background:#76839a;}.ws-dr{position:absolute;top:-30%;width:1px;height:calc(var(--ws-u,4px) * 2.6);background:linear-gradient(to bottom,rgba(255,255,255,0),rgba(205,228,255,.95));animation:wsfall linear infinite;}.ws-fl{position:absolute;top:-15%;width:calc(var(--ws-u,4px) * 1.1);height:calc(var(--ws-u,4px) * 1.1);border-radius:50%;background:#fff;opacity:.92;animation:wssnow linear infinite;}.ws-ha{position:absolute;top:-15%;width:calc(var(--ws-u,4px) * .9);height:calc(var(--ws-u,4px) * .9);border-radius:50%;background:#eef6ff;animation:wshail linear infinite;}.ws-fg{position:absolute;left:-40%;width:180%;height:26%;background:linear-gradient(90deg,transparent,rgba(232,238,245,.6),transparent);filter:blur(calc(var(--ws-u,4px) * .7)) brightness(calc(.45 + .55 * var(--vo-day,1)));animation:wsfog ease-in-out infinite alternate;}.ws-wd{position:absolute;left:-60%;width:55%;height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,.85),transparent);animation:wswind linear infinite;}.ws-fx{position:absolute;inset:0;animation:wsflash 7s linear infinite;}.ws-bo{position:absolute;left:38%;top:20%;width:26%;height:76%;opacity:0;overflow:visible;filter:drop-shadow(0 0 1px #fff) drop-shadow(0 0 3px rgba(170,205,255,1));animation:wsstrike 7s linear infinite;}@keyframes wsspin{to{transform:rotate(360deg);}}@keyframes wspulse{0%,100%{transform:scale(1);filter:brightness(1);}50%{transform:scale(1.08);filter:brightness(1.12);}}@keyframes wsdrift{from{left:-70%;}to{left:110%;}}@keyframes wsfall{from{transform:translate3d(0,0,0);}to{transform:translate3d(-150%,640%,0);}}@keyframes wssnow{0%{transform:translate3d(0,0,0);}50%{transform:translate3d(130%,680%,0);}100%{transform:translate3d(-50%,1350%,0);}}@keyframes wshail{to{transform:translate3d(-80%,1600%,0);}}@keyframes wsfog{from{transform:translateX(-12%);}to{transform:translateX(12%);}}@keyframes wswind{from{left:-60%;}to{left:110%;}}@keyframes wsflash{0%,84%,100%{background:rgba(220,232,255,0);}85.2%{background:rgba(220,232,255,.38);}86.4%{background:rgba(220,232,255,0);}88.2%{background:rgba(220,232,255,.22);}89.2%{background:rgba(220,232,255,0);}}@keyframes wsstrike{0%,86.4%,100%{opacity:0;}86.9%{opacity:1;}87.8%{opacity:.2;}88.4%{opacity:.95;}89.6%{opacity:0;}}
+grid_options:
+  columns: 6
+  rows: auto
+show_icon: false
+show_name: false
+styles:
+  card:
+    - height: 160px
+    - border-radius: 24px
+    - overflow: hidden
+    - padding: '0'
+    - background: rgba(140,170,200,0.10)
+    - backdrop-filter: blur(16px) saturate(170%)
+    - -webkit-backdrop-filter: blur(16px) saturate(170%)
+    - border: 1px solid rgba(255,255,255,0.16)
+    - box-shadow: 0 8px 30px rgba(0,0,0,0.40), inset 0 1px 0 rgba(255,255,255,0.22)
+    - --vo-pos: "[[[ return String(Math.max(0, Math.min(1, ((entity && entity.attributes.current_position != null) ? entity.attributes.current_position : (entity && entity.state === 'open' ? 100 : 0)) / 100))); ]]]"
+    - --vo-mv: "[[[ return String((entity && ['opening','closing'].includes(entity.state)) ? 1 : 0); ]]]"
+    - --vo-dir: "[[[ return String((entity && entity.state === 'closing') ? '225deg' : '45deg'); ]]]"
+    - --vo-adir: "[[[ return String((entity && entity.state === 'closing') ? 'reverse' : 'normal'); ]]]"
+    - --vo-day: "[[[ const s = states['sun.sun']; let el = s ? Number(s.attributes.elevation) : NaN; if (isNaN(el)) el = (s && s.state === 'below_horizon') ? -20 : 45; return String(Math.max(0, Math.min(1, (el + 4) / 8)).toFixed(3)); ]]]"
+    - --ws-sx: "[[[ const s = states['sun.sun']; let az = s ? Number(s.attributes.azimuth) : NaN; if (isNaN(az)) az = 180; return Math.max(-15, Math.min(115, (az - 60) / 2.4)).toFixed(1) + '%'; ]]]"
+    - --ws-sy: "[[[ const s = states['sun.sun']; let el = s ? Number(s.attributes.elevation) : NaN; if (isNaN(el)) el = (s && s.state === 'below_horizon') ? -20 : 45; const y = el >= 0 ? 92 - el * 1.25 : 92 - el * 8; return Math.max(6, Math.min(140, y)).toFixed(1) + '%'; ]]]"
+    - --ws-glow: "[[[ const s = states['sun.sun']; let el = s ? Number(s.attributes.elevation) : NaN; if (isNaN(el)) el = (s && s.state === 'below_horizon') ? -20 : 45; return String(Math.max(0, Math.min(1, 1 - Math.abs(el - 1.5) / 8)).toFixed(3)); ]]]"
+    - --ws-night: "[[[ const s = states['sun.sun']; let el = s ? Number(s.attributes.elevation) : NaN; if (isNaN(el)) el = (s && s.state === 'below_horizon') ? -20 : 45; return String(Math.max(0, Math.min(1, (-el - 1) / 6)).toFixed(3)); ]]]"
+  custom_fields:
+    down:
+      - position: absolute
+      - right: 12px
+      - bottom: 12px
+      - width: calc((100% - 24px - 12px) / 3)
+      - height: 32px
+    info:
+      - position: absolute
+      - inset: '0'
+      - width: 100%
+      - height: 100%
+    scene:
+      - position: absolute
+      - inset: '0'
+      - width: 100%
+      - height: 100%
+    stop:
+      - position: absolute
+      - left: calc(12px + calc((100% - 24px - 12px) / 3) + 6px)
+      - bottom: 12px
+      - width: calc((100% - 24px - 12px) / 3)
+      - height: 32px
+    up:
+      - position: absolute
+      - left: 12px
+      - bottom: 12px
+      - width: calc((100% - 24px - 12px) / 3)
+      - height: 32px
+  grid:
+    - position: relative
+tap_action:
+  action: more-info
+triggers_update:
+  - sun.sun
+  - weather.forecast_maison

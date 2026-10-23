@@ -1,0 +1,131 @@
+# ══════════════════════════════════════════════════════════════════════
+#  Ma Maison · Prévisions de la semaine
+#  Prévisions sur 6 jours avec icônes animées, mini / maxi, pluie et vent.
+#
+#  Entités utilisées (exemples à remplacer par les vôtres) :
+#    - input_text.meteo_previsions_semaine
+#    - weather.forecast_maison
+#  Nécessite : button-card (HACS) + input_text.meteo_previsions_semaine et son automatisation (package)
+#  À coller dans : ✏️ Modifier le tableau de bord → Ajouter une carte
+#  → « Manuel » (tout en bas de la liste), puis remplacez le contenu.
+# ══════════════════════════════════════════════════════════════════════
+type: custom:button-card
+entity: input_text.meteo_previsions_semaine
+name: Prévisions
+custom_fields:
+  days: |-
+    [[[
+    const raw = entity ? String(entity.state) : '';
+    if (!raw || raw === 'unknown' || raw === 'unavailable') {
+      return `<div class='fc-empty'>Prévisions indisponibles</div>`;
+    }
+    const names = ['Dim','Lun','Mar','Mer','Jeu','Ven','Sam'];
+    const today = new Date().getDay();
+    const tvars = (v) => {
+      const hu = Math.round(Math.max(0, Math.min(220, 220 - Number(v) * 5.5)));
+      return `--t1:hsl(${hu},90%,66%);--t2:hsl(${Math.max(0, hu - 28)},90%,60%);--t3:hsl(${Math.min(240, hu + 22)},90%,74%)`;
+    };
+    const mini = (c, wind) => {
+      const sun = ['su','pc','wv'].includes(c);
+      const cloud = ['pc','cl','ra','po','li','lr','sn','sr','ha','fo','wi','wv','ex'].includes(c);
+      const dark = ['ra','po','li','lr','sn','sr','ha'].includes(c);
+      const rain = ['ra','po','lr','sr'].includes(c);
+      const snow = ['sn','sr'].includes(c);
+      const hail = c === 'ha';
+      const bolt = ['li','lr'].includes(c);
+      const fog = c === 'fo';
+      const windy = ['wi','wv'].includes(c) || wind >= 50;
+      let s = '';
+      if (c === 'cn') s += `<div class='mi-moon'></div>`;
+      if (sun) s += `<div class='mi-sun${cloud ? ' mi-sun-pc' : ''}'><i></i></div>`;
+      if (cloud) s += `<div class='mi-cloud${dark ? ' mi-dark' : ''}${sun ? ' mi-cloud-pc' : ''}'></div>`;
+      if (rain) {
+        const n = c === 'po' ? 5 : 3;
+        for (let k = 0; k < n; k++) s += `<span class='mi-drop' style='left:${(26 + k * 40 / n).toFixed(0)}%;animation-delay:-${(k * 0.29).toFixed(2)}s'></span>`;
+      }
+      if (snow || hail) {
+        for (let k = 0; k < 3; k++) s += `<span class='mi-flake' style='left:${30 + k * 15}%;animation-duration:${hail ? 0.8 : 2.2}s;animation-delay:-${(k * 0.6).toFixed(1)}s'></span>`;
+      }
+      if (bolt) s += `<span class='mi-bolt'></span>`;
+      if (fog) s += `<span class='mi-line' style='top:60%'></span><span class='mi-line' style='top:74%;animation-delay:-1.5s'></span>`;
+      if (windy) s += `<span class='mi-gust' style='top:58%'></span><span class='mi-gust' style='top:72%;animation-delay:-.6s'></span>`;
+      return `<div class='mi'>${s}</div>`;
+    };
+    const days = raw.split(';').filter(x => x).map(x => x.split(','));
+    let h = '';
+    days.forEach((d, i) => {
+      const wd = Number(d[0]);
+      const c = d[1];
+      const pr = Number(d[4]) || 0;
+      const wind = Number(d[5]) || 0;
+      const label = (i === 0 && wd === today) ? 'Auj.' : names[wd];
+      const prTxt = pr >= 0.5 ? `${pr.toLocaleString('fr-FR', {maximumFractionDigits: 1})} mm` : '&nbsp;';
+      const windTxt = wind >= 50 ? `💨 ${wind}` : '&nbsp;';
+      h += `<div class='fc-day'><div class='fc-name'>${label}</div>${mini(c, wind)}<div class='fc-hi tgrad' style='${tvars(d[2])}'>${d[2]}°</div><div class='fc-lo tgrad' style='${tvars(d[3])}'>${d[3]}°</div><div class='fc-pr'>${prTxt}</div><div class='fc-wind'>${windTxt}</div></div>`;
+    });
+    const css = `<style>.fc-day .tgrad{background:linear-gradient(90deg,var(--t1),var(--t2),var(--t3),var(--t1));background-size:200% 100%;-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:transparent;animation:tgflow 5s linear infinite;}.fc-day .fc-lo.tgrad{opacity:.8;}@keyframes tgflow{from{background-position:0% 50%;}to{background-position:200% 50%;}}@media (prefers-reduced-motion: reduce){.fc-day .tgrad{animation:none;}}</style>`;
+    return `${css}<div class='fc-row'>${h}</div>`;
+    ]]]
+extra_styles: |-
+  .fc-row{display:flex;justify-content:space-between;align-items:flex-start;gap:2px;padding:14px 8px 10px;}
+  .fc-day{flex:1 1 0;min-width:0;display:flex;flex-direction:column;align-items:center;text-align:center;}
+  .fc-name{font-size:12px;font-weight:600;color:var(--primary-text-color);opacity:.85;margin-bottom:2px;}
+  .fc-hi{font-size:15px;font-weight:600;color:var(--primary-text-color);margin-top:2px;line-height:1.1;}
+  .fc-lo{font-size:12px;color:var(--secondary-text-color);line-height:1.2;}
+  .fc-pr{font-size:10px;color:#7cc4ff;margin-top:3px;white-space:nowrap;line-height:1.2;}
+  .fc-wind{font-size:10px;color:var(--secondary-text-color);white-space:nowrap;line-height:1.2;}
+  .fc-empty{padding:16px;text-align:center;color:var(--secondary-text-color);font-size:13px;}
+  .mi{position:relative;width:40px;height:36px;overflow:hidden;}
+  .mi-sun{position:absolute;left:50%;top:50%;width:22px;height:22px;margin:-11px 0 0 -11px;z-index:1;}
+  .mi-sun i{position:absolute;inset:4px;border-radius:50%;background:radial-gradient(circle at 40% 38%,#fff7c2 0%,#ffd84a 55%,#ffb300 100%);animation:mipulse 3s ease-in-out infinite;}
+  .mi-sun::before{content:'';position:absolute;inset:-4px;border-radius:50%;background:repeating-conic-gradient(rgba(255,215,80,.9) 0deg 10deg,transparent 10deg 30deg);-webkit-mask:radial-gradient(circle,transparent 46%,#000 48%,#000 66%,transparent 70%);mask:radial-gradient(circle,transparent 46%,#000 48%,#000 66%,transparent 70%);animation:mispin 12s linear infinite;}
+  .mi-sun-pc{left:34%;top:36%;}
+  .mi-moon{position:absolute;left:12px;top:8px;width:16px;height:16px;border-radius:50%;box-shadow:5px -2px 0 0 #f3efc8;}
+  .mi-cloud{position:absolute;left:8px;top:15px;width:24px;height:9px;border-radius:9px;background:#f4f6f9;filter:drop-shadow(0 1px 2px rgba(0,0,0,.3));animation:misway 4s ease-in-out infinite alternate;z-index:2;}
+  .mi-cloud::before{content:'';position:absolute;width:11px;height:11px;left:3px;top:-6px;border-radius:50%;background:inherit;}
+  .mi-cloud::after{content:'';position:absolute;width:13px;height:13px;left:10px;top:-8px;border-radius:50%;background:inherit;}
+  .mi-cloud.mi-dark{background:#b9c4d2;}
+  .mi-cloud-pc{left:11px;top:18px;}
+  .mi-drop{position:absolute;top:23px;width:2px;height:6px;border-radius:1px;background:#6ec1ff;animation:midrop .9s linear infinite;z-index:3;}
+  .mi-flake{position:absolute;top:23px;width:4px;height:4px;border-radius:50%;background:#fff;animation:miflake linear infinite;z-index:3;}
+  .mi-bolt{position:absolute;left:17px;top:21px;width:8px;height:13px;background:#ffd23f;clip-path:polygon(40% 0,100% 0,62% 42%,100% 42%,22% 100%,42% 56%,0 56%);animation:mibolt 2.4s linear infinite;z-index:3;}
+  .mi-line{position:absolute;left:6px;width:28px;height:2px;border-radius:2px;background:rgba(255,255,255,.7);animation:miline 3s ease-in-out infinite alternate;z-index:3;}
+  .mi-gust{position:absolute;left:-60%;width:60%;height:2px;border-radius:2px;background:linear-gradient(90deg,transparent,rgba(255,255,255,.85),transparent);animation:migust 1.4s linear infinite;z-index:4;}
+  @keyframes mispin{to{transform:rotate(360deg);}}
+  @keyframes mipulse{0%,100%{transform:scale(1);box-shadow:0 0 6px 2px rgba(255,205,50,.5);}50%{transform:scale(1.08);box-shadow:0 0 12px 4px rgba(255,215,70,.85);}}
+  @keyframes misway{from{transform:translateX(-3px);}to{transform:translateX(3px);}}
+  @keyframes midrop{0%{transform:translateY(0);opacity:0;}20%{opacity:1;}100%{transform:translateY(13px);opacity:0;}}
+  @keyframes miflake{0%{transform:translate(0,0);opacity:0;}20%{opacity:1;}100%{transform:translate(2px,13px);opacity:0;}}
+  @keyframes mibolt{0%,68%,100%{opacity:0;}70%,74%{opacity:1;}72%{opacity:.25;}}
+  @keyframes miline{from{transform:translateX(-3px);}to{transform:translateX(3px);}}
+  @keyframes migust{from{left:-60%;}to{left:110%;}}
+  @media (prefers-reduced-motion: reduce){.mi *,.mi *::before{animation:none !important;}}
+grid_options:
+  columns: 12
+  rows: auto
+hold_action:
+  action: none
+show_icon: false
+show_label: false
+show_name: false
+show_state: false
+styles:
+  card:
+    - padding: '0'
+    - border-radius: 24px
+    - overflow: hidden
+    - background: rgba(140,170,200,0.10)
+    - backdrop-filter: blur(16px) saturate(170%)
+    - -webkit-backdrop-filter: blur(16px) saturate(170%)
+    - border: 1px solid rgba(255,255,255,0.16)
+    - box-shadow: 0 8px 30px rgba(0,0,0,0.40), inset 0 1px 0 rgba(255,255,255,0.22)
+  custom_fields:
+    days:
+      - width: 100%
+  grid:
+    - grid-template-areas: '"days"'
+    - grid-template-columns: 1fr
+    - grid-template-rows: auto
+tap_action:
+  action: more-info
+  entity: weather.forecast_maison

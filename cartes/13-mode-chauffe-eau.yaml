@@ -1,0 +1,290 @@
+# ══════════════════════════════════════════════════════════════════════
+#  Ma Maison · Mode du chauffe-eau
+#  Choix du mode (Manuel, Éco+, Programmé) en un appui, et bouton Boost.
+#
+#  Entités utilisées (exemples à remplacer par les vôtres) :
+#    - switch.domestic_hot_water_boost_eau_chaude
+#    - select.domestic_hot_water_mode_eau_chaude
+#  Nécessite : button-card (HACS) + chauffe-eau Atlantic Cozytouch
+#  À coller dans : ✏️ Modifier le tableau de bord → Ajouter une carte
+#  → « Manuel » (tout en bas de la liste), puis remplacez le contenu.
+# ══════════════════════════════════════════════════════════════════════
+type: custom:button-card
+entity: select.domestic_hot_water_mode_eau_chaude
+name: Mode du chauffe-eau
+custom_fields:
+  boost:
+    card:
+      color: var(--primary-text-color)
+      entity: switch.domestic_hot_water_boost_eau_chaude
+      extra_styles: '@keyframes hdblink{0%,100%{opacity:1;}50%{opacity:.35;}}'
+      icon: mdi:lightning-bolt
+      name: Boost eau chaude
+      state:
+        - color: '#fff3c4'
+          styles:
+            card:
+              - background: rgba(255,170,50,0.50)
+              - border-color: rgba(255,255,255,0.42)
+              - box-shadow: 0 0 16px rgba(255,170,50,0.55), inset 0 1px 0 rgba(255,255,255,0.25)
+            icon:
+              - animation: hdblink 1.6s ease-in-out infinite
+          value: 'on'
+      styles:
+        card:
+          - height: 38px
+          - width: 100%
+          - padding: 0 6px
+          - border-radius: 12px
+          - background: rgba(255,255,255,0.08)
+          - border: 1px solid rgba(255,255,255,0.16)
+          - box-shadow: inset 0 1px 0 rgba(255,255,255,0.12)
+          - transition: background .4s, border-color .4s, box-shadow .4s
+        grid:
+          - grid-template-areas: '"i n"'
+          - grid-template-columns: min-content min-content
+          - grid-template-rows: 1fr
+          - justify-content: center
+          - align-items: center
+          - column-gap: 6px
+        icon:
+          - width: 18px
+          - height: 18px
+        img_cell:
+          - width: 18px
+          - height: 18px
+        name:
+          - font-size: 12.5px
+          - font-weight: '600'
+          - color: var(--primary-text-color)
+          - white-space: nowrap
+          - overflow: visible
+      tap_action:
+        action: toggle
+      type: custom:button-card
+  info: |-
+    [[[
+    const L = {manual: 'Manuel · température fixe', eco_plus: 'Éco+ · s’adapte à vos habitudes', prog: 'Programmé · selon vos plages horaires'};
+    const m = entity ? entity.state : '';
+    const b = states['switch.domestic_hot_water_boost_eau_chaude'];
+    const bo = b && b.state === 'on';
+    return `<div class='hd-info' style='left:16px;right:16px;top:12px'><div class='hd-name'>Mode du chauffe-eau</div><div class='hd-sub'>${L[m] || 'Mode indisponible'}${bo ? " · <b style='color:#ffc773'>Boost actif</b>" : ''}</div></div>`;
+    ]]]
+  m1:
+    card:
+      color: var(--primary-text-color)
+      entity: select.domestic_hot_water_mode_eau_chaude
+      icon: mdi:hand-back-right-outline
+      name: Manuel
+      state:
+        - styles:
+            card:
+              - background: rgba(95,176,255,0.40)
+              - border-color: rgba(255,255,255,0.42)
+              - box-shadow: 0 0 16px rgba(95,176,255,0.45), inset 0 1px 0 rgba(255,255,255,0.25)
+          value: manual
+      styles:
+        card:
+          - height: 38px
+          - width: 100%
+          - padding: 0 6px
+          - border-radius: 12px
+          - background: rgba(255,255,255,0.08)
+          - border: 1px solid rgba(255,255,255,0.16)
+          - box-shadow: inset 0 1px 0 rgba(255,255,255,0.12)
+          - transition: background .4s, border-color .4s, box-shadow .4s
+        grid:
+          - grid-template-areas: '"i n"'
+          - grid-template-columns: min-content min-content
+          - grid-template-rows: 1fr
+          - justify-content: center
+          - align-items: center
+          - column-gap: 6px
+        icon:
+          - width: 18px
+          - height: 18px
+        img_cell:
+          - width: 18px
+          - height: 18px
+        name:
+          - font-size: 12.5px
+          - font-weight: '600'
+          - color: var(--primary-text-color)
+          - white-space: nowrap
+          - overflow: visible
+      tap_action:
+        action: perform-action
+        data:
+          option: manual
+        perform_action: select.select_option
+        target:
+          entity_id: select.domestic_hot_water_mode_eau_chaude
+      type: custom:button-card
+  m2:
+    card:
+      color: var(--primary-text-color)
+      entity: select.domestic_hot_water_mode_eau_chaude
+      icon: mdi:leaf
+      name: Éco+
+      state:
+        - styles:
+            card:
+              - background: rgba(76,201,168,0.45)
+              - border-color: rgba(255,255,255,0.42)
+              - box-shadow: 0 0 16px rgba(76,201,168,0.5), inset 0 1px 0 rgba(255,255,255,0.25)
+          value: eco_plus
+      styles:
+        card:
+          - height: 38px
+          - width: 100%
+          - padding: 0 6px
+          - border-radius: 12px
+          - background: rgba(255,255,255,0.08)
+          - border: 1px solid rgba(255,255,255,0.16)
+          - box-shadow: inset 0 1px 0 rgba(255,255,255,0.12)
+          - transition: background .4s, border-color .4s, box-shadow .4s
+        grid:
+          - grid-template-areas: '"i n"'
+          - grid-template-columns: min-content min-content
+          - grid-template-rows: 1fr
+          - justify-content: center
+          - align-items: center
+          - column-gap: 6px
+        icon:
+          - width: 18px
+          - height: 18px
+        img_cell:
+          - width: 18px
+          - height: 18px
+        name:
+          - font-size: 12.5px
+          - font-weight: '600'
+          - color: var(--primary-text-color)
+          - white-space: nowrap
+          - overflow: visible
+      tap_action:
+        action: perform-action
+        data:
+          option: eco_plus
+        perform_action: select.select_option
+        target:
+          entity_id: select.domestic_hot_water_mode_eau_chaude
+      type: custom:button-card
+  m3:
+    card:
+      color: var(--primary-text-color)
+      entity: select.domestic_hot_water_mode_eau_chaude
+      icon: mdi:calendar-clock
+      name: Prog.
+      state:
+        - styles:
+            card:
+              - background: rgba(150,140,255,0.40)
+              - border-color: rgba(255,255,255,0.42)
+              - box-shadow: 0 0 16px rgba(150,140,255,0.45), inset 0 1px 0 rgba(255,255,255,0.25)
+          value: prog
+      styles:
+        card:
+          - height: 38px
+          - width: 100%
+          - padding: 0 6px
+          - border-radius: 12px
+          - background: rgba(255,255,255,0.08)
+          - border: 1px solid rgba(255,255,255,0.16)
+          - box-shadow: inset 0 1px 0 rgba(255,255,255,0.12)
+          - transition: background .4s, border-color .4s, box-shadow .4s
+        grid:
+          - grid-template-areas: '"i n"'
+          - grid-template-columns: min-content min-content
+          - grid-template-rows: 1fr
+          - justify-content: center
+          - align-items: center
+          - column-gap: 6px
+        icon:
+          - width: 18px
+          - height: 18px
+        img_cell:
+          - width: 18px
+          - height: 18px
+        name:
+          - font-size: 12.5px
+          - font-weight: '600'
+          - color: var(--primary-text-color)
+          - white-space: nowrap
+          - overflow: visible
+      tap_action:
+        action: perform-action
+        data:
+          option: prog
+        perform_action: select.select_option
+        target:
+          entity_id: select.domestic_hot_water_mode_eau_chaude
+      type: custom:button-card
+  scene: <div class="hd-scene"></div>
+extra_styles: |-
+  .hd-scene{position:absolute;inset:0;overflow:hidden;pointer-events:none;}
+  .hd-info{position:absolute;display:flex;flex-direction:column;gap:2px;text-align:left;white-space:normal;min-width:0;}
+  .hd-name{font-size:13px;font-weight:600;line-height:1.25;color:var(--secondary-text-color);opacity:.92;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .hd-name.w{white-space:normal;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;}
+  .hd-title{font-size:22px;font-weight:600;line-height:1.15;color:var(--primary-text-color);transition:color .8s;}
+  .hd-title.s{font-size:15.5px;}
+  .hd-sub{font-size:12.5px;line-height:1.3;color:var(--secondary-text-color);}
+  .hd-sub b{color:var(--primary-text-color);font-weight:600;}
+  @media (prefers-reduced-motion: reduce){.hd-scene *,.hd-scene *::before,.hd-scene *::after{animation:none !important;}}
+grid_options:
+  columns: 12
+  rows: auto
+show_icon: false
+show_name: false
+styles:
+  card:
+    - height: 158px
+    - border-radius: 24px
+    - overflow: hidden
+    - padding: '0'
+    - background: rgba(140,170,200,0.10)
+    - backdrop-filter: blur(16px) saturate(170%)
+    - -webkit-backdrop-filter: blur(16px) saturate(170%)
+    - border: 1px solid rgba(255,255,255,0.16)
+    - box-shadow: 0 8px 30px rgba(0,0,0,0.40), inset 0 1px 0 rgba(255,255,255,0.22)
+  custom_fields:
+    boost:
+      - position: absolute
+      - left: 16px
+      - right: 16px
+      - top: 104px
+      - height: 38px
+    info:
+      - position: absolute
+      - inset: '0'
+      - width: 100%
+      - height: 100%
+    m1:
+      - position: absolute
+      - left: 16px
+      - top: 58px
+      - width: calc((100% - 32px - 16px) / 3)
+      - height: 38px
+    m2:
+      - position: absolute
+      - left: calc(16px + calc((100% - 32px - 16px) / 3) + 8px)
+      - top: 58px
+      - width: calc((100% - 32px - 16px) / 3)
+      - height: 38px
+    m3:
+      - position: absolute
+      - right: 16px
+      - top: 58px
+      - width: calc((100% - 32px - 16px) / 3)
+      - height: 38px
+    scene:
+      - position: absolute
+      - inset: '0'
+      - width: 100%
+      - height: 100%
+  grid:
+    - position: relative
+tap_action:
+  action: none
+triggers_update:
+  - switch.domestic_hot_water_boost_eau_chaude

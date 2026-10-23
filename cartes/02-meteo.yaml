@@ -1,0 +1,212 @@
+# ══════════════════════════════════════════════════════════════════════
+#  Ma Maison · Météo
+#  Ciel animé selon la météo actuelle et l'heure (soleil, nuages, pluie, neige, orage,
+#  brouillard, vent, nuit étoilée), avec température et détails.
+#
+#  Entités utilisées (exemples à remplacer par les vôtres) :
+#    - sun.sun
+#    - weather.forecast_maison
+#  Nécessite : button-card (HACS)
+#  À coller dans : ✏️ Modifier le tableau de bord → Ajouter une carte
+#  → « Manuel » (tout en bas de la liste), puis remplacez le contenu.
+# ══════════════════════════════════════════════════════════════════════
+type: custom:button-card
+entity: weather.forecast_maison
+name: Météo
+custom_fields:
+  info: |-
+    [[[
+    const a = entity ? entity.attributes : {};
+    const st = entity ? entity.state : '';
+    const labels = {'clear-night':'Nuit claire','cloudy':'Nuageux','exceptional':'Exceptionnel','fog':'Brouillard','hail':'Grêle','lightning':'Orageux','lightning-rainy':'Orages et pluie','partlycloudy':'Éclaircies','pouring':'Fortes pluies','rainy':'Pluie','snowy':'Neige','snowy-rainy':'Pluie et neige','sunny':'Ensoleillé','windy':'Venteux','windy-variant':'Venteux et nuageux'};
+    const fmt = (v, d) => Number(v).toLocaleString('fr-FR', {maximumFractionDigits: d});
+    const t = a.temperature != null ? fmt(a.temperature, 1) : '–';
+    const u = a.temperature_unit || '°C';
+    const tv = Number(a.temperature);
+    const hh = isNaN(tv) ? 200 : Math.round(Math.max(0, Math.min(220, 220 - tv * 5.5)));
+    const c1 = `hsl(${hh},95%,66%)`;
+    const c2 = `hsl(${Math.max(0, hh - 28)},95%,60%)`;
+    const c3 = `hsl(${Math.min(240, hh + 22)},95%,74%)`;
+    const parts = [];
+    if (a.wind_speed != null) parts.push(`💨 ${fmt(a.wind_speed, 0)} ${a.wind_speed_unit || 'km/h'}`);
+    if (a.humidity != null) parts.push(`💧 ${fmt(a.humidity, 0)} %`);
+    const css = `<style>.wx-temp.tgrad{background:linear-gradient(90deg,var(--t1),var(--t2),var(--t3),var(--t1));background-size:200% 100%;-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:transparent;text-shadow:none;filter:drop-shadow(0 2px 4px rgba(0,0,0,.6));animation:tgflow 5s linear infinite;}@keyframes tgflow{from{background-position:0% 50%;}to{background-position:200% 50%;}}@media (prefers-reduced-motion: reduce){.wx-temp.tgrad{animation:none;}}</style>`;
+    return `${css}<div class='wx-temp tgrad' style='--t1:${c1};--t2:${c2};--t3:${c3}'>${t}<span>${u}</span></div><div class='wx-cond'>${labels[st] || st}</div><div class='wx-meta'>${parts.join(' · ')}</div>`;
+    ]]]
+  scene: |-
+    [[[
+    const s = entity ? entity.state : 'unknown';
+    const a = entity ? entity.attributes : {};
+    const sun = states['sun.sun'];
+    const el = sun ? Number(sun.attributes.elevation) : 90;
+    const az = sun ? Number(sun.attributes.azimuth) : 180;
+    const night = sun ? sun.state === 'below_horizon' : false;
+    const wind = Number(a.wind_speed) || 0;
+    const tv = Number(a.temperature);
+    const clamp = (v,lo,hi) => Math.max(lo, Math.min(hi, v));
+    const rainy = ['rainy','pouring','lightning-rainy','snowy-rainy'].includes(s);
+    const pouring = s === 'pouring';
+    const snowy = ['snowy','snowy-rainy'].includes(s);
+    const hail = s === 'hail';
+    const storm = ['lightning','lightning-rainy'].includes(s);
+    const fog = s === 'fog';
+    const clear = ['sunny','clear-night'].includes(s);
+    const partly = ['partlycloudy','windy-variant'].includes(s);
+    const breezy = ['windy','windy-variant'].includes(s) || wind >= 35;
+    const nClouds = clear ? 0 : (partly ? 2 : 3);
+    const dark = rainy || storm || hail || snowy || fog || s === 'cloudy';
+    let h = '';
+    if (clear || partly) {
+      if (night) {
+        h += `<div class='wx-moon'></div>`;
+        for (let i = 0; i < 14; i++) {
+          h += `<span class='wx-star' style='left:${(i*37+11)%100}%;top:${(i*23+5)%55}%;animation-delay:${((i*0.37)%3).toFixed(2)}s'></span>`;
+        }
+      } else {
+        const top = clamp(62 - clamp(el,0,54)/54*54, 6, 64);
+        const left = clamp((az-90)/180*78 + 8, 6, 88);
+        const low = el <= 10;
+        h += `<div class='wx-sun${low?' wx-sun-low':''}' style='left:${left.toFixed(1)}%;top:${top.toFixed(1)}%;right:auto'><div class='wx-rays'></div><div class='wx-core'></div></div>`;
+      }
+    }
+    const base = clamp(360/(wind+5), 4, 40); const tilt = clamp(wind/6, 0, 14).toFixed(0);
+    for (let i = 0; i < nClouds; i++) {
+      const dur = (base + i*5).toFixed(1);
+      h += `<div class='wx-cloud${dark?' wx-dark':''}' style='font-size:${17-i*3}px;top:${10+i*17}%;animation-duration:${dur}s;animation-delay:-${(i*base/Math.max(1,nClouds)).toFixed(1)}s;transform:skewX(-${tilt}deg) scaleX(${(1+wind/220).toFixed(2)})'></div>`;
+    }
+    if (rainy) {
+      const n = pouring ? 46 : 28;
+      for (let i = 0; i < n; i++) {
+        h += `<span class='wx-drop' style='left:${(i*53+7)%100}%;animation-duration:${((pouring?0.45:0.75)+((i*7)%5)*0.07).toFixed(2)}s;animation-delay:-${((i*0.17)%1.3).toFixed(2)}s'></span>`;
+      }
+    }
+    if (snowy || hail) {
+      const n = hail ? 30 : 22;
+      for (let i = 0; i < n; i++) {
+        const d = hail ? 0.6+((i*5)%4)*0.08 : 3.2+((i*5)%4)*0.5;
+        h += `<span class='${hail?'wx-hail':'wx-flake'}' style='left:${(i*41+3)%100}%;animation-duration:${d.toFixed(2)}s;animation-delay:-${((i*0.29)%3).toFixed(2)}s'></span>`;
+      }
+    }
+    if (fog) {
+      for (let i = 0; i < 4; i++) {
+        h += `<div class='wx-fog' style='top:${18+i*18}%;animation-duration:${10+i*3}s'></div>`;
+      }
+    }
+    if (breezy) {
+      const wd = clamp(120/(wind+10), 0.7, 3).toFixed(2);
+      for (let i = 0; i < 5; i++) {
+        h += `<span class='wx-wind' style='top:${22+i*13}%;animation-duration:${wd}s;animation-delay:-${(i*0.4).toFixed(1)}s'></span>`;
+      }
+    }
+    if (storm) {
+      const heat = !isNaN(tv) && tv >= 25 && wind < 35;
+      h += `<div class='wx-flash${heat?' wx-flash-soft':''}'></div>`;
+      if (heat) {
+        for (let i = 0; i < 3; i++) {
+          h += `<div class='wx-sheet' style='left:${18+i*30}%;top:${8+i*7}%;animation-delay:${(i*1.3+0.4).toFixed(2)}s'></div>`;
+        }
+      } else {
+        h += `<div class='wx-ground'></div>`; const xs = [26, 60];
+        for (let i = 0; i < 2; i++) {
+          h += `<svg class='wx-bolt' viewBox='0 0 60 180' preserveAspectRatio='none' style='left:${xs[i]}%;animation-delay:${(i*2.1+0.6).toFixed(2)}s'><polyline points='34,2 22,54 40,60 18,116 42,122 26,178' fill='none' stroke='#eaf2ff' stroke-width='3.2' stroke-linejoin='round' stroke-linecap='round'/></svg>`; h += `<div class='wx-strike' style='left:${xs[i]}%;animation-delay:${(i*2.1+0.6).toFixed(2)}s'></div>`;
+        }
+      }
+    }
+    return `<div class='wx-scene'>${h}</div>`;
+    ]]]
+extra_styles: |-
+  .wx-scene{position:absolute;inset:0;overflow:hidden;pointer-events:none;}
+  .wx-sun{position:absolute;right:12%;top:12%;width:70px;height:70px;z-index:1;}
+  .wx-core{position:absolute;inset:12px;border-radius:50%;background:radial-gradient(circle at 40% 38%,#fff7c2 0%,#ffd84a 55%,#ffb300 100%);animation:wxpulse 3.5s ease-in-out infinite;}
+  .wx-rays{position:absolute;inset:-14px;border-radius:50%;background:repeating-conic-gradient(rgba(255,222,100,.6) 0deg 7deg,transparent 7deg 30deg);-webkit-mask:radial-gradient(circle,transparent 38%,#000 40%,#000 62%,transparent 74%);mask:radial-gradient(circle,transparent 38%,#000 40%,#000 62%,transparent 74%);animation:wxspin 20s linear infinite;}
+  .wx-moon{position:absolute;right:15%;top:14%;width:44px;height:44px;border-radius:50%;box-shadow:12px -5px 0 0 #f3efc8;transform:rotate(-12deg);filter:drop-shadow(0 0 10px rgba(243,239,200,.6));z-index:1;}
+  .wx-star{position:absolute;width:3px;height:3px;border-radius:50%;background:#fff;opacity:.3;animation:wxtwinkle 3s ease-in-out infinite;}
+  .wx-cloud{position:absolute;left:-35%;width:6em;height:2em;background:rgba(255,255,255,.92);border-radius:2em;animation:wxdrift linear infinite;filter:drop-shadow(0 4px 6px rgba(0,0,0,.25));z-index:2;}
+  .wx-cloud::before{content:'';position:absolute;width:2.6em;height:2.6em;left:.9em;top:-1.3em;background:inherit;border-radius:50%;}
+  .wx-cloud::after{content:'';position:absolute;width:3.3em;height:3.3em;left:2.3em;top:-1.8em;background:inherit;border-radius:50%;}
+  .wx-cloud.wx-dark{background:rgba(196,205,218,.95);}
+  .wx-drop{position:absolute;top:-25px;width:2px;height:18px;border-radius:0 0 2px 2px;background:linear-gradient(to bottom,rgba(255,255,255,0),rgba(200,225,255,.95));animation:wxfall linear infinite;z-index:3;}
+  .wx-flake{position:absolute;top:-10px;width:6px;height:6px;border-radius:50%;background:#fff;opacity:.9;animation:wxsnow linear infinite;z-index:3;}
+  .wx-hail{position:absolute;top:-10px;width:5px;height:5px;border-radius:50%;background:#eef6ff;animation:wxfall linear infinite;z-index:3;}
+  .wx-fog{position:absolute;left:-50%;width:200%;height:24px;background:linear-gradient(90deg,transparent,rgba(255,255,255,.4),transparent);filter:blur(5px);animation:wxfog ease-in-out infinite alternate;z-index:3;}
+  .wx-wind{position:absolute;left:-35%;width:35%;height:2px;border-radius:2px;background:linear-gradient(90deg,transparent,rgba(255,255,255,.75),transparent);animation:wxwind linear infinite;z-index:3;}
+  .wx-flash{position:absolute;inset:0;animation:wxflash 7s linear infinite;z-index:4;}
+  .wx-temp{font-size:40px;font-weight:300;line-height:1;color:#fff;text-shadow:0 2px 6px rgba(0,0,0,.45);}
+  .wx-temp span{font-size:16px;margin-left:3px;vertical-align:top;}
+  .wx-cond{font-size:14px;font-weight:600;color:#fff;margin-top:6px;text-shadow:0 1px 3px rgba(0,0,0,.55);}
+  .wx-meta{font-size:12px;color:rgba(255,255,255,.92);margin-top:3px;text-shadow:0 1px 3px rgba(0,0,0,.55);}
+  @keyframes wxspin{to{transform:rotate(360deg);}}
+  @keyframes wxpulse{0%,100%{transform:scale(1);box-shadow:0 0 20px 6px rgba(255,205,50,.55);}50%{transform:scale(1.06);box-shadow:0 0 36px 14px rgba(255,215,70,.85);}}
+  @keyframes wxtwinkle{0%,100%{opacity:.25;}50%{opacity:1;}}
+  @keyframes wxdrift{from{left:-35%;}to{left:105%;}}
+  @keyframes wxfall{from{transform:translate3d(0,0,0);}to{transform:translate3d(-14px,230px,0);}}
+  @keyframes wxsnow{0%{transform:translate3d(0,0,0);}50%{transform:translate3d(10px,110px,0);}100%{transform:translate3d(-6px,230px,0);}}
+  @keyframes wxfog{from{transform:translateX(-12%);}to{transform:translateX(12%);}}
+  @keyframes wxwind{from{left:-35%;}to{left:110%;}}
+  @keyframes wxflash{0%,86%,100%{background:rgba(255,255,255,0);}87%{background:rgba(255,255,255,.6);}88%{background:rgba(255,255,255,0);}90%{background:rgba(255,255,255,.45);}91%{background:rgba(255,255,255,0);}}
+  @media (prefers-reduced-motion: reduce){.wx-scene *{animation:none !important;}}
+
+  .wx-sun-low .wx-core{background:radial-gradient(circle at 42% 40%,#fff1c0 0%,#ff9d3c 55%,#ff6a00 100%);}
+  .wx-sun-low .wx-rays{background:repeating-conic-gradient(rgba(255,150,60,.6) 0deg 7deg,transparent 7deg 30deg);}
+  .wx-sheet{position:absolute;width:120px;height:58px;border-radius:50%;background:radial-gradient(ellipse at center,rgba(255,255,255,.95) 0%,rgba(205,222,255,.35) 60%,transparent 72%);filter:blur(6px);opacity:0;z-index:4;animation:wxsheet 3.8s ease-in-out infinite;}
+  .wx-bolt{position:absolute;top:20%;width:46px;height:78%;opacity:0;filter:drop-shadow(0 0 6px rgba(180,210,255,.95));z-index:5;animation:wxstrike 4.2s linear infinite;}
+  .wx-flash-soft{animation:wxflashsoft 5s ease-in-out infinite !important;}
+  @keyframes wxstrike{0%,8%,100%{opacity:0;}2%{opacity:1;}3.5%{opacity:.15;}5%{opacity:.9;}6.5%{opacity:0;}}
+  @keyframes wxsheet{0%,87%,100%{opacity:0;}89%{opacity:.85;}91%{opacity:.2;}93%{opacity:.65;}95%{opacity:0;}}
+  @keyframes wxflashsoft{0%,90%,100%{background:rgba(255,245,220,0);}92%{background:rgba(255,245,220,.26);}94%{background:rgba(255,245,220,0);}} .wx-ground{position:absolute;left:0;right:0;bottom:0;height:3px;background:linear-gradient(90deg,transparent,rgba(180,210,255,.6),transparent);box-shadow:0 0 14px 3px rgba(150,190,255,.4);z-index:4;} .wx-strike{position:absolute;bottom:0;width:60px;height:26px;margin-left:-30px;border-radius:50%;background:radial-gradient(ellipse at center bottom,rgba(220,235,255,.95),transparent 70%);opacity:0;filter:blur(3px);z-index:5;animation:wxstrikeground 4.2s linear infinite;} @keyframes wxstrikeground{0%,8%,100%{opacity:0;}2%{opacity:.9;}3.5%{opacity:.1;}5%{opacity:.8;}6.5%{opacity:0;}}
+grid_options:
+  columns: 12
+  rows: auto
+show_icon: false
+show_label: false
+show_name: false
+show_state: false
+styles:
+  card:
+    - height: 180px
+    - border-radius: 24px
+    - overflow: hidden
+    - padding: '0'
+    - border: 1px solid rgba(255,255,255,0.16)
+    - box-shadow: 0 8px 30px rgba(0,0,0,0.40), inset 0 1px 0 rgba(255,255,255,0.22)
+    - background: |-
+        [[[
+        const s = entity ? entity.state : '';
+        const sun = states['sun.sun'];
+        const el = sun ? Number(sun.attributes.elevation) : 90;
+        const night = sun ? sun.state === 'below_horizon' : false;
+        const golden = !night && el <= 10;
+        const wet = ['rainy','pouring','lightning','lightning-rainy','hail','snowy-rainy'].includes(s);
+        const grey = ['cloudy','fog','snowy','windy','exceptional'].includes(s);
+        if (wet) {
+          if (night) return 'linear-gradient(180deg,#151d2b 0%,#2b3a4f 100%)';
+          if (golden) return 'linear-gradient(180deg,#5b5566 0%,#9a8597 100%)';
+          return 'linear-gradient(180deg,#4a5b70 0%,#8193a8 100%)';
+        }
+        if (grey) {
+          if (night) return 'linear-gradient(180deg,#1b2230 0%,#3a475b 100%)';
+          if (golden) return 'linear-gradient(180deg,#6e6a7a 0%,#c0a7a0 100%)';
+          return 'linear-gradient(180deg,#7e92aa 0%,#b7c5d5 100%)';
+        }
+        if (night) return 'linear-gradient(180deg,#0a1230 0%,#20305e 100%)';
+        if (golden) return 'linear-gradient(180deg,#ff8a5c 0%,#ffd39e 55%,#8fbce8 100%)';
+        return 'linear-gradient(180deg,#2f86de 0%,#93cdf5 100%)';
+        ]]]
+  custom_fields:
+    info:
+      - position: absolute
+      - left: 18px
+      - bottom: 14px
+      - z-index: '6'
+      - text-align: left
+    scene:
+      - position: absolute
+      - inset: '0'
+      - width: 100%
+      - height: 100%
+  grid:
+    - position: relative
+tap_action:
+  action: more-info
+triggers_update:
+  - sun.sun

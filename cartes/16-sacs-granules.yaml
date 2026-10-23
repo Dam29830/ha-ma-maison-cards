@@ -1,0 +1,207 @@
+# ══════════════════════════════════════════════════════════════════════
+#  Ma Maison · Stock de sacs de granulés
+#  Stock de sacs avec boutons − (sac versé), + et « Livraison » (palette livrée), alerte stock bas.
+#
+#  Entités utilisées (exemples à remplacer par les vôtres) :
+#    - counter.sacs_de_granules
+#  Nécessite : button-card (HACS) + counter.sacs_de_granules (package)
+#  À coller dans : ✏️ Modifier le tableau de bord → Ajouter une carte
+#  → « Manuel » (tout en bas de la liste), puis remplacez le contenu.
+# ══════════════════════════════════════════════════════════════════════
+type: custom:button-card
+entity: counter.sacs_de_granules
+name: Sacs en stock
+custom_fields:
+  info: |-
+    [[[
+    const n = entity ? parseInt(entity.state) : NaN;
+    const max = (entity && entity.attributes.maximum) || 72;
+    const ok = !isNaN(n);
+    const low = ok && n <= 6;
+    const c = !ok ? 'var(--secondary-text-color)' : (low ? '#ff8a5c' : '#e8c27a');
+    const t = !ok ? 'Indisponible' : n + ' sac' + (n > 1 ? 's' : '');
+    const d = !ok ? '' : (low ? 'Stock bas : pensez à commander' : 'sur ' + max + ' (une palette)');
+    return `<div class='hd-info' style='left:16px;right:16px;top:12px'><div class='hd-name'>Sacs en stock</div></div>`
+     + `<div class='hd-info' style='left:150px;right:12px;top:32px'><div class='hd-title' style='color:${c}'>${t}</div>${d ? `<div class='hd-sub'>${d}</div>` : ''}</div>`;
+    ]]]
+  minus:
+    card:
+      color: var(--primary-text-color)
+      icon: mdi:minus
+      show_name: false
+      styles:
+        card:
+          - height: 34px
+          - width: 100%
+          - padding: 0 6px
+          - border-radius: 12px
+          - background: rgba(255,255,255,0.08)
+          - border: 1px solid rgba(255,255,255,0.16)
+          - box-shadow: inset 0 1px 0 rgba(255,255,255,0.12)
+          - transition: background .4s, border-color .4s, box-shadow .4s
+        grid:
+          - grid-template-areas: '"i"'
+          - grid-template-columns: min-content
+          - grid-template-rows: 1fr
+          - justify-content: center
+          - align-items: center
+        icon:
+          - width: 18px
+          - height: 18px
+        img_cell:
+          - width: 18px
+          - height: 18px
+      tap_action:
+        action: perform-action
+        perform_action: counter.decrement
+        target:
+          entity_id: counter.sacs_de_granules
+      type: custom:button-card
+  plus:
+    card:
+      color: var(--primary-text-color)
+      icon: mdi:plus
+      show_name: false
+      styles:
+        card:
+          - height: 34px
+          - width: 100%
+          - padding: 0 6px
+          - border-radius: 12px
+          - background: rgba(255,255,255,0.08)
+          - border: 1px solid rgba(255,255,255,0.16)
+          - box-shadow: inset 0 1px 0 rgba(255,255,255,0.12)
+          - transition: background .4s, border-color .4s, box-shadow .4s
+        grid:
+          - grid-template-areas: '"i"'
+          - grid-template-columns: min-content
+          - grid-template-rows: 1fr
+          - justify-content: center
+          - align-items: center
+        icon:
+          - width: 18px
+          - height: 18px
+        img_cell:
+          - width: 18px
+          - height: 18px
+      tap_action:
+        action: perform-action
+        perform_action: counter.increment
+        target:
+          entity_id: counter.sacs_de_granules
+      type: custom:button-card
+  reset:
+    card:
+      color: var(--primary-text-color)
+      icon: mdi:truck-delivery-outline
+      name: Livraison
+      styles:
+        card:
+          - height: 34px
+          - width: 100%
+          - padding: 0 6px
+          - border-radius: 12px
+          - background: rgba(255,255,255,0.08)
+          - border: 1px solid rgba(255,255,255,0.16)
+          - box-shadow: inset 0 1px 0 rgba(255,255,255,0.12)
+          - transition: background .4s, border-color .4s, box-shadow .4s
+        grid:
+          - grid-template-areas: '"i n"'
+          - grid-template-columns: min-content min-content
+          - grid-template-rows: 1fr
+          - justify-content: center
+          - align-items: center
+          - column-gap: 6px
+        icon:
+          - width: 18px
+          - height: 18px
+        img_cell:
+          - width: 18px
+          - height: 18px
+        name:
+          - font-size: 12px
+          - font-weight: '600'
+          - color: var(--primary-text-color)
+          - white-space: nowrap
+          - overflow: visible
+      tap_action:
+        action: perform-action
+        confirmation:
+          text: Nouvelle palette livrée ? Le compteur repartira à sa valeur de départ.
+        perform_action: counter.reset
+        target:
+          entity_id: counter.sacs_de_granules
+      type: custom:button-card
+  scene: <div class="hd-scene"><div class="sk"><div class="sk-bags"><i style="--i:1;left:0px;bottom:0px"></i><i style="--i:2;left:20px;bottom:0px"></i><i style="--i:3;left:40px;bottom:0px"></i><i style="--i:4;left:60px;bottom:0px"></i><i style="--i:5;left:80px;bottom:0px"></i><i style="--i:6;left:100px;bottom:0px"></i><i style="--i:7;left:0px;bottom:13px"></i><i style="--i:8;left:20px;bottom:13px"></i><i style="--i:9;left:40px;bottom:13px"></i><i style="--i:10;left:60px;bottom:13px"></i><i style="--i:11;left:80px;bottom:13px"></i><i style="--i:12;left:100px;bottom:13px"></i><i style="--i:13;left:0px;bottom:26px"></i><i style="--i:14;left:20px;bottom:26px"></i><i style="--i:15;left:40px;bottom:26px"></i><i style="--i:16;left:60px;bottom:26px"></i><i style="--i:17;left:80px;bottom:26px"></i><i style="--i:18;left:100px;bottom:26px"></i><i style="--i:19;left:0px;bottom:39px"></i><i style="--i:20;left:20px;bottom:39px"></i><i style="--i:21;left:40px;bottom:39px"></i><i style="--i:22;left:60px;bottom:39px"></i><i style="--i:23;left:80px;bottom:39px"></i><i style="--i:24;left:100px;bottom:39px"></i></div><div class="sk-pal"><i></i><i></i><i></i></div></div><div class="sk-alert"></div></div>
+extra_styles: |-
+  .hd-scene{position:absolute;inset:0;overflow:hidden;pointer-events:none;}
+  .hd-info{position:absolute;display:flex;flex-direction:column;gap:2px;text-align:left;white-space:normal;min-width:0;}
+  .hd-name{font-size:13px;font-weight:600;line-height:1.25;color:var(--secondary-text-color);opacity:.92;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .hd-name.w{white-space:normal;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;}
+  .hd-title{font-size:22px;font-weight:600;line-height:1.15;color:var(--primary-text-color);transition:color .8s;}
+  .hd-title.s{font-size:15.5px;}
+  .hd-sub{font-size:12.5px;line-height:1.3;color:var(--secondary-text-color);}
+  .hd-sub b{color:var(--primary-text-color);font-weight:600;}
+  @media (prefers-reduced-motion: reduce){.hd-scene *,.hd-scene *::before,.hd-scene *::after{animation:none !important;}}
+  .sk{position:absolute;left:16px;top:44px;width:120px;height:72px;}
+  .sk-bags{position:absolute;left:0;right:0;bottom:13px;height:52px;}
+  .sk-bags i{position:absolute;width:19px;height:12px;border-radius:5px 5px 3px 3px;background:linear-gradient(180deg,#f4e4c4,#d8b47c);box-shadow:inset 0 -2px 0 rgba(0,0,0,.12),0 1px 2px rgba(0,0,0,.35);opacity:clamp(0,calc((var(--sk-n,0) - var(--i) + 1) * 10),1);transform:translateY(calc((1 - clamp(0,calc((var(--sk-n,0) - var(--i) + 1) * 10),1)) * -12px));transition:opacity .6s,transform .6s cubic-bezier(.3,1.5,.5,1);}
+  .sk-bags i::after{content:'';position:absolute;left:3px;right:3px;top:4px;height:3px;border-radius:1px;background:#c0392b;opacity:.85;}
+  .sk-pal{position:absolute;left:-4px;right:-4px;bottom:0;height:13px;}
+  .sk-pal i{position:absolute;left:0;right:0;height:4px;border-radius:1px;background:linear-gradient(180deg,#c99a5b,#8c6431);}
+  .sk-pal i:nth-child(1){top:0;}
+  .sk-pal i:nth-child(2){top:4px;height:5px;background:repeating-linear-gradient(90deg,#7a5528 0 9px,transparent 9px 28px);}
+  .sk-pal i:nth-child(3){top:9px;}
+  .sk-alert{position:absolute;inset:0;border-radius:24px;opacity:var(--sk-low,0);animation:skalert 2s ease-in-out infinite;transition:opacity 1s;}
+  @keyframes skalert{0%,100%{box-shadow:inset 0 0 0 2px rgba(255,120,60,.12);}50%{box-shadow:inset 0 0 0 2px rgba(255,120,60,.75);}}
+grid_options:
+  columns: 12
+  rows: auto
+show_icon: false
+show_name: false
+styles:
+  card:
+    - height: 142px
+    - border-radius: 24px
+    - overflow: hidden
+    - padding: '0'
+    - background: rgba(140,170,200,0.10)
+    - backdrop-filter: blur(16px) saturate(170%)
+    - -webkit-backdrop-filter: blur(16px) saturate(170%)
+    - border: 1px solid rgba(255,255,255,0.16)
+    - box-shadow: 0 8px 30px rgba(0,0,0,0.40), inset 0 1px 0 rgba(255,255,255,0.22)
+    - --sk-n: '[[[ return String((entity && !isNaN(parseInt(entity.state))) ? Math.min(24, Math.ceil(parseInt(entity.state) / ((entity.attributes.maximum || 72) / 24))) : 0); ]]]'
+    - --sk-low: '[[[ return String((entity && !isNaN(parseInt(entity.state)) && parseInt(entity.state) <= 6) ? 1 : 0); ]]]'
+  custom_fields:
+    info:
+      - position: absolute
+      - inset: '0'
+      - width: 100%
+      - height: 100%
+    minus:
+      - position: absolute
+      - left: 150px
+      - bottom: 14px
+      - width: 40px
+      - height: 34px
+    plus:
+      - position: absolute
+      - left: 196px
+      - bottom: 14px
+      - width: 40px
+      - height: 34px
+    reset:
+      - position: absolute
+      - left: 242px
+      - right: 12px
+      - bottom: 14px
+      - height: 34px
+    scene:
+      - position: absolute
+      - inset: '0'
+      - width: 100%
+      - height: 100%
+  grid:
+    - position: relative
+tap_action:
+  action: more-info

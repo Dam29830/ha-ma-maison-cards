@@ -1,0 +1,161 @@
+# ══════════════════════════════════════════════════════════════════════
+#  Ma Maison · Présence
+#  Maison animée (fumée, fenêtres allumées) qui s'éclaire quand quelqu'un est là.
+#  Deux personnes : avatar, statut, distance de la maison, heure du dernier changement.
+#
+#  Entités utilisées (exemples à remplacer par les vôtres) :
+#    - zone.home
+#    - person.personne_2
+#    - person.personne_1
+#  Nécessite : button-card (HACS)
+#  À coller dans : ✏️ Modifier le tableau de bord → Ajouter une carte
+#  → « Manuel » (tout en bas de la liste), puis remplacez le contenu.
+# ══════════════════════════════════════════════════════════════════════
+type: custom:button-card
+entity: person.personne_1
+name: Présence
+custom_fields:
+  ava: |-
+    [[[
+    const pic = entity && entity.attributes.entity_picture;
+    const n = (entity && entity.attributes.friendly_name) || '?';
+    return `<div class='pr-ava'>${pic ? `<img src='${pic}' alt=''>` : `<b>${n.charAt(0)}</b>`}</div>`;
+    ]]]
+  info: |-
+    [[[
+    const zh = states['zone.home'];
+    const hm = d => d.toLocaleTimeString('fr-FR', {hour: '2-digit', minute: '2-digit'});
+    const row = (p, top) => {
+      const st = p ? p.state : 'unknown';
+      const a = p ? p.attributes : {};
+      const home = st === 'home';
+      let t, c;
+      if (home) { t = 'À la maison'; c = '#4cc9a8'; }
+      else if (st === 'not_home') { t = 'Absent'; c = '#8fb3d9'; }
+      else if (st === 'unknown' || st === 'unavailable') { t = 'Position inconnue'; c = 'var(--secondary-text-color)'; }
+      else { t = st; c = '#8fd0ff'; }
+      const d = [];
+      if (!home && zh && a.latitude != null && a.longitude != null) {
+        const R = 6371, rad = x => x * Math.PI / 180;
+        const dLa = rad(a.latitude - zh.attributes.latitude), dLo = rad(a.longitude - zh.attributes.longitude);
+        const h = Math.sin(dLa / 2) ** 2 + Math.cos(rad(zh.attributes.latitude)) * Math.cos(rad(a.latitude)) * Math.sin(dLo / 2) ** 2;
+        const km = 2 * R * Math.asin(Math.sqrt(h));
+        d.push('à ' + (km < 1 ? Math.round(km * 1000) + ' m' : km.toLocaleString('fr-FR', {maximumFractionDigits: km < 10 ? 1 : 0}) + ' km'));
+      }
+      if (p && p.last_changed) {
+        const lc = new Date(p.last_changed), now = new Date(), y = new Date(now);
+        y.setDate(now.getDate() - 1);
+        const when = lc.toDateString() === now.toDateString() ? hm(lc)
+          : lc.toDateString() === y.toDateString() ? 'hier ' + hm(lc)
+          : lc.toLocaleDateString('fr-FR', {day: 'numeric', month: 'short'});
+        d.push('depuis ' + when);
+      }
+      return `<div class='hd-info pr-row' style='left:180px;right:12px;top:${top}px'><div class='hd-name'>${a.friendly_name || 'Présence'}</div><div class='hd-title pr-st' style='color:${c}'>${t}</div><div class='hd-sub pr-sub'>${d.join(' · ')}</div></div>`;
+    };
+    return row(entity, 10) + row(states['person.personne_2'], 64);
+    ]]]
+  scene: <div class="hd-scene"><div class="pr-glow"></div><div class="pr"><div class="pr-smoke"><i style="animation-delay:-0.0s"></i><i style="animation-delay:-1.1s"></i><i style="animation-delay:-2.2s"></i></div><div class="pr-chim"></div><div class="pr-roof"></div><div class="pr-wall"></div><div class="pr-win l"><i></i></div><div class="pr-win r"><i></i></div><div class="pr-door"><i></i></div><div class="pr-ground"></div></div><div class="pr-path d"></div><div class="pr-path g"></div></div>
+  ava2: |-
+    [[[
+    const p = states['person.personne_2'];
+    const pic = p && p.attributes.entity_picture;
+    const n = (p && p.attributes.friendly_name) || '?';
+    return `<div class='pr-ava g'>${pic ? `<img src='${pic}' alt=''>` : `<b>${n.charAt(0)}</b>`}</div>`;
+    ]]]
+extra_styles: |-
+  .hd-scene{position:absolute;inset:0;overflow:hidden;pointer-events:none;}
+  .hd-info{position:absolute;display:flex;flex-direction:column;gap:2px;text-align:left;white-space:normal;min-width:0;}
+  .hd-name{font-size:13px;font-weight:600;line-height:1.25;color:var(--secondary-text-color);opacity:.92;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .hd-name.w{white-space:normal;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;}
+  .hd-title{font-size:22px;font-weight:600;line-height:1.15;color:var(--primary-text-color);transition:color .8s;}
+  .hd-title.s{font-size:15.5px;}
+  .hd-sub{font-size:12.5px;line-height:1.3;color:var(--secondary-text-color);}
+  .hd-sub b{color:var(--primary-text-color);font-weight:600;}
+  @media (prefers-reduced-motion: reduce){.hd-scene *,.hd-scene *::before,.hd-scene *::after{animation:none !important;}}
+  .pr{position:absolute;left:18px;top:20px;width:92px;height:80px;}
+  .pr-glow{position:absolute;left:-36px;top:-46px;width:220px;height:200px;border-radius:50%;background:radial-gradient(closest-side,rgba(255,190,90,.28),rgba(255,170,70,0));opacity:var(--pr-home,0);transition:opacity 2s;}
+  .pr-roof{position:absolute;left:-6px;right:-6px;top:2px;height:30px;clip-path:polygon(50% 0,100% 100%,0 100%);background:linear-gradient(180deg,#6b7382,#3b414c);}
+  .pr-chim{position:absolute;left:63px;top:6px;width:10px;height:16px;background:linear-gradient(90deg,#4d5460,#6b7382);}
+  .pr-smoke{position:absolute;left:61px;top:-16px;width:14px;height:22px;opacity:var(--pr-home,0);transition:opacity 2s;}
+  .pr-smoke i{position:absolute;left:3px;bottom:0;width:8px;height:8px;border-radius:50%;background:rgba(220,228,238,.55);animation:prsmoke 3.3s ease-out infinite;}
+  .pr-wall{position:absolute;left:6px;right:6px;top:30px;bottom:6px;background:linear-gradient(90deg,#d6dce3,#eef2f6 45%,#cfd6de);}
+  .pr-win{position:absolute;top:39px;width:19px;height:16px;border-radius:2px;background:#1b2433;box-shadow:inset 0 0 0 2px #9aa4af;overflow:hidden;}
+  .pr-win.l{left:13px;}
+  .pr-win.r{right:13px;}
+  .pr-win i{position:absolute;inset:2px;background:linear-gradient(180deg,#ffe29a,#ffb347);opacity:var(--pr-home,0);transition:opacity 1.6s;animation:prwin 4s ease-in-out infinite;}
+  .pr-win::after{content:'';position:absolute;left:50%;top:0;bottom:0;width:2px;margin-left:-1px;background:#9aa4af;}
+  .pr-door{position:absolute;left:37px;top:49px;width:18px;bottom:6px;border-radius:2px 2px 0 0;background:linear-gradient(180deg,#8a5a3c,#6b4329);}
+  .pr-door i{position:absolute;left:4px;right:4px;top:4px;height:6px;border-radius:2px;background:#ffd27a;opacity:var(--pr-home,0);transition:opacity 1.6s;}
+  .pr-ground{position:absolute;left:-10px;right:-10px;bottom:0;height:7px;border-radius:3px;background:linear-gradient(180deg,#5a8a4c,#3d6334);}
+  .pr-path{position:absolute;left:112px;top:77px;width:20px;height:0;border-top:2px dashed rgba(143,179,217,.65);opacity:calc(1 - var(--pr-home,0));transition:opacity 1.2s;}
+  .pr-ava{position:absolute;inset:0;border-radius:50%;overflow:hidden;box-shadow:0 0 0 2px var(--pr-ring,#8fb3d9),0 4px 10px rgba(0,0,0,.45);background:linear-gradient(135deg,#3a4a66,#2a3140);}
+  .pr-ava img{width:100%;height:100%;object-fit:cover;display:block;}
+  .pr-ava b{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font:700 18px/1 Roboto,Arial,sans-serif;color:#e9ecf1;}
+  @keyframes prsmoke{0%{transform:translate(0,0) scale(.5);opacity:0;}20%{opacity:.8;}100%{transform:translate(8px,-22px) scale(1.6);opacity:0;}}
+  @keyframes prwin{0%,100%{filter:brightness(1);}45%{filter:brightness(.88);}60%{filter:brightness(1.08);}}
+  .pr-path{left:110px;width:26px;}
+  .pr-path.d{top:32px;opacity:calc(1 - var(--pr-d,0));}
+  .pr-path.g{top:86px;opacity:calc(1 - var(--pr-g,0));}
+  .pr-ava.g{box-shadow:0 0 0 2px var(--pr-ring2,#8fb3d9),0 4px 10px rgba(0,0,0,.45);background:linear-gradient(135deg,#5a4a7a,#2f2a44);}
+  .pr-ava b{font-size:15px;}
+  .pr-row{gap:0;}
+  .pr-row .hd-name{font-size:12px;line-height:1.15;}
+  .pr-row .pr-st{font-size:16.5px;line-height:1.2;}
+  .pr-row .pr-sub{font-size:11px;line-height:1.25;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+grid_options:
+  columns: 12
+  rows: auto
+show_icon: false
+show_name: false
+styles:
+  card:
+    - height: 120px
+    - border-radius: 24px
+    - overflow: hidden
+    - padding: '0'
+    - background: rgba(140,170,200,0.10)
+    - backdrop-filter: blur(16px) saturate(170%)
+    - -webkit-backdrop-filter: blur(16px) saturate(170%)
+    - border: 1px solid rgba(255,255,255,0.16)
+    - box-shadow: 0 8px 30px rgba(0,0,0,0.40), inset 0 1px 0 rgba(255,255,255,0.22)
+    - --pr-home: "[[[ const g = states['person.personne_2']; return String(((entity && entity.state === 'home') || (g && g.state === 'home')) ? 1 : 0); ]]]"
+    - --pr-d: "[[[ return String((entity && entity.state === 'home') ? 1 : 0); ]]]"
+    - --pr-g: "[[[ const g = states['person.personne_2']; return String((g && g.state === 'home') ? 1 : 0); ]]]"
+    - --pr-ring: "[[[ return (entity && entity.state === 'home') ? '#4cc9a8' : '#8fb3d9'; ]]]"
+    - --pr-ring2: "[[[ const g = states['person.personne_2']; return (g && g.state === 'home') ? '#4cc9a8' : '#8fb3d9'; ]]]"
+  custom_fields:
+    ava:
+      - position: absolute
+      - left: 104px
+      - top: 16px
+      - width: 34px
+      - height: 34px
+      - z-index: '2'
+      - transform: translateX(calc((1 - var(--pr-d, 0)) * 30px))
+      - transition: transform 1.4s ease
+    info:
+      - position: absolute
+      - inset: '0'
+      - width: 100%
+      - height: 100%
+    scene:
+      - position: absolute
+      - inset: '0'
+      - width: 100%
+      - height: 100%
+    ava2:
+      - position: absolute
+      - left: 104px
+      - top: 70px
+      - width: 34px
+      - height: 34px
+      - z-index: '2'
+      - transform: translateX(calc((1 - var(--pr-g, 0)) * 30px))
+      - transition: transform 1.4s ease
+  grid:
+    - position: relative
+tap_action:
+  action: more-info
+triggers_update:
+  - zone.home
+  - person.personne_2

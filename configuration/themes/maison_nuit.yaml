@@ -1,0 +1,57 @@
+# ══════════════════════════════════════════════════════════════════════
+#  Thème « maison_nuit » — ardoise sombre, accents cyan / ambre
+#
+#  1. Copiez ce fichier dans /config/themes/maison_nuit.yaml
+#     (avec l'app File editor ou Studio Code Server).
+#  2. Dans /config/configuration.yaml, ajoutez une seule fois :
+#
+#       frontend:
+#         themes: !include_dir_merge_named themes
+#
+#  3. Redémarrez Home Assistant (ou Outils → Actions → frontend.reload_themes
+#     si ce bloc existait déjà).
+#  4. Le tableau « Ma Maison » l'applique tout seul (thème défini en mode
+#     sombre : activez le mode sombre dans votre profil si besoin).
+# ══════════════════════════════════════════════════════════════════════
+maison_nuit:
+  modes:
+    dark:
+      mn-cyan: '#7cc8e0'
+      mn-ambre: '#ffcf7a'
+      mn-orange: '#ff9b5e'
+      mn-vert: '#62d394'
+      mn-rouge: '#ff6b6b'
+      mn-violet: '#a99cff'
+      primary-color: '#7cc8e0'
+      accent-color: '#ff9b5e'
+      primary-text-color: '#eaf1f6'
+      secondary-text-color: '#8c98a9'
+      disabled-text-color: '#566170'
+      text-primary-color: '#0e1319'
+      divider-color: rgba(255, 255, 255, 0.06)
+      primary-background-color: '#0e1319'
+      secondary-background-color: '#151c25'
+      lovelace-background: 'radial-gradient(1100px 520px at 0% -10%, rgba(124, 200, 224, 0.10), transparent 60%), radial-gradient(900px 480px at 100% 0%, rgba(255, 155, 94, 0.06), transparent 55%), #0e1319'
+      card-background-color: '#18202b'
+      ha-card-background: '#18202b'
+      ha-card-border-radius: 18px
+      ha-card-border-width: 0px
+      ha-card-box-shadow: 0 8px 24px rgba(0, 0, 0, 0.28)
+      ha-dialog-surface-background: '#151c25'
+      ha-view-sections-column-gap: 20px
+      ha-view-sections-column-max-width: 520px
+      app-header-background-color: '#0e1319'
+      app-header-text-color: '#eaf1f6'
+      sidebar-background-color: '#0b1016'
+      sidebar-text-color: '#c9d3dd'
+      sidebar-icon-color: '#8c98a9'
+      sidebar-selected-text-color: '#7cc8e0'
+      sidebar-selected-icon-color: '#7cc8e0'
+      state-icon-color: '#8c98a9'
+      state-light-active-color: '#ffcf7a'
+      state-switch-active-color: '#7cc8e0'
+      state-cover-active-color: '#ff9b5e'
+      state-climate-heat-color: '#ff9b5e'
+      state-person-home-color: '#62d394'
+      graph-color-1: '#7cc8e0'
+      energy-grid-consumption-color: '#7cc8e0'

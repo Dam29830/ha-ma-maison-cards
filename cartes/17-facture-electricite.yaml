@@ -1,0 +1,92 @@
+# ══════════════════════════════════════════════════════════════════════
+#  Ma Maison · Facture d'électricité du mois
+#  Estimation de la facture du mois et dépense à date, calculées depuis le Linky et vos tarifs.
+#
+#  Entités utilisées (exemples à remplacer par les vôtres) :
+#    - input_number.electricite_facture_estimee_du_mois
+#    - input_number.electricite_depense_ce_mois_ci
+#  Nécessite : button-card (HACS) + intégration ha-linky + entrées « Électricité » et leur automatisation (package)
+#  À coller dans : ✏️ Modifier le tableau de bord → Ajouter une carte
+#  → « Manuel » (tout en bas de la liste), puis remplacez le contenu.
+# ══════════════════════════════════════════════════════════════════════
+type: custom:button-card
+entity: input_number.electricite_facture_estimee_du_mois
+name: Facture du mois
+custom_fields:
+  info: |-
+    [[[
+    const S = id => { const s = states[id]; const v = s ? parseFloat(s.state) : NaN; return isNaN(v) ? null : v; };
+    const e = S('input_number.electricite_facture_estimee_du_mois'), d = S('input_number.electricite_depense_ce_mois_ci');
+    const eur = v => v.toLocaleString('fr-FR', {minimumFractionDigits: 2, maximumFractionDigits: 2}) + ' €';
+    const now = new Date();
+    const dim = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
+    const day = now.getDate();
+    const tp = (day - 0.5) / dim;
+    const r = (e && d !== null) ? Math.max(0, Math.min(1, d / e)) : 0;
+    const month = now.toLocaleDateString('fr-FR', {month: 'long'});
+    const de = /^[aeiouéèêh]/i.test(month) ? "d'" : 'de ';
+    const pc = Math.round(r * 100);
+    const ahead = r > tp + 0.08;
+    const fill = ahead ? 'linear-gradient(90deg,#ff9a3d,#ff5f45)' : 'linear-gradient(90deg,#ffb13d,#ffd27a)';
+    return `<div class='hd-info' style='left:94px;right:14px;top:13px'><div class='hd-name'>Facture ${de}${month}</div>`
+     + `<div class='hd-title'>${d !== null ? eur(d) : '—'} <span style='font-size:13px;font-weight:500;color:var(--secondary-text-color)'>dépensés</span></div>`
+     + `<div class='hd-sub'>Estimation fin de mois : <b>${e !== null ? eur(e) : '—'}</b></div>`
+     + `<div style='position:relative;height:10px;margin-top:10px;border-radius:5px;background:rgba(255,255,255,.12)'>`
+     + `<div style='position:absolute;left:0;top:0;bottom:0;width:${(r * 100).toFixed(1)}%;border-radius:5px;background:${fill};box-shadow:0 0 10px rgba(255,170,80,.45)'></div>`
+     + `<div style='position:absolute;top:-4px;bottom:-4px;left:${(tp * 100).toFixed(1)}%;width:2px;margin-left:-1px;border-radius:1px;background:#fff;box-shadow:0 0 6px rgba(255,255,255,.8)'></div></div>`
+     + `<div class='hd-sub' style='margin-top:6px;font-size:11.5px'>${pc} % de l'estimation · jour ${day} sur ${dim}</div></div>`;
+    ]]]
+  scene: <div class="hd-scene"><div class="fb"><div class="fb-paper"><i></i><i></i><i></i><i></i><b></b></div><div class="fb-tear"></div></div></div>
+extra_styles: |-
+  .hd-scene{position:absolute;inset:0;overflow:hidden;pointer-events:none;}
+  .hd-info{position:absolute;display:flex;flex-direction:column;gap:2px;text-align:left;white-space:normal;min-width:0;}
+  .hd-name{font-size:13px;font-weight:600;line-height:1.25;color:var(--secondary-text-color);opacity:.92;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .hd-name.w{white-space:normal;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;}
+  .hd-title{font-size:22px;font-weight:600;line-height:1.15;color:var(--primary-text-color);transition:color .8s;}
+  .hd-title.s{font-size:15.5px;}
+  .hd-sub{font-size:12.5px;line-height:1.3;color:var(--secondary-text-color);}
+  .hd-sub b{color:var(--primary-text-color);font-weight:600;}
+  @media (prefers-reduced-motion: reduce){.hd-scene *,.hd-scene *::before,.hd-scene *::after{animation:none !important;}}
+  .fb{position:absolute;left:18px;top:24px;width:58px;height:92px;filter:drop-shadow(0 5px 8px rgba(0,0,0,.45));animation:fbfloat 5s ease-in-out infinite;}
+  .fb-paper{position:absolute;left:0;right:0;top:0;bottom:6px;border-radius:4px 4px 0 0;background:linear-gradient(180deg,#ffffff,#eef1f4);}
+  .fb-paper i{position:absolute;left:8px;height:3px;border-radius:2px;background:#c9d0d8;}
+  .fb-paper i:nth-child(1){top:11px;right:18px;}
+  .fb-paper i:nth-child(2){top:20px;right:10px;}
+  .fb-paper i:nth-child(3){top:29px;right:22px;}
+  .fb-paper i:nth-child(4){top:38px;right:14px;}
+  .fb-paper b{position:absolute;left:8px;right:8px;bottom:11px;height:15px;border-radius:3px;background:linear-gradient(90deg,#ffd27a,#ffb13d);}
+  .fb-tear{position:absolute;left:0;right:0;bottom:0;height:7px;background:linear-gradient(135deg,#eef1f4 33%,transparent 33%) 0 0/8px 7px repeat-x,linear-gradient(225deg,#eef1f4 33%,transparent 33%) 0 0/8px 7px repeat-x;}
+  @keyframes fbfloat{0%,100%{transform:translateY(0) rotate(-2deg);}50%{transform:translateY(-4px) rotate(1deg);}}
+grid_options:
+  columns: 12
+  rows: auto
+show_icon: false
+show_name: false
+styles:
+  card:
+    - height: 146px
+    - border-radius: 24px
+    - overflow: hidden
+    - padding: '0'
+    - background: rgba(140,170,200,0.10)
+    - backdrop-filter: blur(16px) saturate(170%)
+    - -webkit-backdrop-filter: blur(16px) saturate(170%)
+    - border: 1px solid rgba(255,255,255,0.16)
+    - box-shadow: 0 8px 30px rgba(0,0,0,0.40), inset 0 1px 0 rgba(255,255,255,0.22)
+  custom_fields:
+    info:
+      - position: absolute
+      - inset: '0'
+      - width: 100%
+      - height: 100%
+    scene:
+      - position: absolute
+      - inset: '0'
+      - width: 100%
+      - height: 100%
+  grid:
+    - position: relative
+tap_action:
+  action: more-info
+triggers_update:
+  - input_number.electricite_depense_ce_mois_ci
