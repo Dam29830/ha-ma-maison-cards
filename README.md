@@ -17,7 +17,7 @@ Un tableau de bord sombre et vivant pour Home Assistant : le ciel suit la vraie 
 
 ## Démarrage rapide
 
-[![Ouvrir le dépôt dans HACS](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=Dam29830&repository=ha-ma-maison-cards&category=plugin)
+<a href="https://my.home-assistant.io/redirect/hacs_repository/?owner=Dam29830&repository=ha-ma-maison-cards&category=plugin"><img src="https://my.home-assistant.io/badges/hacs_repository.svg" alt="Ouvrir le dépôt dans HACS" align="absmiddle"></a>&nbsp;<a href="https://ko-fi.com/dam29830"><img src="https://img.shields.io/badge/Ko--fi-Offrir%20un%20caf%C3%A9-FF5E5B?logo=kofi&logoColor=white" alt="Offrir un café sur Ko-fi" align="absmiddle"></a>
 
 1. Dans **HACS**, téléchargez **Ma Maison** (bouton ci-dessus), puis **[button-card](https://github.com/custom-cards/button-card)** et **[card-mod](https://github.com/thomasloven/lovelace-card-mod)**.
 2. *Paramètres → Tableaux de bord → Ajouter un tableau de bord*, puis choisissez **Ma Maison** dans la liste.
@@ -36,10 +36,10 @@ Sur iPhone ou sur iPad, deux tableaux tout prêts vous attendent : [versions iPh
 - [Aperçu du tableau complet](#aperçu-du-tableau-complet)
 - [Versions iPhone et iPad](#versions-iphone-et-ipad)
 - [Les cartes](#les-cartes)
+- [Soutenir le projet](#soutenir-le-projet)
 - [Installation](#installation) : [le tableau automatique](#le-tableau-automatique-recommandé) · [à la main](#installation-à-la-main) · [guide pas à pas](INSTALLATION.md)
 - [Entités à remplacer](#entités-à-remplacer)
 - [Personnaliser](#personnaliser)
-- [Soutenir le projet](#soutenir-le-projet)
 - [Crédits](#crédits)
 
 ## Aperçu du tableau complet
@@ -97,6 +97,14 @@ Chaque fichier du dossier [`cartes/`](cartes) est une carte prête à coller. En
 | <img src="images/cartes/17-facture-electricite.png" alt="Facture d&#x27;électricité du mois" width="300"> | **Facture d'électricité du mois** · [`17-facture-electricite.yaml`](cartes/17-facture-electricite.yaml)<br>Estimation de la facture du mois et dépense à date, calculées depuis le Linky et vos tarifs.<br><sub>Nécessite : button-card (HACS) + intégration ha-linky + entrées « Électricité » et leur automatisation (package)</sub> |
 | <img src="images/cartes/19-poubelle-jaune.png" alt="Poubelle jaune (emballages)" width="300"> | **Poubelle jaune (emballages)** · [`19-poubelle-jaune.yaml`](cartes/19-poubelle-jaune.yaml)<br>Compte à rebours jusqu'à la prochaine collecte, alerte la veille, report des jours fériés, envol animé du bac quand il y a du vent ; appui = « bac rangé à l'abri » pour la journée.<br><sub>Nécessite : button-card (HACS) + vent max prévu, input_datetime et script poubelle (package)</sub> |
 | <img src="images/cartes/20-poubelle-bleue.png" alt="Poubelle bleue (ordures ménagères)" width="300"> | **Poubelle bleue (ordures ménagères)** · [`20-poubelle-bleue.yaml`](cartes/20-poubelle-bleue.yaml)<br>Même principe que la poubelle jaune, avec son propre calendrier et son animation.<br><sub>Nécessite : button-card (HACS) + vent max prévu, input_datetime et script poubelle (package)</sub> |
+
+## Soutenir le projet
+
+Les cartes sont gratuites et le resteront. Si elles vous plaisent, vous pouvez offrir un café : les dons servent à acheter de nouveaux appareils connectés pour créer de nouvelles cartes, gratuites elles aussi.
+
+**Prochaines cartes** : un robot tondeuse et une machine à café. Une idée d'appareil à animer ? Dites-le dans votre message.
+
+[![Offrir un café sur Ko-fi](https://img.shields.io/badge/Ko--fi-Offrir%20un%20caf%C3%A9-FF5E5B?logo=kofi&logoColor=white)](https://ko-fi.com/dam29830)
 
 ## Installation
 
@@ -252,12 +260,6 @@ node outils/tester.mjs tests/maison-fictive.json '{}' iphone   # génère le tab
 ```
 
 Les entités d'exemple des tableaux sont celles que la stratégie remplace : gardez-les telles quelles dans `dashboard/`.
-
-## Soutenir le projet
-
-Les cartes sont gratuites et le resteront. Si elles vous plaisent, vous pouvez offrir un café : les dons servent à acheter de nouveaux appareils connectés pour créer de nouvelles cartes, gratuites elles aussi. Une idée d'appareil à animer ? Dites-le dans votre message.
-
-[![Offrir un café sur Ko-fi](https://img.shields.io/badge/Ko--fi-Offrir%20un%20caf%C3%A9-FF5E5B?logo=kofi&logoColor=white)](https://ko-fi.com/dam29830)
 
 ## Crédits
 - Damien Joulou-Bénardeau
