@@ -17,7 +17,7 @@ Un tableau de bord sombre et vivant pour Home Assistant : le ciel suit la vraie 
 
 ## Démarrage rapide
 
-<a href="https://my.home-assistant.io/redirect/hacs_repository/?owner=Dam29830&repository=ha-ma-maison-cards&category=plugin"><img src="https://my.home-assistant.io/badges/hacs_repository.svg" alt="Ouvrir le dépôt dans HACS" align="absmiddle"></a>&nbsp;<a href="https://ko-fi.com/dam29830"><img src="https://img.shields.io/badge/Ko--fi-Offrir%20un%20caf%C3%A9-FF5E5B?logo=kofi&logoColor=white" alt="Offrir un café sur Ko-fi" align="absmiddle"></a>
+<a href="https://my.home-assistant.io/redirect/hacs_repository/?owner=Dam29830&repository=ha-ma-maison-cards&category=plugin"><img src="https://my.home-assistant.io/badges/hacs_repository.svg" alt="Ouvrir le dépôt dans HACS" align="absmiddle"></a>&nbsp;<a href="https://ko-fi.com/dam29830"><img src="images/offrir-un-cafe.svg" alt="Offrir un café sur Ko-fi" height="40" align="absmiddle"></a>
 
 1. Dans **HACS**, téléchargez **Ma Maison** (bouton ci-dessus), puis **[button-card](https://github.com/custom-cards/button-card)** et **[card-mod](https://github.com/thomasloven/lovelace-card-mod)**.
 2. *Paramètres → Tableaux de bord → Ajouter un tableau de bord*, puis choisissez **Ma Maison** dans la liste.
@@ -104,7 +104,9 @@ Les cartes sont gratuites et le resteront. Si elles vous plaisent, vous pouvez o
 
 **Prochaines cartes** : un robot tondeuse et une machine à café. Une idée d'appareil à animer ? Dites-le dans votre message.
 
-[![Offrir un café sur Ko-fi](https://img.shields.io/badge/Ko--fi-Offrir%20un%20caf%C3%A9-FF5E5B?logo=kofi&logoColor=white)](https://ko-fi.com/dam29830)
+<p align="center">
+  <a href="https://ko-fi.com/dam29830"><img src="images/offrir-un-cafe.svg" alt="Offrir un café sur Ko-fi" width="300"></a>
+</p>
 
 ## Installation
 
